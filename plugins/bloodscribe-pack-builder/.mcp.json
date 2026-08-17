@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "bloodscribe-pack-builder": {
+      "type": "http",
+      "url": "https://bloodscribe.app/mcp"
+    }
+  }
+}

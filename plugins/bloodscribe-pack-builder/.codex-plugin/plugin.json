@@ -1,0 +1,36 @@
+{
+  "name": "bloodscribe-pack-builder",
+  "version": "1.1.0",
+  "description": "Create and validate BloodScribe characters with your own AI and the public Pack Builder MCP.",
+  "author": {
+    "name": "Pixel Dice Studio",
+    "url": "https://bloodscribe.app"
+  },
+  "homepage": "https://bloodscribe.app/pack-builder",
+  "repository": "https://github.com/Pixel-Dice-Studio/bloodscribe-pack-builder",
+  "license": "CC0-1.0",
+  "keywords": [
+    "bloodscribe",
+    "pack-builder",
+    "characters",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "BloodScribe Pack Builder",
+    "shortDescription": "Create validated BloodScribe characters",
+    "longDescription": "Guides your AI through character requirements, mechanic recipes, and deterministic Pack Builder validation without calling BloodScribe's internal AI.",
+    "developerName": "Pixel Dice Studio",
+    "category": "DeveloperTools",
+    "capabilities": [
+      "Read"
+    ],
+    "websiteURL": "https://bloodscribe.app/pack-builder",
+    "defaultPrompt": [
+      "Create a BloodScribe character from my idea.",
+      "Validate this BloodScribe character JSON.",
+      "Find mechanics for this character ability."
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}

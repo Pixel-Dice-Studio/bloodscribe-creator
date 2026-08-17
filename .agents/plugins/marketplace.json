@@ -1,0 +1,20 @@
+{
+  "name": "bloodscribe-pack-builder",
+  "interface": {
+    "displayName": "BloodScribe Pack Builder"
+  },
+  "plugins": [
+    {
+      "name": "bloodscribe-pack-builder",
+      "source": {
+        "source": "local",
+        "path": "./plugins/bloodscribe-pack-builder"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "DeveloperTools"
+    }
+  ]
+}

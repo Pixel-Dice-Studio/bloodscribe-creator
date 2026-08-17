@@ -1,0 +1,16 @@
+{
+  "name": "bloodscribe-pack-builder",
+  "description": "BloodScribe Pack Builder authoring tools",
+  "owner": {
+    "name": "Pixel Dice Studio"
+  },
+  "plugins": [
+    {
+      "name": "bloodscribe-pack-builder",
+      "source": "./plugins/bloodscribe-pack-builder",
+      "description": "Guided character authoring with the public BloodScribe MCP",
+      "version": "1.1.0",
+      "category": "development"
+    }
+  ]
+}
