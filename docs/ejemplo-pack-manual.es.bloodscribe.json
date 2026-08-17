@@ -1,0 +1,442 @@
+{
+  "schemaVersion": "bloodscribe-v3",
+  "id": "demo:manual-autoria",
+  "key": "manual-autoria",
+  "version": "1.0.0",
+  "locale": "es",
+  "name": "Pack de demostración manual",
+  "description": "Ejemplo mínimo completo con equipo, personaje, composición, votación, regla y cuento.",
+  "author": "Autor de ejemplo",
+  "legal": {
+    "license": "CC0-1.0",
+    "disclaimer": "Contenido inventado para documentación."
+  },
+  "links": [],
+  "books": [
+    {
+      "id": "book:demo:manual-autoria",
+      "name": "Libro de demostración",
+      "description": "Agrupa el cuento y sus entidades.",
+      "collection": {
+        "id": "collection:demo",
+        "name": "Colección de demostración",
+        "description": "Colección inventada para la guía pública."
+      },
+      "origin": "custom",
+      "author": "Autor de ejemplo",
+      "taleIds": [
+        "tale:demo:manual-autoria"
+      ],
+      "characterIds": [
+        "character:demo:vigia"
+      ],
+      "gameRuleIds": [
+        "rule:demo:composition:composicion",
+        "rule:demo:voting:votacion",
+        "rule:demo:other:anuncio"
+      ],
+      "teamIds": [
+        "team:demo:habitantes"
+      ]
+    }
+  ],
+  "teams": [
+    {
+      "teamId": "team:demo:habitantes",
+      "terms": {
+        "singular": "Habitante",
+        "plural": "Habitantes"
+      },
+      "description": "Personajes buenos que forman el núcleo del reparto.",
+      "defaults": {
+        "role": "core",
+        "allegiance": {
+          "default": "good",
+          "allowed": [
+            "good"
+          ]
+        },
+        "entryMode": {
+          "default": "cast",
+          "allowed": [
+            "cast"
+          ]
+        },
+        "victory": {
+          "type": "withCurrentAllegiance"
+        }
+      },
+      "colors": {
+        "text": {
+          "onLight": "#155E75",
+          "onDark": "#A5F3FC"
+        },
+        "surface": "#2563EB",
+        "border": "#1D4ED8",
+        "reminderSurface": "#1E3A8A",
+        "gradient": {
+          "from": "#2563EB",
+          "to": "#4F46E5"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "id": "character:demo:vigia",
+      "teamId": "team:demo:habitantes",
+      "gameplay": {
+        "role": "core",
+        "allegiance": {
+          "default": "good",
+          "allowed": [
+            "good"
+          ]
+        },
+        "entryMode": {
+          "default": "cast",
+          "allowed": [
+            "cast"
+          ]
+        },
+        "victory": {
+          "type": "withCurrentAllegiance"
+        }
+      },
+      "info": {
+        "name": "Vigía",
+        "ability": "Cada noche recibes un número de demostración.",
+        "howToPlay": "Usa la información como punto de partida para conversar.",
+        "howToRun": "Despierta al Vigía y muéstrale el número calculado por su mecánica."
+      },
+      "rules": {
+        "setup": false,
+        "wake": {
+          "first": true,
+          "other": true
+        },
+        "reminderTokens": [],
+        "cues": [
+          {
+            "when": {
+              "window": "night",
+              "occurrence": {
+                "type": "relative",
+                "value": "first"
+              }
+            },
+            "audience": "storyteller",
+            "body": "Despierta al Vigía y entrega su información."
+          }
+        ],
+        "mechanics": [
+          {
+            "mechanicId": "mechanic:demo:vigia:informacion:1",
+            "tags": [
+              "night-information"
+            ],
+            "when": {
+              "window": "night",
+              "cadence": "each"
+            },
+            "input": {
+              "kind": "none"
+            },
+            "conditions": [],
+            "effects": [
+              {
+                "type": "emitInformation",
+                "value": {
+                  "type": "literal",
+                  "value": 1
+                },
+                "presentation": {
+                  "kind": "number",
+                  "title": "Valor de demostración"
+                },
+                "delivery": {
+                  "audience": {
+                    "type": "actor"
+                  }
+                }
+              }
+            ],
+            "usage": {
+              "scope": "repeat",
+              "consumeOn": "resolution"
+            },
+            "policies": []
+          }
+        ]
+      }
+    }
+  ],
+  "gameRules": [
+    {
+      "entityKind": "gameRule",
+      "id": "rule:demo:composition:composicion",
+      "visibility": "base",
+      "ruleKind": "composition",
+      "systemType": "composition",
+      "name": "Composición de demostración",
+      "info": {
+        "name": "Composición de demostración",
+        "ability": "Define una partida mínima de una persona."
+      },
+      "categoryId": "rule-category:demo:composicion",
+      "category": {
+        "id": "rule-category:demo:composicion",
+        "terms": {
+          "singular": "Composición",
+          "plural": "Composiciones"
+        }
+      },
+      "bookIds": [
+        "book:demo:manual-autoria"
+      ],
+      "composition": {
+        "enforcement": "exact",
+        "playerCounts": {
+          "1": {
+            "good": 1,
+            "goodSupport": 0,
+            "neutral": 0,
+            "evilSupport": 0,
+            "evil": 0
+          }
+        },
+        "rosterMinimums": {
+          "good": 1,
+          "goodSupport": 0,
+          "neutral": 0,
+          "evilSupport": 0,
+          "evil": 0
+        },
+        "maxExtraPlayers": 0
+      },
+      "rules": {
+        "setup": false,
+        "wake": {
+          "first": false,
+          "other": false
+        },
+        "cues": [],
+        "mechanics": []
+      }
+    },
+    {
+      "entityKind": "gameRule",
+      "id": "rule:demo:voting:votacion",
+      "visibility": "public",
+      "ruleKind": "voting",
+      "systemType": "voting",
+      "name": "Votación pública",
+      "info": {
+        "name": "Votación pública",
+        "ability": "Nominaciones públicas y votación registrada por el Narrador."
+      },
+      "categoryId": "rule-category:common:voting-system",
+      "category": {
+        "id": "rule-category:common:voting-system",
+        "terms": {
+          "singular": "Regla de votación",
+          "plural": "Reglas de votación"
+        },
+        "selection": {
+          "maxActive": 1
+        }
+      },
+      "bookIds": [
+        "book:demo:manual-autoria"
+      ],
+      "voting": {
+        "version": 1,
+        "nomination": {
+          "mode": "public",
+          "nomineeLifeState": "any",
+          "allowSelfNomination": false,
+          "maxPerNominatorPerDay": 1,
+          "maxPerNomineePerDay": 1
+        },
+        "candidates": {
+          "source": "nominated",
+          "lifeState": "any"
+        },
+        "ballot": {
+          "shape": "approvalPerNominee",
+          "enteredBy": "storyteller",
+          "pace": "simultaneous",
+          "reveal": "live",
+          "visibility": "public",
+          "electorate": {
+            "kind": "standard",
+            "lastBreathsPerPlayer": 1
+          },
+          "abstention": "allowed"
+        },
+        "resolution": {
+          "threshold": {
+            "kind": "fraction",
+            "base": "livingPlayers",
+            "numerator": 1,
+            "denominator": 2,
+            "comparison": "atLeast"
+          },
+          "winner": "highest",
+          "onTie": {
+            "kind": "spareAll"
+          },
+          "onNoQualifier": {
+            "kind": "spareAll"
+          }
+        },
+        "timing": {
+          "open": "perNomination",
+          "resolve": "dusk"
+        },
+        "disclosure": {
+          "publicResult": "totals"
+        }
+      },
+      "rules": {
+        "setup": false,
+        "wake": {
+          "first": false,
+          "other": false
+        },
+        "cues": [],
+        "mechanics": []
+      }
+    },
+    {
+      "entityKind": "gameRule",
+      "id": "rule:demo:other:anuncio",
+      "visibility": "public",
+      "ruleKind": "general",
+      "systemType": "other",
+      "name": "Anuncio al amanecer",
+      "info": {
+        "name": "Anuncio al amanecer",
+        "ability": "El Narrador realiza un anuncio de demostración al amanecer."
+      },
+      "categoryId": "rule-category:common:generic",
+      "category": {
+        "id": "rule-category:common:generic",
+        "terms": {
+          "singular": "Regla genérica",
+          "plural": "Reglas genéricas"
+        }
+      },
+      "bookIds": [
+        "book:demo:manual-autoria"
+      ],
+      "rules": {
+        "setup": false,
+        "wake": {
+          "first": false,
+          "other": false
+        },
+        "cues": [],
+        "mechanics": [
+          {
+            "mechanicId": "mechanic:demo:anuncio:amanecer:1",
+            "tags": [
+              "dawn-announcement"
+            ],
+            "when": {
+              "window": "dawn",
+              "cadence": "each"
+            },
+            "input": {
+              "kind": "none"
+            },
+            "conditions": [],
+            "effects": [
+              {
+                "type": "manualInstruction",
+                "instruction": "Realiza el anuncio público descrito por la regla."
+              }
+            ],
+            "usage": {
+              "scope": "repeat",
+              "consumeOn": "resolution"
+            },
+            "policies": []
+          }
+        ]
+      }
+    }
+  ],
+  "tales": [
+    {
+      "id": "tale:demo:manual-autoria",
+      "bookId": "book:demo:manual-autoria",
+      "category": "tale",
+      "author": "Autor de ejemplo",
+      "text": {
+        "name": "Una noche de demostración",
+        "tagline": "Un cuento mínimo para aprender el formato.",
+        "description": "Incluye un personaje y las reglas de composición, votación y anuncio."
+      },
+      "teams": [
+        {
+          "teamId": "team:demo:habitantes",
+          "terms": {
+            "singular": "Habitante",
+            "plural": "Habitantes"
+          },
+          "description": "Personajes buenos que forman el núcleo del reparto.",
+          "defaults": {
+            "role": "core",
+            "allegiance": {
+              "default": "good",
+              "allowed": [
+                "good"
+              ]
+            },
+            "entryMode": {
+              "default": "cast",
+              "allowed": [
+                "cast"
+              ]
+            },
+            "victory": {
+              "type": "withCurrentAllegiance"
+            }
+          },
+          "colors": {
+            "text": {
+              "onLight": "#155E75",
+              "onDark": "#A5F3FC"
+            },
+            "surface": "#2563EB",
+            "border": "#1D4ED8",
+            "reminderSurface": "#1E3A8A",
+            "gradient": {
+              "from": "#2563EB",
+              "to": "#4F46E5"
+            }
+          }
+        }
+      ],
+      "characterIds": [
+        "character:demo:vigia"
+      ],
+      "gameRuleBindings": [
+        {
+          "ruleId": "rule:demo:composition:composicion",
+          "activation": "automatic"
+        },
+        {
+          "ruleId": "rule:demo:other:anuncio",
+          "activation": "setupChoice"
+        }
+      ],
+      "votingRuleId": "rule:demo:voting:votacion",
+      "presentation": {
+        "theme": "verdigris",
+        "backdrop": "astrolabe"
+      }
+    }
+  ]
+}

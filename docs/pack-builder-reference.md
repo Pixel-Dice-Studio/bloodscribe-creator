@@ -1,6 +1,6 @@
 # Referencia del Pack Builder: personajes y reglas de partida
 
-Esta es la guía de autoría para crear contenido desde `/pack-builder`. Explica qué debe declarar un pack, qué opciones ofrece cada primitiva y cómo se combinan. La referencia de bajo nivel del lenguaje de expresiones está en [`referencia-ast-declarativo.md`](referencia-ast-declarativo.md).
+Esta referencia enumera las opciones que ofrece el editor. Para aprender a construir un pack completo paso a paso, consulta el [`manual de autoría manual`](manual-autoria-packs.es.md). La referencia de bajo nivel del lenguaje de expresiones está en [`referencia-ast-declarativo.md`](referencia-ast-declarativo.md).
 
 Las fuentes de verdad ejecutables dentro del código de BloodScribe son:
 
