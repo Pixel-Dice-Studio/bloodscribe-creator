@@ -1,10 +1,22 @@
 # BloodScribe Pack Builder plugin
 
+[Español](#español) · [English](#english)
+
 ## Español
 
 Este repositorio distribuye el plugin `bloodscribe-pack-builder`. El plugin guía a tu propia IA para crear personajes con las recetas y la validación determinista del MCP público. Nunca llama ni permite acceder a la IA interna de BloodScribe.
 
 El endpoint es `https://bloodscribe.app/mcp`. Durante la instalación o el primer uso, según el cliente, BloodScribe se abrirá en el navegador para que inicies sesión y autorices la conexión; no necesitas copiar un bearer token.
+
+### Documentación
+
+- [Configurar el MCP en ChatGPT / Codex](#instalar-en-chatgpt--codex)
+- [Configurar el MCP en Claude Code](#instalar-en-claude-code)
+- [Configurar manualmente el MCP y el skill](#configuración-manual)
+- [Crear personajes: matriz de mecánicas, recetas y ejemplos](./docs/pack-builder-character-authoring.es.md)
+- [Usar el Pack Builder y componer mecánicas](./docs/pack-builder-reference.md)
+- [Consultar expresiones, relaciones, filtros y agregados](./docs/referencia-ast-declarativo.md)
+- [Ver personajes reales de ejemplo](#ejemplos-reales)
 
 ### Instalar en ChatGPT / Codex
 
@@ -37,6 +49,16 @@ Los [packs oficiales de Grimm](https://github.com/Pixel-Dice-Studio/bloodscribe-
 This repository distributes the `bloodscribe-pack-builder` plugin. The plugin guides your own AI through public MCP recipes and deterministic validation. It never calls or exposes BloodScribe's internal AI.
 
 The endpoint is `https://bloodscribe.app/mcp`. During installation or first use, depending on the client, BloodScribe opens in the browser so you can sign in and authorize the connection; no bearer token needs to be copied.
+
+### Documentation
+
+- [Configure MCP in ChatGPT / Codex](#install-in-chatgpt--codex)
+- [Configure MCP in Claude Code](#install-in-claude-code)
+- [Configure MCP and the skill manually](#manual-setup)
+- [Create characters: mechanic matrix, recipes, and examples](./docs/pack-builder-character-authoring.en.md)
+- [Use the Pack Builder and compose mechanics (Spanish)](./docs/pack-builder-reference.md)
+- [Reference expressions, relations, filters, and aggregates (Spanish)](./docs/referencia-ast-declarativo.md)
+- [Browse real character examples](#real-examples)
 
 ### Install in ChatGPT / Codex
 
