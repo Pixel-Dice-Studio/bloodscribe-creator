@@ -4,7 +4,7 @@
 
 Este repositorio distribuye el plugin `bloodscribe-pack-builder`. El plugin guía a tu propia IA para crear personajes con las recetas y la validación determinista del MCP público. Nunca llama ni permite acceder a la IA interna de BloodScribe.
 
-El endpoint es `https://bloodscribe.app/mcp`. La primera vez que la IA lo use, BloodScribe se abrirá en el navegador para que inicies sesión y autorices la conexión; no necesitas copiar un bearer token.
+El endpoint es `https://bloodscribe.app/mcp`. Durante la instalación o el primer uso, según el cliente, BloodScribe se abrirá en el navegador para que inicies sesión y autorices la conexión; no necesitas copiar un bearer token.
 
 ### Instalar en ChatGPT / Codex
 
@@ -36,7 +36,7 @@ Los [packs oficiales de Grimm](https://github.com/Pixel-Dice-Studio/bloodscribe-
 
 This repository distributes the `bloodscribe-pack-builder` plugin. The plugin guides your own AI through public MCP recipes and deterministic validation. It never calls or exposes BloodScribe's internal AI.
 
-The endpoint is `https://bloodscribe.app/mcp`. The first time your AI uses it, BloodScribe opens in the browser so you can sign in and authorize the connection; no bearer token needs to be copied.
+The endpoint is `https://bloodscribe.app/mcp`. During installation or first use, depending on the client, BloodScribe opens in the browser so you can sign in and authorize the connection; no bearer token needs to be copied.
 
 ### Install in ChatGPT / Codex
 
