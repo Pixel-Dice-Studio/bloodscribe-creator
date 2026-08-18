@@ -242,6 +242,135 @@ Un equipo proporciona términos, presentación y valores mecánicos predetermina
 | `entryMode.allowed` | Modos de entrada permitidos. |
 | `victory.type` | `withCurrentAllegiance`, `withSide` o `personal` |
 
+Antes de escribir la habilidad, decide estos ejes en este orden:
+
+1. Si entra en el reparto (`cast`), fuera del reparto como participante exiliable (`independent`) o de ambas formas.
+2. Si ocupa un rol `core`, `support` o `independent` en la composición.
+3. Si su alineamiento es `good`, `evil` o `neutral` y a cuáles puede cambiar.
+4. Si gana con su alineamiento actual, con un bando fijo o mediante una condición personal.
+
+`teamId`, el nombre y el texto de habilidad no resuelven ninguna de esas decisiones. En contenido nuevo se declara siempre `entryMode`; `assignment` es únicamente compatibilidad de lectura para packs históricos.
+
+### Perfiles completos habituales
+
+Personaje regular de un bando:
+
+```json
+{
+  "gameplay": {
+    "role": "core",
+    "allegiance": {
+      "default": "good",
+      "allowed": ["good"]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": ["cast"]
+    },
+    "victory": {
+      "type": "withCurrentAllegiance"
+    }
+  }
+}
+```
+
+Viajero o participante temporal: queda fuera del reparto base y del conteo estándar de dos vivos, puede incorporarse durante la partida y es elegible para exilio. Su alineamiento bueno o malvado se asigna de forma secreta al entrar.
+
+```json
+{
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": ["neutral", "good", "evil"]
+    },
+    "entryMode": {
+      "default": "independent",
+      "allowed": ["independent"]
+    },
+    "victory": {
+      "type": "withCurrentAllegiance"
+    }
+  }
+}
+```
+
+Neutral dentro del reparto con victoria personal: ocupa una plaza neutral, cuenta entre los vivos regulares, muere normalmente y no gana automáticamente con bueno ni malvado.
+
+```json
+{
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": ["neutral"]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": ["cast"]
+    },
+    "victory": {
+      "type": "personal",
+      "condition": {
+        "type": "storytellerDecision",
+        "decision": "resolveCharacterPersonalVictory"
+      }
+    }
+  }
+}
+```
+
+La condición `personal` se comprueba al resolver un final. Si cumplirla debe terminar la partida por sí mismo, declara además una mecánica `resolveGameEnd`.
+
+Neutral dentro del reparto que gana siempre con un bando fijo:
+
+```json
+{
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": ["neutral"]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": ["cast"]
+    },
+    "victory": {
+      "type": "withSide",
+      "side": "good"
+    }
+  }
+}
+```
+
+Entrada flexible: el mismo personaje puede comportarse como parte normal del reparto o como participante independiente. El comportamiento efectivo depende del modo elegido para ese jugador.
+
+```json
+{
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": ["neutral", "good", "evil"]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": ["cast", "independent"]
+    },
+    "victory": {
+      "type": "personal",
+      "condition": {
+        "type": "storytellerDecision",
+        "decision": "resolveCharacterPersonalVictory"
+      }
+    }
+  }
+}
+```
+
+Si “Universal” es solo una categoría editorial, usa un `teamId` universal pero conserva `role`, `allegiance`, `entryMode` y `victory` del comportamiento real. No conviertas la etiqueta universal en una rama mecánica.
+
 La composición estándar se deriva de `role` y `allegiance`, no del nombre ni del ID del equipo:
 
 | Alineamiento y rol | Eje de composición |

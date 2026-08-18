@@ -13,12 +13,18 @@ Reply in the user's language.
 
 1. Confirm that `get_mechanic_catalog`, `search_mechanic_recipes`, and `validate_character_proposal` are available. Use the catalog version to detect an obsolete server.
 2. If authentication is required, retry one public MCP tool once so the client starts OAuth. Tell the user to sign in and approve access in the BloodScribe browser page that opens. Never ask them to paste a token into the conversation. If the client cannot start OAuth, direct them to the README's **Manual setup** section; any fallback key belongs only in the client's secure credential settings, never in chat.
-3. Get the pack context from an attached or exported `.bloodscribe.json`. If none is available, collect only the locale, collection, existing opaque IDs, and team IDs needed by the character.
-4. Turn the idea into a mechanical brief. Ask only about choices that change behavior: timing, actor, target, identity mode, usage scope or `keyBy`, duration, visibility, and manual fallback.
-5. Call `search_mechanic_recipes` with the user's intent. Use `get_mechanic_catalog` only when recipes do not cover a required primitive or field.
-6. Build one complete character using opaque invented IDs. Mechanics must come from declared data, never from the character's ID, name, description, edition, or origin.
-7. Call `validate_character_proposal`. On failure, change only the paths listed in `issues` and retry, at most three validation attempts.
-8. Return the valid JSON plus a short automation summary based on `coverage`.
+3. Get the pack context from an attached or exported `.bloodscribe.json`. If none is available, collect only the locale, collection, existing opaque IDs, and each relevant team's ID plus its `role`, `allegiance`, `entryMode`, and `victory` defaults.
+4. Classify the gameplay profile before modeling the ability. If the user's idea does not already answer these points, ask whether the character:
+   - enters the regular cast (`entryMode.default: "cast"`), joins independently and is exile-eligible (`"independent"`), or allows both modes;
+   - counts in a regular composition role (`core` or `support`) or in the neutral role (`independent`);
+   - is good, evil, or neutral, including allowed alignment changes;
+   - wins with its current alignment, with a fixed side, or only through a personal condition.
+5. Use the catalog's `gameplayProfiles` to explain the behavioral consequences and get the user's choice. Never infer the profile from `teamId`, the character name, or ability prose. New proposals must use `entryMode`; never emit the historical `assignment` field.
+6. Turn the ability into a mechanical brief. Ask only about choices that change behavior: timing, actor, target, identity mode, usage scope or `keyBy`, duration, visibility, and manual fallback.
+7. Call `search_mechanic_recipes` with the user's intent. Use `get_mechanic_catalog` when recipes do not cover a required primitive, field, or gameplay profile.
+8. Build one complete character using opaque invented IDs and a complete `gameplay` profile. Mechanics must come from declared data, never from the character's ID, name, description, edition, or origin.
+9. Call `validate_character_proposal`. On failure, change only the paths listed in `issues` and retry, at most three validation attempts.
+10. Return the valid JSON plus a short automation summary based on `coverage`.
 
 ## Unsupported intentions
 
@@ -31,4 +37,6 @@ For every intent whose recipe reports `status: "unsupported"`, list its `missing
 - Never assume installed Grimm characters, teams, translations, or IDs.
 - Never infer mechanics from prose or names.
 - Never silently choose identity semantics, targets, usage keys, durations, or hidden information.
+- Never silently choose `role`, `allegiance`, `entryMode`, or `victory` when the user's intent leaves them ambiguous.
+- Never emit gameplay `assignment`; it exists only to read historical packs.
 - Never store, print, or request MCP tokens or other secrets.

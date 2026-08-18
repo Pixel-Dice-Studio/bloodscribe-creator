@@ -2,8 +2,181 @@
 
 Esta referencia se genera desde el mismo contrato que consume el MCP. Los ejemplos usan IDs inventados.
 
+## Perfil de participación y victoria
+
+Antes de modelar la habilidad, clasifica cómo entra, cuenta y gana el personaje. Si la idea no lo deja claro, la IA debe preguntarlo. `teamId` solo agrupa y presenta contenido; nunca sustituye estos campos. Las propuestas nuevas usan `entryMode`, no el campo histórico `assignment`.
+
+### `regular-aligned` — Personaje regular de un bando
+
+Entra en la bolsa, ocupa una plaza normal y gana con su alineamiento efectivo.
+
+- Cuenta entre los vivos regulares.
+- Muere por los flujos normales y no se exilia.
+
+```json
+{
+  "gameplay": {
+    "role": "core",
+    "allegiance": {
+      "default": "good",
+      "allowed": [
+        "good"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast"
+      ]
+    },
+    "victory": {
+      "type": "withCurrentAllegiance"
+    }
+  }
+}
+```
+
+### `independent-traveller` — Viajero o participante temporal
+
+Entra fuera del reparto base, recibe alineamiento secreto y usa el flujo de exilio.
+
+- No ocupa una plaza del reparto base ni cuenta para el final estándar de dos vivos.
+- Puede añadirse durante la partida y es elegible para exilio.
+
+```json
+{
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral",
+        "good",
+        "evil"
+      ]
+    },
+    "entryMode": {
+      "default": "independent",
+      "allowed": [
+        "independent"
+      ]
+    },
+    "victory": {
+      "type": "withCurrentAllegiance"
+    }
+  }
+}
+```
+
+### `regular-neutral-personal` — Neutral regular con victoria personal
+
+Forma parte del reparto y solo gana si se cumple su condición declarativa.
+
+- Ocupa el eje neutral de la composición y cuenta entre los vivos regulares.
+- No gana automáticamente con bueno ni malvado.
+
+```json
+{
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast"
+      ]
+    },
+    "victory": {
+      "type": "personal",
+      "condition": {
+        "type": "storytellerDecision",
+        "decision": "resolveCharacterPersonalVictory"
+      }
+    }
+  }
+}
+```
+
+### `regular-neutral-fixed-side` — Neutral regular que gana con un bando fijo
+
+Permanece neutral para identidad y composición, pero comparte la victoria de un bando concreto.
+
+- Cuenta entre los vivos regulares.
+- Gana con el bando fijado aunque su alineamiento siga siendo neutral.
+
+```json
+{
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast"
+      ]
+    },
+    "victory": {
+      "type": "withSide",
+      "side": "good"
+    }
+  }
+}
+```
+
+### `flexible-entry` — Entrada flexible
+
+El Narrador decide si la misma definición entra en el reparto o como participante independiente.
+
+- Con cast cuenta y muere como parte normal del reparto.
+- Con independent queda fuera del conteo regular y usa exilio.
+
+```json
+{
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral",
+        "good",
+        "evil"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast",
+        "independent"
+      ]
+    },
+    "victory": {
+      "type": "personal",
+      "condition": {
+        "type": "storytellerDecision",
+        "decision": "resolveCharacterPersonalVictory"
+      }
+    }
+  }
+}
+```
+
 ## Preguntas de diseño
 
+- ¿Entra en el reparto normal (cast), como participante independiente y exiliable (independent), o puede usar ambos modos?
+- ¿Cuenta como personaje regular para la composición y el final de partida, o como participante extra fuera de ese conteo?
+- ¿Su alineamiento es bueno, malvado o neutral, y a cuáles puede cambiar?
+- ¿Gana con su alineamiento actual, con un bando fijo o solo mediante una condición personal?
+- ¿Su rol de composición es core, support o independent?
 - ¿Qué resultado observable debe producir la habilidad?
 - ¿Cuándo se activa y con qué frecuencia?
 - ¿Quién actúa, quién puede ser objetivo y pueden elegirse muertos o el propio actor?

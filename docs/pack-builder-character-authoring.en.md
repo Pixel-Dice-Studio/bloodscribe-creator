@@ -2,8 +2,181 @@
 
 This reference is generated from the same contract used by the MCP. Examples use invented IDs.
 
+## Participation and victory profile
+
+Before modeling the ability, classify how the character enters, counts, and wins. If the idea does not make this clear, the AI must ask. `teamId` only groups and presents content; it never replaces these fields. New proposals use `entryMode`, not the historical `assignment` field.
+
+### `regular-aligned` — Regular aligned character
+
+Enters the bag, occupies a regular slot, and wins with its effective alignment.
+
+- Counts among regular living players.
+- Uses normal death flows and is not exiled.
+
+```json
+{
+  "gameplay": {
+    "role": "core",
+    "allegiance": {
+      "default": "good",
+      "allowed": [
+        "good"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast"
+      ]
+    },
+    "victory": {
+      "type": "withCurrentAllegiance"
+    }
+  }
+}
+```
+
+### `independent-traveller` — Traveller or temporary participant
+
+Enters outside the base cast, receives a secret alignment, and uses exile.
+
+- Does not occupy a base-cast slot or count toward the standard two-alive ending.
+- May join during play and is eligible for exile.
+
+```json
+{
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral",
+        "good",
+        "evil"
+      ]
+    },
+    "entryMode": {
+      "default": "independent",
+      "allowed": [
+        "independent"
+      ]
+    },
+    "victory": {
+      "type": "withCurrentAllegiance"
+    }
+  }
+}
+```
+
+### `regular-neutral-personal` — Regular neutral with personal victory
+
+Belongs to the regular cast and wins only when its declarative condition is met.
+
+- Occupies the neutral composition axis and counts among regular living players.
+- Does not automatically win with good or evil.
+
+```json
+{
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast"
+      ]
+    },
+    "victory": {
+      "type": "personal",
+      "condition": {
+        "type": "storytellerDecision",
+        "decision": "resolveCharacterPersonalVictory"
+      }
+    }
+  }
+}
+```
+
+### `regular-neutral-fixed-side` — Regular neutral that wins with a fixed side
+
+Remains neutral for identity and composition but shares one fixed side's victory.
+
+- Counts among regular living players.
+- Wins with the fixed side even while its alignment remains neutral.
+
+```json
+{
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast"
+      ]
+    },
+    "victory": {
+      "type": "withSide",
+      "side": "good"
+    }
+  }
+}
+```
+
+### `flexible-entry` — Flexible entry
+
+The Storyteller decides whether the same definition enters the cast or joins independently.
+
+- With cast it counts and dies as part of the regular cast.
+- With independent it stays outside the regular count and uses exile.
+
+```json
+{
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral",
+        "good",
+        "evil"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast",
+        "independent"
+      ]
+    },
+    "victory": {
+      "type": "personal",
+      "condition": {
+        "type": "storytellerDecision",
+        "decision": "resolveCharacterPersonalVictory"
+      }
+    }
+  }
+}
+```
+
 ## Design questions
 
+- Does the character enter the regular cast, as an independent exile-eligible participant, or through either mode?
+- Does the character count as regular for composition and game end, or as an extra participant outside that count?
+- Is its alignment good, evil, or neutral, and which alignments may it change to?
+- Does it win with its current alignment, with a fixed side, or only through a personal condition?
+- Is its composition role core, support, or independent?
 - What observable result must the ability produce?
 - When does it trigger and how often?
 - Who acts, who may be targeted, and may dead players or the actor be selected?
