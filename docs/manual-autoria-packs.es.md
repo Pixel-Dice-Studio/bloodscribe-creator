@@ -996,7 +996,7 @@ Reglas de enlace:
 - `characterIds` solo contiene personajes jugables del Cuento;
 - `teams` copia las definiciones necesarias para que el snapshot de partida sea autocontenido.
 
-Temas disponibles: `ink`, `purple`, `oxblood`, `verdigris`, `midnight` y `leather`. Fondos: `none`, `astrolabe`, `orrery`, `rose`, `filigree` y `plain`.
+Temas disponibles: `ink`, `purple`, `oxblood`, `verdigris`, `midnight` y `leather`. Fondos: `none`, `astrolabe`, `orrery`, `rose`, `filigree`, `baroque`, `thorns`, `cobweb`, `ribcage`, `candelabra`, `bramble`, `sigil`, `runes`, `blood` y `plain`.
 
 ## 15. Ejemplo razonado: vecinos registrados como malvados
 

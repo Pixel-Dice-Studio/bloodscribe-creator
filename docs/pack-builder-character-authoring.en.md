@@ -1548,6 +1548,15 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `backdrops.orrery` | Supported backdrops option identified by orrery. | `{"value":"orrery"}` |
 | `backdrops.rose` | Supported backdrops option identified by rose. | `{"value":"rose"}` |
 | `backdrops.filigree` | Supported backdrops option identified by filigree. | `{"value":"filigree"}` |
+| `backdrops.baroque` | Supported backdrops option identified by baroque. | `{"value":"baroque"}` |
+| `backdrops.thorns` | Supported backdrops option identified by thorns. | `{"value":"thorns"}` |
+| `backdrops.cobweb` | Supported backdrops option identified by cobweb. | `{"value":"cobweb"}` |
+| `backdrops.ribcage` | Supported backdrops option identified by ribcage. | `{"value":"ribcage"}` |
+| `backdrops.candelabra` | Supported backdrops option identified by candelabra. | `{"value":"candelabra"}` |
+| `backdrops.bramble` | Supported backdrops option identified by bramble. | `{"value":"bramble"}` |
+| `backdrops.sigil` | Supported backdrops option identified by sigil. | `{"value":"sigil"}` |
+| `backdrops.runes` | Supported backdrops option identified by runes. | `{"value":"runes"}` |
+| `backdrops.blood` | Supported backdrops option identified by blood. | `{"value":"blood"}` |
 | `backdrops.plain` | Supported backdrops option identified by plain. | `{"value":"plain"}` |
 | `windows.setup` | Supported windows option identified by setup. | `{"window":"setup"}` |
 | `windows.firstNight` | Supported windows option identified by firstNight. | `{"window":"firstNight"}` |

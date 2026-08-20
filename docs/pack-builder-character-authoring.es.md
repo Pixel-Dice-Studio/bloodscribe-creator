@@ -1548,6 +1548,15 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `backdrops.orrery` | Fondo de planetario. | `{"value":"orrery"}` |
 | `backdrops.rose` | Fondo de rosa. | `{"value":"rose"}` |
 | `backdrops.filigree` | Fondo de filigrana. | `{"value":"filigree"}` |
+| `backdrops.baroque` | Fondo de cartela barroca. | `{"value":"baroque"}` |
+| `backdrops.thorns` | Fondo de zarza espinosa. | `{"value":"thorns"}` |
+| `backdrops.cobweb` | Fondo de telaraña. | `{"value":"cobweb"}` |
+| `backdrops.ribcage` | Fondo de costillar. | `{"value":"ribcage"}` |
+| `backdrops.candelabra` | Fondo de candelabro. | `{"value":"candelabra"}` |
+| `backdrops.bramble` | Fondo de corona de zarza. | `{"value":"bramble"}` |
+| `backdrops.sigil` | Fondo de sello de invocación. | `{"value":"sigil"}` |
+| `backdrops.runes` | Fondo de anillo de runas. | `{"value":"runes"}` |
+| `backdrops.blood` | Fondo de salpicadura de sangre. | `{"value":"blood"}` |
 | `backdrops.plain` | Fondo liso. | `{"value":"plain"}` |
 | `windows.setup` | Durante la preparación de la partida. | `{"window":"setup"}` |
 | `windows.firstNight` | Solo durante la primera noche. | `{"window":"firstNight"}` |
