@@ -91,7 +91,7 @@ Un binding apunta a un participante ya conocido por la resolución.
 | Facetas | `teamId`, `allegiance`, `role`, `character`, `mechanicTags` |
 | Alineamientos | `good`, `evil`, `neutral` |
 | Funciones | `core`, `support`, `independent` |
-| Asignaciones de personaje | `player`, `temporalPlayer`; las reglas públicas viven en `gameRules[]` |
+| Modos de entrada | `cast`, `temporary`; las reglas públicas viven en `gameRules[]` |
 
 - `real`: identidad mecánica real.
 - `shown`: identidad entregada o mostrada al jugador.
@@ -215,7 +215,7 @@ Solo se aplican a `players`.
 |---|---|---|
 | `alive` | `value`; `subject?` limita la comprobación al binding. | `{"type":"alive","value":true}` |
 | `identity` | `identityMode`, `facet`, `values`, `subject?`; para `mechanicTags`, `match?` puede ser `all` o `any`. | `{"type":"identity","identityMode":"registered","facet":"allegiance","values":["evil"]}` |
-| `assignment` | `values`: `player`, `temporalPlayer`; las reglas públicas no son personajes seleccionables. | `{"type":"assignment","values":["player"]}` |
+| `entryMode` | `values`: `cast`, `temporary`; las reglas públicas no son personajes seleccionables. | `{"type":"entryMode","values":["cast"]}` |
 | `identityMatchesBinding` | Compara `teamId`, `allegiance`, `role` o `character` con otro binding bajo un `identityMode`. | `{"type":"identityMatchesBinding","identityMode":"real","facet":"teamId","binding":"actor"}` |
 | `state` | `values`, `active?`, `subject?`. | `{"type":"state","values":["drunk"],"active":true}` |
 | `marker` | `markerId`, `active?`, `subject?`. | `{"type":"marker","markerId":"protected","active":true}` |
@@ -288,7 +288,7 @@ Campos de `eventField`: `actionId`, `outcome`, `died`, `attribution`, `resolutio
 
 ### 5.1 `EventPattern`
 
-Tipos de evento: `characterEntry`, `death`, `execution`, `exile`, `nomination`, `publicAction`, `mechanicUse`, `mechanicTargeted`, `stateChange`, `restrictionChange`, `markerChange`, `storytellerSignal`.
+Tipos de evento: `characterEntry`, `death`, `execution`, `expulsion`, `nomination`, `publicAction`, `mechanicUse`, `mechanicTargeted`, `stateChange`, `restrictionChange`, `markerChange`, `storytellerSignal`.
 
 ```json
 {
@@ -311,7 +311,7 @@ Tipos de evento: `characterEntry`, `death`, `execution`, `exile`, `nomination`, 
 
 | Campo | Opciones |
 |---|---|
-| `window` | `setup`, `firstNight`, `night`, `dawn`, `day`, `voting`, `speech`, `nomination`, `execution`, `exile`, `dusk`, `mainEvilInfo`, `gameEnd`, `anyTime` |
+| `window` | `setup`, `firstNight`, `night`, `dawn`, `day`, `voting`, `speech`, `nomination`, `execution`, `expulsion`, `dusk`, `mainEvilInfo`, `gameEnd`, `anyTime` |
 | `stage` | ID semántico de etapa declarado por el pack. |
 | `cadence` | `once`, `each` |
 | `startsAt` | Número de día/noche desde el que se activa. |
@@ -422,12 +422,13 @@ Los campos comunes de la mayoría de efectos son:
 | `resurrect` | Devuelve objetivos a la vida. | Solo campos comunes. | `{"type":"resurrect","targets":{"type":"binding","binding":"selected"}}` |
 | `execute` | Ejecuta objetivos y registra la resolución. | `dies`, `requiresSourceAlive`, `targetReminder`. | `{"type":"execute","targets":{"type":"binding","binding":"selected"},"dies":true}` |
 | `setPlayerState` | Activa o desactiva un estado explícito y su ficha física asociada. | `state`, `active`; `targets` obligatorio. | `{"type":"setPlayerState","targets":{"type":"binding","binding":"selected"},"state":"estado-nublado","active":true}` |
+| `setPlayerRelation` | Activa o desactiva una relación persistente entre la fuente y cada objetivo. | `kind`, `active`, `duration?`, `ownership?`, `markerId?`; `targets` obligatorio. | `{"type":"setPlayerRelation","targets":{"type":"binding","binding":"selected"},"kind":"protegido","active":true}` |
 | `applyMarker` | Añade o retira una ficha recordatoria. | `kind:"reminder"`, `id`, `active`, `exclusive?`, `ownership?`. | `{"type":"applyMarker","targets":{"type":"binding","binding":"selected"},"kind":"reminder","id":"watched","active":true}` |
 | `moveMarker` | Transfiere atómicamente una ficha entre jugadores. | `kind:"reminder"`, `id`, `from`; `targets` indica el destino. | `{"type":"moveMarker","kind":"reminder","id":"crown","from":{"type":"binding","binding":"actor"},"targets":{"type":"binding","binding":"selected"}}` |
 | `adjustCounter` | Ajusta un contador persistente y puede proyectar fichas/estados o disparar efectos al cruzar un umbral. | `counter`, `delta`, `scope?`, `bounds?`, `projection?`, `stateProjection?`, `threshold?`, `onThreshold?`. | `{"type":"adjustCounter","targets":{"type":"binding","binding":"actor"},"counter":"charges","delta":1,"bounds":{"max":3}}` |
 | `changeAlignment` | Cambia el alineamiento. | `alignment`, `allowsSelfTarget`, `notifyPlayer`, `setupEffect`, `targetAlignment`, `targetTeam`. | `{"type":"changeAlignment","targets":{"type":"binding","binding":"selected"},"alignment":"evil"}` |
 | `changeCharacter` | Sustituye una identidad. | Identidad real/mostrada, equipo, límites de elección y consecuencias de la sustitución. | `{"type":"changeCharacter","targets":{"type":"binding","binding":"selected"},"newCharacter":"personaje-zafiro","preserveAlignment":true}` |
-| `grantAbility` | Concede o retira una habilidad declarada. | `active`, `abilityCharacterId`. | `{"type":"grantAbility","targets":{"type":"binding","binding":"selected"},"abilityCharacterId":"habilidad-ambar","active":true}` |
+| `grantAbility` | Concede o retira una habilidad declarada. | `active`, `abilityCharacterId`, `owner`, `controller`, `ownership`. | `{"type":"grantAbility","targets":{"type":"binding","binding":"selected"},"abilityCharacterId":"habilidad-ambar","active":true,"ownership":"sourceAbility"}` |
 | `swapSeats` | Intercambia posiciones en el círculo. | Solo campos comunes. | `{"type":"swapSeats","targets":{"type":"binding","binding":"selected"}}` |
 | `swapCharacters` | Intercambia identidades entre participantes. | `actor`, `resultingState`, `resultingStateDuration`, `swapsCharactersAndAlignments`. | `{"type":"swapCharacters","targets":{"type":"binding","binding":"selected"},"swapsCharactersAndAlignments":true,"resultingState":"estado-nublado"}` |
 | `swapTargets` | Intercambia objetivos ya resueltos. | Solo campos comunes. | `{"type":"swapTargets","targets":{"type":"binding","binding":"selected"}}` |
@@ -743,7 +744,7 @@ Censo realizado sobre los ocho seeds mantenidos de `docs/content/botc/source/scr
 | Sin campo `reason` | 8 |
 | Con una carencia concreta documentada | 11 |
 
-Distribución: Bad Moon Rising 5, Fabled 17, Grimm Hansel & Gretel 4, Loric 13, The Carousel 42, Travellers 14, Sects & Violets 0 y Trouble Brewing 0.
+Distribución: Bad Moon Rising 5, Fabled 17, Grimm Hansel & Gretel 4, Loric 13, The Carousel 42, contenido temporal BOTC 14, Sects & Violets 0 y Trouble Brewing 0.
 
 ### 10.1 Las 7 marcadas explícitamente como modelado manual
 
@@ -763,11 +764,7 @@ Estas son el núcleo que el corpus declara como no representable de extremo a ex
 
 ### 10.2 Otras carencias concretas
 
-La aplicación declarativa de restricciones ya es interceptable mediante `restrictionChange`: una protección puede comparar el conjunto mecánico (`ability`, `vote`, `speak`, etc.) sin depender del nombre del estado ni del personaje que lo origina. Queda esta carencia de evento no relacionada:
-
-| Pack | Entidad | `mechanicId` | Parte manual |
-|---|---|---|---|
-| Travellers | Deviant | `deviant:passive-protection:1` | Exilio no forma parte de los eventos interceptables actuales. |
+La aplicación declarativa de restricciones ya es interceptable mediante `restrictionChange`: una protección puede comparar el conjunto mecánico (`ability`, `vote`, `speak`, etc.) sin depender del nombre del estado ni del personaje que lo origina. La expulsión también es interceptable mediante `expulsion`; las protecciones declarativas específicas pueden cancelarla sin convertirla en ejecución.
 
 ### 10.3 Mecánicas mixtas restantes
 
@@ -786,7 +783,7 @@ Estas ya tienen una resolución mecánica parcial y no deberían describirse com
 | The Carousel | Boomdandy | `boomdandy:public-day-action:2` | `recordAction`, `death` |
 | The Carousel | Riot | `riot:setup-modifier:1` | `modifySetup` |
 | The Carousel | Deus ex Fiasco | `deusexfiasco:public-day-action:1` | `recordAction` |
-| Travellers | Judge | `judge:public-day-action:1` | `recordAction` |
+| Contenido temporal BOTC | Judge | `judge:public-day-action:1` | `recordAction` |
 
 ### 10.4 Inventario completo por pack
 
@@ -899,7 +896,7 @@ Leyenda de cobertura:
 | Ferryman | `ferryman:global-rule:1` | manual | `restoreDeadVoteTokensOnFinalDay` |
 | Storm Catcher | `stormcatcher:global-rule:1` | manual | `announceFavouredGoodCharacter` |
 
-#### Travellers
+#### Personajes temporales del pack BOTC
 
 | Entidad | `mechanicId` | Cobertura | `instruction` |
 |---|---|---|---|
@@ -908,9 +905,8 @@ Leyenda de cobertura:
 | Butcher | `butcher:global-rule:1` | manual | `allowSecondNominationAfterFirstExecution` |
 | Matron | `matron:global-rule:1` | manual | `playersMayOnlyPrivateTalkFromSeats` |
 | Judge | `judge:public-day-action:1` | mixta (`recordAction`) | `forceExecutionPassOrFail` |
-| Apprentice | `apprentice:global-rule:1` | manual | `travellerHasChosenAbilityUntilDeath` |
+| Apprentice | `apprentice:global-rule:1` | manual | `temporaryCharacterHasChosenAbilityUntilDeath` |
 | Beggar | `beggar:global-rule:1` | manual | `beggarMustSpendDonatedVoteTokenToVote` |
-| Deviant | `deviant:passive-protection:1` | manual | Decidir si sobrevive al exilio por haber sido divertido. |
 | Scapegoat | `scapegoat:global-rule:1` | manual | `scapegoatExecutionCountsAsExecution` |
 | Gnome | `gnome:global-rule:1` | manual | `allPlayersLearnAmigoOfGnome` |
 | Bishop | `bishop:global-rule:1` | manual | `onlyStorytellerMayNominate` |

@@ -369,7 +369,7 @@ Ventanas de `when.window`:
 | `speech` | Conversación pública o privada. |
 | `nomination` | Nominación. |
 | `execution` | Ejecución. |
-| `exile` | Exilio. |
+| `expulsion` | Expulsión de un personaje temporal. |
 | `dusk` | Transición a la noche. |
 | `mainEvilInfo` | Información inicial del malvado principal. |
 | `gameEnd` | Comprobación del final. |
@@ -377,7 +377,7 @@ Ventanas de `when.window`:
 
 `cadence` puede ser `once` o `each`; `startsAt` fija el primer día o noche. `delay` usa `night`, `day` o `phase` y un `count` positivo.
 
-Eventos de `when.trigger.event`: `characterEntry`, `abilityGrant`, `death`, `execution`, `exile`, `nomination`, `publicAction`, `mechanicUse`, `mechanicTargeted`, `stateChange`, `restrictionChange`, `markerChange`, `storytellerSignal` y `storytellerExecution`. Este último procede de una nominación y ejecución tipadas del Narrador, no de una señal de texto.
+Eventos de `when.trigger.event`: `characterEntry`, `abilityGrant`, `death`, `execution`, `expulsion`, `nomination`, `publicAction`, `mechanicUse`, `mechanicTargeted`, `tableAction`, `stateChange`, `restrictionChange`, `markerChange`, `storytellerSignal` y `storytellerExecution`. Este último procede de una nominación y ejecución tipadas del Narrador, no de una señal de texto.
 
 Cada evento conserva `causedByEventId` cuando nace de otro y una copia de las identidades de sus participantes en ese instante. Las consultas históricas usan esa copia, por lo que un cambio posterior de personaje o alineamiento no reescribe lo sucedido.
 
@@ -448,12 +448,13 @@ Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affected
 | `resurrect` | Devuelve objetivos a la vida. | Sin opciones propias. | `{"type":"resurrect","targets":{"type":"binding","binding":"selected"}}` |
 | `execute` | Ejecuta y registra si el objetivo muere. | `dies`, `requiresSourceAlive`, `targetReminder`. | `{"type":"execute","targets":{"type":"binding","binding":"selected"},"dies":true}` |
 | `setPlayerState` | Activa o desactiva un estado. | `state`, `active`, `exclusive`. | `{"type":"setPlayerState","state":"silenced","active":true,"targets":{"type":"binding","binding":"selected"}}` |
+| `setPlayerRelation` | Activa o desactiva una relación persistente entre la fuente y cada objetivo. | `kind`, `active`, `duration`, `ownership`, `markerId`. | `{"type":"setPlayerRelation","kind":"protected","active":true,"targets":{"type":"binding","binding":"selected"}}` |
 | `applyMarker` | Añade o retira una ficha. | `kind`, `id`, `active`, `exclusive`, `ownership`. | `{"type":"applyMarker","kind":"reminder","id":"watched","active":true,"targets":{"type":"binding","binding":"selected"}}` |
 | `moveMarker` | Mueve atómicamente una ficha existente. | `kind`, `id`, `from`; `targets` es el destino. | `{"type":"moveMarker","kind":"reminder","id":"crown","from":{"type":"binding","binding":"actor"},"targets":{"type":"binding","binding":"selected"}}` |
 | `adjustCounter` | Ajusta un contador y puede proyectar estado o disparar un umbral. | `counter`, `delta`, `scope`, `bounds`, `projection`, `stateProjection`, `threshold`, `onThreshold`. | `{"type":"adjustCounter","counter":"charges","delta":1,"targets":{"type":"binding","binding":"actor"}}` |
 | `changeAlignment` | Cambia el alineamiento. | `alignment`, `notifyPlayer`, perfiles y límites de objetivo. | `{"type":"changeAlignment","alignment":"evil","targets":{"type":"binding","binding":"selected"}}` |
 | `changeCharacter` | Sustituye identidad real o mostrada. | Personaje/equipo nuevo, preservación de alineamiento, límites y consecuencias. | `{"type":"changeCharacter","newCharacter":"character:ejemplo:nuevo","targets":{"type":"binding","binding":"selected"}}` |
-| `grantAbility` | Concede o retira una habilidad declarada. | `abilityCharacterId`, `active`. | `{"type":"grantAbility","abilityCharacterId":"character:ejemplo:fuente","active":true,"targets":{"type":"binding","binding":"selected"}}` |
+| `grantAbility` | Concede o retira una habilidad declarada. | `abilityCharacterId`, `active`, `owner`, `controller`, `ownership`. | `{"type":"grantAbility","abilityCharacterId":"character:ejemplo:fuente","active":true,"ownership":"sourceAbility","targets":{"type":"binding","binding":"selected"}}` |
 | `swapSeats` | Intercambia asientos seleccionados. | Sin opciones propias. | `{"type":"swapSeats","targets":{"type":"binding","binding":"selected"}}` |
 | `swapCharacters` | Intercambia identidades entre jugadores. | `actor`, `resultingState`, `resultingStateDuration`, `swapsCharactersAndAlignments`. | `{"type":"swapCharacters","targets":{"type":"binding","binding":"selected"}}` |
 | `swapTargets` | Intercambia objetivos ya resueltos. | Sin opciones propias. | `{"type":"swapTargets","targets":{"type":"binding","binding":"selected"}}` |
@@ -463,12 +464,13 @@ Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affected
 | `blockGameEnd` | Impide cerrar una victoria mientras la fuente esté activa. | `winner`: `good`, `evil` o `any`; `reason`, `activation.lifeState`. | `{"type":"blockGameEnd","winner":"good","reason":"La victoria está bloqueada."}` |
 | `transformGameEnd` | Transforma el conjunto final de ganadores después de resolver precedencia y bloqueos. | `operation: "invertWinners"`, `reason`, `activation.lifeState`. | `{"type":"transformGameEnd","operation":"invertWinners","reason":"Se invierten ganadores y perdedores."}` |
 | `startActionSequence` | Mantiene una secuencia obligatoria hasta que una expresión indique que terminó. | Actualmente: nominación, muerte del nominado, siguiente actor nominado y respaldo del Narrador. | `{"type":"startActionSequence","action":"nomination","onAction":"killNominee","nextActor":"nominee","repeatUntil":{"type":"literal","value":false}}` |
+| `performTableAction` | Registra una acción física tipada antes de resolver sus consecuencias. | `action`: `devour`, `feed`, `abandon`, `occupy` o `building`; `targets`, `consequences`. | `{"type":"performTableAction","action":"devour","targets":{"type":"binding","binding":"selected"},"consequences":[]}` |
 | `interceptEvent` | Cancela, redirige o sustituye un evento coincidente. | `event`, `bindings`, `match`, `reaction`, `priority`, `consumption`, `scope`, `appliesWhenProtectionBypassed`. | `{"type":"interceptEvent","event":"death","reaction":{"type":"cancel"}}` |
 | `disableAbility` | Anula total o parcialmente una habilidad. | `blocks`, `consumeOnPass`, `informationMayBeFalse`. | `{"type":"disableAbility","blocks":"ability","targets":{"type":"binding","binding":"selected"}}` |
 | `restrict` | Limita acciones disponibles. | `actions`, `restrictions`, `relation`, `requiresSourceAlive`, `informationMayBeFalse`. | `{"type":"restrict","actions":["vote"],"targets":{"type":"binding","binding":"selected"}}` |
 | `registerAs` | Cambia cómo se registra una identidad. | `affects`, `alignment`, `roles`, `characterIds`, `lifeState`, `mode`, `registersAs`, `teamIds`, `worksWhenDead`. | `{"type":"registerAs","alignment":"evil","targets":{"type":"binding","binding":"actor"}}` |
 | `modifyTargets` | Aumenta o reduce el máximo de objetivos. | `delta`, `sourceProfile`, `targetMechanicTags`. | `{"type":"modifyTargets","delta":1,"targetMechanicTags":["night-information"]}` |
-| `modifyVote` | Cambia el peso de votantes resueltos. | `weight`, `pairedTargets`, `pairedWeight`; pesos numéricos o `ValueExpr`. | `{"type":"modifyVote","targets":{"type":"binding","binding":"actor"},"weight":2}` |
+| `modifyVote` | Cambia la política de una votación. | `purposes`, `threshold`, pesos, electorado, créditos y validez del recuento. | `{"type":"modifyVote","purposes":["standard"],"threshold":0}` |
 | `modifySetup` | Modifica cantidades o asignaciones de preparación. | `operations`: ajustar, elegir, reemplazar, fijar, duplicar, exigir, retirar o configurar reparto. | `{"type":"modifySetup","operations":[{"type":"adjustBucket","bucket":"outsider","delta":1}]}` |
 | `restrictSetupCombination` | Limita cuántos personajes de una combinación pueden estar en juego. | `characterIds`, `maximum`. | `{"type":"restrictSetupCombination","characterIds":["character:ejemplo:uno","character:ejemplo:dos"],"maximum":1}` |
 | `modifyInformation` | Transforma información antes de entregarla. | `audience`, `mustBeFalse`. | `{"type":"modifyInformation","mustBeFalse":true}` |
@@ -476,6 +478,7 @@ Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affected
 | `modifyNomination` | Cambia el resultado de una nominación. | `countsAsExecution`, `voteDelta`, `requiresActorAbstention`, consumo y fichas. | `{"type":"modifyNomination","voteDelta":1}` |
 | `recordAction` | Registra una acción y su resultado para consultas posteriores. | `actionId`, `outcome`, éxito/fallo, restricciones y metadatos del objetivo. | `{"type":"recordAction","actionId":"claim-example"}` |
 | `storytellerDecision` | Solicita una decisión humana cerrada. | `decision`, `options`; los textos viven en `presentation.decisionPrompts`. | `{"type":"storytellerDecision","decision":"fate","options":["dies","survives"]}` |
+| `manualCheckpoint` | Pausa la resolución hasta que el Narrador elige un resultado cerrado y persistido. | `reason`, `prompt`, `outcomes`, `blocking`, `optional`; cada resultado declara sus efectos. | `{"type":"manualCheckpoint","reason":"storytellerJudgment","prompt":"¿Se cumplió?","outcomes":[{"id":"yes","label":"Sí","effects":[]}],"blocking":true}` |
 | `manualInstruction` | Muestra un paso que el motor no puede ejecutar. | `instruction`, `reason`, `publicKnown`, `ruleStepActivation` y ayudas. | `{"type":"manualInstruction","instruction":"Resuelve el acuerdo de la mesa.","reason":"Decisión social"}` |
 
 ### Información
@@ -512,6 +515,7 @@ Las políticas conectan una mecánica con los asistentes sin crear comportamient
 `presentation` configura labels, títulos, descripciones, guías nocturnas, controles, resultados y acciones públicas. Ningún texto decide mecánicas.
 
 - Usa `storytellerDecision` cuando el Narrador elige entre opciones cerradas que el runtime puede resolver.
+- Usa `manualCheckpoint` cuando esa elección debe quedar pendiente, bloquear el flujo y persistir su resultado antes de aplicar efectos.
 - Usa `manualInstruction` cuando la propia operación todavía no existe o depende de una interacción física/social.
 - Usa `requiresManualModeling: true` solo para reconocer que el programa conserva una parte sin modelar; no convierte una descripción en lógica.
 

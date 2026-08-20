@@ -4,14 +4,14 @@ Esta referencia se genera desde el mismo contrato que consume el MCP. Los ejempl
 
 ## Perfil de participación y victoria
 
-Antes de modelar la habilidad, clasifica cómo entra, cuenta y gana el personaje. Si la idea no lo deja claro, la IA debe preguntarlo. `teamId` solo agrupa y presenta contenido; nunca sustituye estos campos. Las propuestas nuevas usan `entryMode`, no el campo histórico `assignment`.
+Antes de modelar la habilidad, clasifica cómo entra, cuenta y gana el personaje. Si la idea no lo deja claro, la IA debe preguntarlo. `teamId` solo agrupa y presenta contenido; nunca sustituye estos campos. Toda propuesta usa `entryMode`.
 
 ### `regular-aligned` — Personaje regular de un bando
 
 Entra en la bolsa, ocupa una plaza normal y gana con su alineamiento efectivo.
 
 - Cuenta entre los vivos regulares.
-- Muere por los flujos normales y no se exilia.
+- Muere por los flujos normales y no puede ser expulsado como temporal.
 
 ```json
 {
@@ -36,12 +36,12 @@ Entra en la bolsa, ocupa una plaza normal y gana con su alineamiento efectivo.
 }
 ```
 
-### `independent-traveller` — Viajero o participante temporal
+### `temporary-character` — Personaje temporal
 
-Entra fuera del reparto base, recibe alineamiento secreto y usa el flujo de exilio.
+Entra fuera del reparto base, recibe alineamiento secreto y usa el flujo de expulsión.
 
 - No ocupa una plaza del reparto base ni cuenta para el final estándar de dos vivos.
-- Puede añadirse durante la partida y es elegible para exilio.
+- Puede añadirse durante la partida y es elegible para expulsión.
 
 ```json
 {
@@ -56,9 +56,9 @@ Entra fuera del reparto base, recibe alineamiento secreto y usa el flujo de exil
       ]
     },
     "entryMode": {
-      "default": "independent",
+      "default": "temporary",
       "allowed": [
-        "independent"
+        "temporary"
       ]
     },
     "victory": {
@@ -135,10 +135,10 @@ Permanece neutral para identidad y composición, pero comparte la victoria de un
 
 ### `flexible-entry` — Entrada flexible
 
-El Narrador decide si la misma definición entra en el reparto o como participante independiente.
+El Narrador decide si la misma definición entra en el reparto o como personaje temporal.
 
 - Con cast cuenta y muere como parte normal del reparto.
-- Con independent queda fuera del conteo regular y usa exilio.
+- Con temporary queda fuera del conteo regular y usa expulsión.
 
 ```json
 {
@@ -156,7 +156,7 @@ El Narrador decide si la misma definición entra en el reparto o como participan
       "default": "cast",
       "allowed": [
         "cast",
-        "independent"
+        "temporary"
       ]
     },
     "victory": {
@@ -170,9 +170,147 @@ El Narrador decide si la misma definición entra en el reparto o como participan
 }
 ```
 
+## Ejemplos completos de gameplay
+
+### `character:invented:night-envoy` — Temporal malvado incorporado durante el día
+
+1. Entra durante el día mediante add-temporary-player. La revelación inmediata enseña personaje y alineamiento, pero no los malvados principales.
+2. La noche siguiente, su primer paso muestra por separado todos los malvados principales vivos. No muestra ayudantes ni faroles; después actúa su habilidad.
+3. Una votación temporaryExpulsion aprobada genera expulsion y death. Pueden votar vivos y muertos, no se gastan últimos suspiros y todavía puede haber una ejecución ese día.
+
+```json
+{
+  "id": "character:invented:night-envoy",
+  "name": "Enviado nocturno",
+  "teamId": "team:invented:visitors",
+  "gameplay": {
+    "role": "support",
+    "allegiance": {
+      "default": "evil",
+      "allowed": [
+        "good",
+        "evil"
+      ]
+    },
+    "entryMode": {
+      "default": "temporary",
+      "allowed": [
+        "temporary"
+      ]
+    },
+    "victory": {
+      "type": "withCurrentAllegiance"
+    }
+  },
+  "summaryEs": "Cada noche, elige un jugador y aprende si está vivo."
+}
+```
+
+### `character:invented:two-doors` — Personaje con entrada dual
+
+1. Si entra como cast, ocupa reparto, cuenta entre los vivos normales, muere por los flujos ordinarios y no puede ser expulsado como temporal.
+2. Si entra como temporary, queda fuera de esos conteos, puede incorporarse durante la partida y usa expulsión. Solo en esta entrada recibe la información automática si es malvado.
+
+```json
+{
+  "id": "character:invented:two-doors",
+  "name": "Dos Puertas",
+  "teamId": "team:invented:neutral",
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral",
+        "good",
+        "evil"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast",
+        "temporary"
+      ]
+    },
+    "victory": {
+      "type": "withCurrentAllegiance"
+    }
+  },
+  "summaryEs": "Una vez por partida, elige un jugador: aprende su alineamiento."
+}
+```
+
+### `character:invented:common-mediator` — Neutral de reparto que cuenta normalmente
+
+1. Aunque role y allegiance sean independent/neutral, cast hace que ocupe reparto, cuente para el final y use muerte y ejecución normales.
+
+```json
+{
+  "id": "character:invented:common-mediator",
+  "name": "Mediador común",
+  "teamId": "team:invented:neutral",
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast"
+      ]
+    },
+    "victory": {
+      "type": "withSide",
+      "side": "good"
+    }
+  },
+  "summaryEs": "Cada día, puede hacer una pregunta pública al Narrador."
+}
+```
+
+### `character:invented:solitary-oath` — Independiente con victoria personal
+
+1. Cuenta como jugador normal porque entra como cast, pero no comparte automáticamente la victoria de ningún bando: solo gana cuando se cumple su condición personal.
+
+```json
+{
+  "id": "character:invented:solitary-oath",
+  "name": "Juramento solitario",
+  "teamId": "team:invented:neutral",
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast"
+      ]
+    },
+    "victory": {
+      "type": "personal",
+      "condition": {
+        "type": "storytellerDecision",
+        "decision": "inventedOathFulfilled"
+      }
+    }
+  },
+  "summaryEs": "Ganas solo si el Narrador confirma que cumpliste tu juramento público."
+}
+```
+
 ## Preguntas de diseño
 
-- ¿Entra en el reparto normal (cast), como participante independiente y exiliable (independent), o puede usar ambos modos?
+- ¿Entra en el reparto normal (cast), como personaje temporal (temporary), o puede usar ambos modos?
 - ¿Cuenta como personaje regular para la composición y el final de partida, o como participante extra fuera de ese conteo?
 - ¿Su alineamiento es bueno, malvado o neutral, y a cuáles puede cambiar?
 - ¿Gana con su alineamiento actual, con un bando fijo o solo mediante una condición personal?
@@ -1195,14 +1333,15 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `valueNodes.if` | Elige uno de dos valores mediante una condición booleana. | `{"type":"if"}` |
 | `valueNodes.inputValue` | Usa un valor tipado introducido durante la resolución. | `{"type":"inputValue"}` |
 | `terminology.teamId` | Categoría visible declarada por el pack; no selecciona comportamiento. | `{"value":"teamId"}` |
-| `events.characterEntry` | Un personaje entra en una plaza del reparto o independiente. | `{"type":"event","event":"characterEntry"}` |
+| `events.characterEntry` | Un personaje entra en una plaza del reparto o temporalmente. | `{"type":"event","event":"characterEntry"}` |
 | `events.death` | Un jugador muere o evita morir. | `{"type":"event","event":"death"}` |
 | `events.execution` | Se resuelve una ejecución. | `{"type":"event","event":"execution"}` |
-| `events.exile` | Se resuelve el exilio de un Viajero. | `{"type":"event","event":"exile"}` |
+| `events.expulsion` | Se resuelve la expulsión de un personaje temporal. | `{"type":"event","event":"expulsion"}` |
 | `events.nomination` | Se registra una nominación y su votación. | `{"type":"event","event":"nomination"}` |
 | `events.publicAction` | Se resuelve una acción pública declarada. | `{"type":"event","event":"publicAction"}` |
 | `events.mechanicUse` | Se registra el intento o la resolución de una mecánica declarada. | `{"type":"event","event":"mechanicUse"}` |
 | `events.mechanicTargeted` | Una mecánica selecciona un objetivo. | `{"type":"event","event":"mechanicTargeted"}` |
+| `events.tableAction` | Se resuelve una acción física tipada con consecuencias mecánicas. | `{"type":"event","event":"tableAction"}` |
 | `events.stateChange` | Cambia un estado tipado de un jugador. | `{"type":"event","event":"stateChange"}` |
 | `events.restrictionChange` | Añade o retira restricciones declarativas de un jugador. | `{"type":"event","event":"restrictionChange"}` |
 | `events.markerChange` | Añade, retira o mueve una ficha tipada. | `{"type":"event","event":"markerChange"}` |
@@ -1230,11 +1369,12 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `entities.markers` | Fichas y estados proyectados. | `{"value":"markers"}` |
 | `predicateTypes.players.alive` | Comprueba si el jugador está vivo. | `{"value":"alive"}` |
 | `predicateTypes.players.identity` | Compara una faceta de la identidad del jugador. | `{"value":"identity"}` |
-| `predicateTypes.players.assignment` | Compara el tipo de asiento del jugador. | `{"value":"assignment"}` |
+| `predicateTypes.players.entryMode` | Compara si participa en el reparto o temporalmente. | `{"value":"entryMode"}` |
 | `predicateTypes.players.identityMatchesBinding` | Compara una faceta con otro participante vinculado. | `{"value":"identityMatchesBinding"}` |
 | `predicateTypes.players.identityMatchesInput` | Compara una faceta con el valor introducido durante la resolución. | `{"value":"identityMatchesInput"}` |
 | `predicateTypes.players.state` | Comprueba un estado persistente del jugador. | `{"value":"state"}` |
 | `predicateTypes.players.marker` | Comprueba una ficha concreta del jugador. | `{"value":"marker"}` |
+| `predicateTypes.players.membership` | Comprueba una relación activa declarada por el pack. | `{"value":"membership"}` |
 | `predicateTypes.players.isBinding` | Comprueba si es el participante indicado. | `{"value":"isBinding"}` |
 | `predicateTypes.players.all` | Exige que se cumplan todas las condiciones. | `{"value":"all"}` |
 | `predicateTypes.players.any` | Exige que se cumpla al menos una condición. | `{"value":"any"}` |
@@ -1259,6 +1399,8 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `predicateTypes.markers.markerKind` | Compara el tipo semántico de la ficha. | `{"value":"markerKind"}` |
 | `predicateTypes.markers.markerId` | Compara el identificador estable de la ficha. | `{"value":"markerId"}` |
 | `predicateTypes.markers.markerActive` | Comprueba si la ficha está activa. | `{"value":"markerActive"}` |
+| `predicateTypes.markers.markerEntity` | Comprueba que la ficha pertenece al participante vinculado. | `{"value":"markerEntity"}` |
+| `predicateTypes.markers.markerSourceCharacter` | Compara el personaje que creó la ficha. | `{"value":"markerSourceCharacter"}` |
 | `predicateTypes.markers.all` | Exige que se cumplan todas las condiciones. | `{"value":"all"}` |
 | `predicateTypes.markers.any` | Exige que se cumpla al menos una condición. | `{"value":"any"}` |
 | `predicateTypes.markers.not` | Invierte el resultado de otra condición. | `{"value":"not"}` |
@@ -1309,6 +1451,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `identityModes.initial` | Consulta la identidad asignada al comienzo de la partida. | `{"identityMode":"initial"}` |
 | `identityModes.base` | Consulta la identidad declarada por el personaje antes de cambios de bando. | `{"identityMode":"base"}` |
 | `identityModes.shown` | Consulta la identidad mostrada al jugador. | `{"identityMode":"shown"}` |
+| `identityModes.apparent` | Consulta la identidad pública confirmada o, si no existe, la mostrada. | `{"identityMode":"apparent"}` |
 | `identityModes.registered` | Aplica decisiones de registro antes de consultar. | `{"identityMode":"registered"}` |
 | `identityFacets.teamId` | Categoría visible estable del pack. | `{"value":"teamId"}` |
 | `identityFacets.allegiance` | Bando bueno, malo o neutral. | `{"value":"allegiance"}` |
@@ -1325,8 +1468,9 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `roles.core` | Pieza principal de su bando. | `{"value":"core"}` |
 | `roles.support` | Pieza de apoyo de su bando. | `{"value":"support"}` |
 | `roles.independent` | Participa con una política propia. | `{"value":"independent"}` |
-| `assignments.player` | Ocupa un asiento normal. | `{"value":"player"}` |
-| `assignments.temporalPlayer` | Se incorpora temporalmente a la partida. | `{"value":"temporalPlayer"}` |
+| `entryModes.cast` | Ocupa una plaza normal del reparto. | `{"value":"cast"}` |
+| `entryModes.temporary` | Se incorpora temporalmente a la partida. | `{"value":"temporary"}` |
+| `eventPeriods.currentBatch` | Eventos del lote causal que se está resolviendo. | `{"value":"currentBatch"}` |
 | `eventPeriods.currentDay` | Eventos del día actual. | `{"value":"currentDay"}` |
 | `eventPeriods.currentNight` | Eventos de la noche actual. | `{"value":"currentNight"}` |
 | `eventPeriods.previousDay` | Eventos del día anterior. | `{"value":"previousDay"}` |
@@ -1358,6 +1502,12 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `eventFields.abilityProvenance` | Indica si la habilidad era propia, concedida, copiada u otra procedencia. | `{"type":"eventField","field":"abilityProvenance","value":"<value>"}` |
 | `eventFields.effectiveTargetCount` | Cantidad de jugadores sobre los que terminó actuando la mecánica. | `{"type":"eventField","field":"effectiveTargetCount","value":"<value>"}` |
 | `eventFields.targetResultStatus` | Resultado común de los objetivos cuando todos comparten el mismo estado. | `{"type":"eventField","field":"targetResultStatus","value":"<value>"}` |
+| `eventFields.tableAction` | Tipo estable de acción física observada. | `{"type":"eventField","field":"tableAction","value":"<value>"}` |
+| `eventFields.causalOutcome` | Resultado auditable del intento, incluida su cancelación. | `{"type":"eventField","field":"causalOutcome","value":"<value>"}` |
+| `eventFields.originalTargets` | IDs de los objetivos antes de las reacciones causales. | `{"type":"eventField","field":"originalTargets","value":"<value>"}` |
+| `eventFields.effectiveTargets` | IDs de los objetivos después de las reacciones causales. | `{"type":"eventField","field":"effectiveTargets","value":"<value>"}` |
+| `eventFields.sourceMechanicId` | ID de la mecánica que originó la cadena causal. | `{"type":"eventField","field":"sourceMechanicId","value":"<value>"}` |
+| `eventFields.reactionSources` | IDs de las mecánicas que intervinieron en la cadena causal. | `{"type":"eventField","field":"reactionSources","value":"<value>"}` |
 | `eventFields.causedByEventId` | ID del evento que originó este evento automático. | `{"type":"eventField","field":"causedByEventId","value":"<value>"}` |
 | `information.kinds.boolean` | Información booleana. | `{"value":"boolean"}` |
 | `information.kinds.number` | Información numérica. | `{"value":"number"}` |
@@ -1408,7 +1558,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `windows.speech` | Durante la conversación pública o privada. | `{"window":"speech"}` |
 | `windows.nomination` | Mientras se propone y resuelve una nominación. | `{"window":"nomination"}` |
 | `windows.execution` | Durante la resolución de una ejecución. | `{"window":"execution"}` |
-| `windows.exile` | Durante la resolución de un exilio. | `{"window":"exile"}` |
+| `windows.expulsion` | Durante la resolución de una expulsión. | `{"window":"expulsion"}` |
 | `windows.dusk` | En la transición del día a la noche. | `{"window":"dusk"}` |
 | `windows.mainEvilInfo` | Durante el paso de información inicial del malvado principal. | `{"window":"mainEvilInfo"}` |
 | `windows.gameEnd` | Cuando se comprueban condiciones de victoria. | `{"window":"gameEnd"}` |
@@ -1456,6 +1606,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.death.fields.reminder` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"reminder":"<reminder>"}` |
 | `effects.death.fields.reminderTokens` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"reminderTokens":"<reminderTokens>"}` |
 | `effects.death.fields.spentReminder` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
+| `effects.death.fields.attribution` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"attribution":"<attribution>"}` |
 | `effects.death.fields.bypassesDeathProtection` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"bypassesDeathProtection":"<bypassesDeathProtection>"}` |
 | `effects.death.fields.bypassesProtection` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"bypassesProtection":"<bypassesProtection>"}` |
 | `effects.death.fields.chargeReminder` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"chargeReminder":"<chargeReminder>"}` |
@@ -1517,6 +1668,17 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.setPlayerState.fields.active` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"active":"<active>"}` |
 | `effects.setPlayerState.fields.exclusive` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"exclusive":"<exclusive>"}` |
 | `effects.setPlayerState.fields.excludeInitialTargets` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"excludeInitialTargets":"<excludeInitialTargets>"}` |
+| `effects.setPlayerRelation` | Crea o retira una relación mecánica tipada. | `{"type":"setPlayerRelation","kind":"linked","active":true,"targets":{"type":"binding","binding":"selected"}}` |
+| `effects.setPlayerRelation.fields.type` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.setPlayerRelation.fields.when` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
+| `effects.setPlayerRelation.fields.delay` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
+| `effects.setPlayerRelation.fields.targets` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
+| `effects.setPlayerRelation.fields.affectedBy` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"affectedBy":"<affectedBy>"}` |
+| `effects.setPlayerRelation.fields.duration` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"duration":"<duration>"}` |
+| `effects.setPlayerRelation.fields.kind` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"kind":"<kind>"}` |
+| `effects.setPlayerRelation.fields.active` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"active":"<active>"}` |
+| `effects.setPlayerRelation.fields.markerId` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"markerId":"<markerId>"}` |
+| `effects.setPlayerRelation.fields.ownership` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"ownership":"<ownership>"}` |
 | `effects.applyMarker` | Añade o retira una ficha recordatoria. | `{"type":"applyMarker","kind":"reminder","id":"marker","active":true,"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.applyMarker.fields.type` | Campo admitido por applyMarker; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `effects.applyMarker.fields.when` | Campo admitido por applyMarker; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
@@ -1622,6 +1784,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.grantAbility.fields.abilityCharacterId` | Campo admitido por grantAbility; su valor debe cumplir el contrato tipado. | `{"abilityCharacterId":"<abilityCharacterId>"}` |
 | `effects.grantAbility.fields.owner` | Campo admitido por grantAbility; su valor debe cumplir el contrato tipado. | `{"owner":"<owner>"}` |
 | `effects.grantAbility.fields.controller` | Campo admitido por grantAbility; su valor debe cumplir el contrato tipado. | `{"controller":"<controller>"}` |
+| `effects.grantAbility.fields.ownership` | Campo admitido por grantAbility; su valor debe cumplir el contrato tipado. | `{"ownership":"<ownership>"}` |
 | `effects.swapSeats` | Intercambia posiciones en el círculo. | `{"type":"swapSeats"}` |
 | `effects.swapSeats.fields.type` | Campo admitido por swapSeats; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `effects.swapSeats.fields.when` | Campo admitido por swapSeats; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
@@ -1706,6 +1869,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.resolveGameEnd.fields.winner` | Campo admitido por resolveGameEnd; su valor debe cumplir el contrato tipado. | `{"winner":"<winner>"}` |
 | `effects.resolveGameEnd.fields.reason` | Campo admitido por resolveGameEnd; su valor debe cumplir el contrato tipado. | `{"reason":"<reason>"}` |
 | `effects.resolveGameEnd.fields.precedence` | Campo admitido por resolveGameEnd; su valor debe cumplir el contrato tipado. | `{"precedence":"<precedence>"}` |
+| `effects.resolveGameEnd.fields.activation` | Campo admitido por resolveGameEnd; su valor debe cumplir el contrato tipado. | `{"activation":"<activation>"}` |
 | `effects.blockGameEnd` | Impide cerrar un resultado mientras esta política siga activa. | `{"type":"blockGameEnd","winner":"good","reason":"La victoria está bloqueada."}` |
 | `effects.blockGameEnd.fields.type` | Campo admitido por blockGameEnd; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `effects.blockGameEnd.fields.when` | Campo admitido por blockGameEnd; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
@@ -1838,7 +2002,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.modifyTargets.fields.delta` | Campo admitido por modifyTargets; su valor debe cumplir el contrato tipado. | `{"delta":"<delta>"}` |
 | `effects.modifyTargets.fields.sourceProfile` | Campo admitido por modifyTargets; su valor debe cumplir el contrato tipado. | `{"sourceProfile":"<sourceProfile>"}` |
 | `effects.modifyTargets.fields.targetMechanicTags` | Campo admitido por modifyTargets; su valor debe cumplir el contrato tipado. | `{"targetMechanicTags":"<targetMechanicTags>"}` |
-| `effects.modifyVote` | Cambia el peso de votantes calculados. | `{"type":"modifyVote","targets":{"type":"binding","binding":"selected"},"weight":2}` |
+| `effects.modifyVote` | Cambia peso, electorado, recursos o validez del recuento. | `{"type":"modifyVote","targets":{"type":"binding","binding":"selected"},"weight":2}` |
 | `effects.modifyVote.fields.type` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `effects.modifyVote.fields.when` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.modifyVote.fields.delay` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
@@ -1852,6 +2016,11 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.modifyVote.fields.weight` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"weight":"<weight>"}` |
 | `effects.modifyVote.fields.pairedTargets` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"pairedTargets":"<pairedTargets>"}` |
 | `effects.modifyVote.fields.pairedWeight` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"pairedWeight":"<pairedWeight>"}` |
+| `effects.modifyVote.fields.threshold` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"threshold":"<threshold>"}` |
+| `effects.modifyVote.fields.purposes` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"purposes":"<purposes>"}` |
+| `effects.modifyVote.fields.electorate` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"electorate":"<electorate>"}` |
+| `effects.modifyVote.fields.creditRequired` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"creditRequired":"<creditRequired>"}` |
+| `effects.modifyVote.fields.tallyValidity` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"tallyValidity":"<tallyValidity>"}` |
 | `effects.modifySetup` | Aplica operaciones tipadas a cantidades o asignaciones del setup. | `{"type":"modifySetup","operations":[{"type":"adjustBucket","bucket":"setupBucket","delta":0}]}` |
 | `effects.modifySetup.fields.type` | Campo admitido por modifySetup; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `effects.modifySetup.fields.when` | Campo admitido por modifySetup; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
@@ -1912,6 +2081,19 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.modifyNomination.fields.createsReminder` | Campo admitido por modifyNomination; su valor debe cumplir el contrato tipado. | `{"createsReminder":"<createsReminder>"}` |
 | `effects.modifyNomination.fields.voteDelta` | Campo admitido por modifyNomination; su valor debe cumplir el contrato tipado. | `{"voteDelta":"<voteDelta>"}` |
 | `effects.modifyNomination.fields.requiresActorAbstention` | Campo admitido por modifyNomination; su valor debe cumplir el contrato tipado. | `{"requiresActorAbstention":"<requiresActorAbstention>"}` |
+| `effects.performTableAction` | Registra una acción física tipada y aplica sus consecuencias solo si no es interceptada. | `{"type":"performTableAction","action":"devour","targets":{"type":"binding","binding":"selected"},"consequences":[]}` |
+| `effects.performTableAction.fields.type` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.performTableAction.fields.when` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
+| `effects.performTableAction.fields.delay` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
+| `effects.performTableAction.fields.targets` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
+| `effects.performTableAction.fields.affectedBy` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"affectedBy":"<affectedBy>"}` |
+| `effects.performTableAction.fields.duration` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"duration":"<duration>"}` |
+| `effects.performTableAction.fields.optional` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"optional":"<optional>"}` |
+| `effects.performTableAction.fields.reminder` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"reminder":"<reminder>"}` |
+| `effects.performTableAction.fields.reminderTokens` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"reminderTokens":"<reminderTokens>"}` |
+| `effects.performTableAction.fields.spentReminder` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
+| `effects.performTableAction.fields.action` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"action":"<action>"}` |
+| `effects.performTableAction.fields.consequences` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"consequences":"<consequences>"}` |
 | `effects.recordAction` | Registra una acción y su resultado. | `{"type":"recordAction"}` |
 | `effects.recordAction.fields.type` | Campo admitido por recordAction; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `effects.recordAction.fields.when` | Campo admitido por recordAction; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
@@ -1950,6 +2132,21 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.storytellerDecision.fields.spentReminder` | Campo admitido por storytellerDecision; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.storytellerDecision.fields.decision` | Campo admitido por storytellerDecision; su valor debe cumplir el contrato tipado. | `{"decision":"<decision>"}` |
 | `effects.storytellerDecision.fields.options` | Campo admitido por storytellerDecision; su valor debe cumplir el contrato tipado. | `{"options":"<options>"}` |
+| `effects.manualCheckpoint` | Registra un juicio o acción humana con resultados mecánicos cerrados. | `{"type":"manualCheckpoint","reason":"storytellerJudgment","prompt":"Confirma el resultado.","outcomes":[{"id":"confirmed","label":"Confirmado","effects":[]}],"blocking":true}` |
+| `effects.manualCheckpoint.fields.type` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.manualCheckpoint.fields.when` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
+| `effects.manualCheckpoint.fields.delay` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
+| `effects.manualCheckpoint.fields.targets` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
+| `effects.manualCheckpoint.fields.affectedBy` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"affectedBy":"<affectedBy>"}` |
+| `effects.manualCheckpoint.fields.duration` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"duration":"<duration>"}` |
+| `effects.manualCheckpoint.fields.optional` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"optional":"<optional>"}` |
+| `effects.manualCheckpoint.fields.reminder` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"reminder":"<reminder>"}` |
+| `effects.manualCheckpoint.fields.reminderTokens` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"reminderTokens":"<reminderTokens>"}` |
+| `effects.manualCheckpoint.fields.spentReminder` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
+| `effects.manualCheckpoint.fields.reason` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"reason":"<reason>"}` |
+| `effects.manualCheckpoint.fields.prompt` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"prompt":"<prompt>"}` |
+| `effects.manualCheckpoint.fields.outcomes` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"outcomes":"<outcomes>"}` |
+| `effects.manualCheckpoint.fields.blocking` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"blocking":"<blocking>"}` |
 | `effects.manualInstruction` | Muestra una resolución guiada no automatizada. | `{"type":"manualInstruction","instruction":"Describe cómo resolver esta regla."}` |
 | `effects.manualInstruction.fields.type` | Campo admitido por manualInstruction; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `effects.manualInstruction.fields.when` | Campo admitido por manualInstruction; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |

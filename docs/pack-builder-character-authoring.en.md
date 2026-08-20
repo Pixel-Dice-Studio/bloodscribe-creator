@@ -4,14 +4,14 @@ This reference is generated from the same contract used by the MCP. Examples use
 
 ## Participation and victory profile
 
-Before modeling the ability, classify how the character enters, counts, and wins. If the idea does not make this clear, the AI must ask. `teamId` only groups and presents content; it never replaces these fields. New proposals use `entryMode`, not the historical `assignment` field.
+Before modeling the ability, classify how the character enters, counts, and wins. If the idea does not make this clear, the AI must ask. `teamId` only groups and presents content; it never replaces these fields. Every proposal uses `entryMode`.
 
 ### `regular-aligned` — Regular aligned character
 
 Enters the bag, occupies a regular slot, and wins with its effective alignment.
 
 - Counts among regular living players.
-- Uses normal death flows and is not exiled.
+- Uses normal death flows and cannot be expelled as temporary.
 
 ```json
 {
@@ -36,12 +36,12 @@ Enters the bag, occupies a regular slot, and wins with its effective alignment.
 }
 ```
 
-### `independent-traveller` — Traveller or temporary participant
+### `temporary-character` — Temporary character
 
-Enters outside the base cast, receives a secret alignment, and uses exile.
+Enters outside the base cast, receives a secret alignment, and uses expulsion.
 
 - Does not occupy a base-cast slot or count toward the standard two-alive ending.
-- May join during play and is eligible for exile.
+- May join during play and is eligible for expulsion.
 
 ```json
 {
@@ -56,9 +56,9 @@ Enters outside the base cast, receives a secret alignment, and uses exile.
       ]
     },
     "entryMode": {
-      "default": "independent",
+      "default": "temporary",
       "allowed": [
-        "independent"
+        "temporary"
       ]
     },
     "victory": {
@@ -135,10 +135,10 @@ Remains neutral for identity and composition but shares one fixed side's victory
 
 ### `flexible-entry` — Flexible entry
 
-The Storyteller decides whether the same definition enters the cast or joins independently.
+The Storyteller decides whether the same definition enters the cast or as a temporary character.
 
 - With cast it counts and dies as part of the regular cast.
-- With independent it stays outside the regular count and uses exile.
+- With temporary it stays outside the regular count and uses expulsion.
 
 ```json
 {
@@ -156,7 +156,7 @@ The Storyteller decides whether the same definition enters the cast or joins ind
       "default": "cast",
       "allowed": [
         "cast",
-        "independent"
+        "temporary"
       ]
     },
     "victory": {
@@ -170,9 +170,147 @@ The Storyteller decides whether the same definition enters the cast or joins ind
 }
 ```
 
+## Complete gameplay examples
+
+### `character:invented:night-envoy` — Evil temporary character joining during the day
+
+1. It joins during the day through add-temporary-player. The immediate reveal shows character and alignment, but not main evil players.
+2. On the next night, its first step separately shows every living main evil player. It excludes helpers and bluffs, then its own ability acts.
+3. An approved temporaryExpulsion vote produces expulsion and death. Living and dead players may vote, no last breath is spent, and an execution may still happen that day.
+
+```json
+{
+  "id": "character:invented:night-envoy",
+  "name": "Enviado nocturno",
+  "teamId": "team:invented:visitors",
+  "gameplay": {
+    "role": "support",
+    "allegiance": {
+      "default": "evil",
+      "allowed": [
+        "good",
+        "evil"
+      ]
+    },
+    "entryMode": {
+      "default": "temporary",
+      "allowed": [
+        "temporary"
+      ]
+    },
+    "victory": {
+      "type": "withCurrentAllegiance"
+    }
+  },
+  "summaryEs": "Cada noche, elige un jugador y aprende si está vivo."
+}
+```
+
+### `character:invented:two-doors` — Dual-entry character
+
+1. When entered as cast, it occupies a cast slot, counts among regular living players, uses ordinary death flows, and cannot be expelled as temporary.
+2. When entered as temporary, it stays outside those counts, may join during play, and uses expulsion. Only this entry receives automatic evil information when evil.
+
+```json
+{
+  "id": "character:invented:two-doors",
+  "name": "Dos Puertas",
+  "teamId": "team:invented:neutral",
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral",
+        "good",
+        "evil"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast",
+        "temporary"
+      ]
+    },
+    "victory": {
+      "type": "withCurrentAllegiance"
+    }
+  },
+  "summaryEs": "Una vez por partida, elige un jugador: aprende su alineamiento."
+}
+```
+
+### `character:invented:common-mediator` — Neutral cast character that counts normally
+
+1. Even with independent role and neutral allegiance, cast makes it occupy the cast, count for game end, and use normal death and execution.
+
+```json
+{
+  "id": "character:invented:common-mediator",
+  "name": "Mediador común",
+  "teamId": "team:invented:neutral",
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast"
+      ]
+    },
+    "victory": {
+      "type": "withSide",
+      "side": "good"
+    }
+  },
+  "summaryEs": "Cada día, puede hacer una pregunta pública al Narrador."
+}
+```
+
+### `character:invented:solitary-oath` — Independent character with personal victory
+
+1. It counts as a regular player because it enters as cast, but it does not automatically share either side's victory: it wins only when its personal condition is satisfied.
+
+```json
+{
+  "id": "character:invented:solitary-oath",
+  "name": "Juramento solitario",
+  "teamId": "team:invented:neutral",
+  "gameplay": {
+    "role": "independent",
+    "allegiance": {
+      "default": "neutral",
+      "allowed": [
+        "neutral"
+      ]
+    },
+    "entryMode": {
+      "default": "cast",
+      "allowed": [
+        "cast"
+      ]
+    },
+    "victory": {
+      "type": "personal",
+      "condition": {
+        "type": "storytellerDecision",
+        "decision": "inventedOathFulfilled"
+      }
+    }
+  },
+  "summaryEs": "Ganas solo si el Narrador confirma que cumpliste tu juramento público."
+}
+```
+
 ## Design questions
 
-- Does the character enter the regular cast, as an independent exile-eligible participant, or through either mode?
+- Does the character enter the regular cast, as a temporary character, or through either mode?
 - Does the character count as regular for composition and game end, or as an extra participant outside that count?
 - Is its alignment good, evil, or neutral, and which alignments may it change to?
 - Does it win with its current alignment, with a fixed side, or only through a personal condition?
@@ -1198,11 +1336,12 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `events.characterEntry` | Supported events option identified by characterEntry. | `{"type":"event","event":"characterEntry"}` |
 | `events.death` | Supported events option identified by death. | `{"type":"event","event":"death"}` |
 | `events.execution` | Supported events option identified by execution. | `{"type":"event","event":"execution"}` |
-| `events.exile` | Supported events option identified by exile. | `{"type":"event","event":"exile"}` |
+| `events.expulsion` | Supported events option identified by expulsion. | `{"type":"event","event":"expulsion"}` |
 | `events.nomination` | Supported events option identified by nomination. | `{"type":"event","event":"nomination"}` |
 | `events.publicAction` | Supported events option identified by publicAction. | `{"type":"event","event":"publicAction"}` |
 | `events.mechanicUse` | Supported events option identified by mechanicUse. | `{"type":"event","event":"mechanicUse"}` |
 | `events.mechanicTargeted` | Supported events option identified by mechanicTargeted. | `{"type":"event","event":"mechanicTargeted"}` |
+| `events.tableAction` | Supported events option identified by tableAction. | `{"type":"event","event":"tableAction"}` |
 | `events.stateChange` | Supported events option identified by stateChange. | `{"type":"event","event":"stateChange"}` |
 | `events.restrictionChange` | Supported events option identified by restrictionChange. | `{"type":"event","event":"restrictionChange"}` |
 | `events.markerChange` | Supported events option identified by markerChange. | `{"type":"event","event":"markerChange"}` |
@@ -1230,11 +1369,12 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `entities.markers` | Supported entities option identified by markers. | `{"value":"markers"}` |
 | `predicateTypes.players.alive` | Supported players option identified by alive. | `{"value":"alive"}` |
 | `predicateTypes.players.identity` | Supported players option identified by identity. | `{"value":"identity"}` |
-| `predicateTypes.players.assignment` | Supported players option identified by assignment. | `{"value":"assignment"}` |
+| `predicateTypes.players.entryMode` | Supported players option identified by entryMode. | `{"value":"entryMode"}` |
 | `predicateTypes.players.identityMatchesBinding` | Supported players option identified by identityMatchesBinding. | `{"value":"identityMatchesBinding"}` |
 | `predicateTypes.players.identityMatchesInput` | Supported players option identified by identityMatchesInput. | `{"value":"identityMatchesInput"}` |
 | `predicateTypes.players.state` | Supported players option identified by state. | `{"value":"state"}` |
 | `predicateTypes.players.marker` | Supported players option identified by marker. | `{"value":"marker"}` |
+| `predicateTypes.players.membership` | Supported players option identified by membership. | `{"value":"membership"}` |
 | `predicateTypes.players.isBinding` | Supported players option identified by isBinding. | `{"value":"isBinding"}` |
 | `predicateTypes.players.all` | Supported players option identified by all. | `{"value":"all"}` |
 | `predicateTypes.players.any` | Supported players option identified by any. | `{"value":"any"}` |
@@ -1259,6 +1399,8 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `predicateTypes.markers.markerKind` | Supported markers option identified by markerKind. | `{"value":"markerKind"}` |
 | `predicateTypes.markers.markerId` | Supported markers option identified by markerId. | `{"value":"markerId"}` |
 | `predicateTypes.markers.markerActive` | Supported markers option identified by markerActive. | `{"value":"markerActive"}` |
+| `predicateTypes.markers.markerEntity` | Supported markers option identified by markerEntity. | `{"value":"markerEntity"}` |
+| `predicateTypes.markers.markerSourceCharacter` | Supported markers option identified by markerSourceCharacter. | `{"value":"markerSourceCharacter"}` |
 | `predicateTypes.markers.all` | Supported markers option identified by all. | `{"value":"all"}` |
 | `predicateTypes.markers.any` | Supported markers option identified by any. | `{"value":"any"}` |
 | `predicateTypes.markers.not` | Supported markers option identified by not. | `{"value":"not"}` |
@@ -1309,6 +1451,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `identityModes.initial` | Supported identity modes option identified by initial. | `{"identityMode":"initial"}` |
 | `identityModes.base` | Supported identity modes option identified by base. | `{"identityMode":"base"}` |
 | `identityModes.shown` | Supported identity modes option identified by shown. | `{"identityMode":"shown"}` |
+| `identityModes.apparent` | Supported identity modes option identified by apparent. | `{"identityMode":"apparent"}` |
 | `identityModes.registered` | Applies registration decisions before reading identity. | `{"identityMode":"registered"}` |
 | `identityFacets.teamId` | Supported identity facets option identified by teamId. | `{"value":"teamId"}` |
 | `identityFacets.allegiance` | Supported identity facets option identified by allegiance. | `{"value":"allegiance"}` |
@@ -1325,8 +1468,9 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `roles.core` | Supported roles option identified by core. | `{"value":"core"}` |
 | `roles.support` | Supported roles option identified by support. | `{"value":"support"}` |
 | `roles.independent` | Supported roles option identified by independent. | `{"value":"independent"}` |
-| `assignments.player` | Supported assignments option identified by player. | `{"value":"player"}` |
-| `assignments.temporalPlayer` | Supported assignments option identified by temporalPlayer. | `{"value":"temporalPlayer"}` |
+| `entryModes.cast` | Supported entry modes option identified by cast. | `{"value":"cast"}` |
+| `entryModes.temporary` | Supported entry modes option identified by temporary. | `{"value":"temporary"}` |
+| `eventPeriods.currentBatch` | Supported event periods option identified by currentBatch. | `{"value":"currentBatch"}` |
 | `eventPeriods.currentDay` | Supported event periods option identified by currentDay. | `{"value":"currentDay"}` |
 | `eventPeriods.currentNight` | Supported event periods option identified by currentNight. | `{"value":"currentNight"}` |
 | `eventPeriods.previousDay` | Supported event periods option identified by previousDay. | `{"value":"previousDay"}` |
@@ -1358,6 +1502,12 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `eventFields.abilityProvenance` | Reports whether an ability was native, granted, copied, or otherwise sourced. | `{"type":"eventField","field":"abilityProvenance","value":"<value>"}` |
 | `eventFields.effectiveTargetCount` | Counts players the mechanic ultimately affected. | `{"type":"eventField","field":"effectiveTargetCount","value":"<value>"}` |
 | `eventFields.targetResultStatus` | Reports the common result applied to a mechanic's targets. | `{"type":"eventField","field":"targetResultStatus","value":"<value>"}` |
+| `eventFields.tableAction` | Supported event fields option identified by tableAction. | `{"type":"eventField","field":"tableAction","value":"<value>"}` |
+| `eventFields.causalOutcome` | Supported event fields option identified by causalOutcome. | `{"type":"eventField","field":"causalOutcome","value":"<value>"}` |
+| `eventFields.originalTargets` | Supported event fields option identified by originalTargets. | `{"type":"eventField","field":"originalTargets","value":"<value>"}` |
+| `eventFields.effectiveTargets` | Supported event fields option identified by effectiveTargets. | `{"type":"eventField","field":"effectiveTargets","value":"<value>"}` |
+| `eventFields.sourceMechanicId` | Supported event fields option identified by sourceMechanicId. | `{"type":"eventField","field":"sourceMechanicId","value":"<value>"}` |
+| `eventFields.reactionSources` | Supported event fields option identified by reactionSources. | `{"type":"eventField","field":"reactionSources","value":"<value>"}` |
 | `eventFields.causedByEventId` | Supported event fields option identified by causedByEventId. | `{"type":"eventField","field":"causedByEventId","value":"<value>"}` |
 | `information.kinds.boolean` | Supported kinds option identified by boolean. | `{"value":"boolean"}` |
 | `information.kinds.number` | Supported kinds option identified by number. | `{"value":"number"}` |
@@ -1408,7 +1558,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `windows.speech` | Supported windows option identified by speech. | `{"window":"speech"}` |
 | `windows.nomination` | Supported windows option identified by nomination. | `{"window":"nomination"}` |
 | `windows.execution` | Supported windows option identified by execution. | `{"window":"execution"}` |
-| `windows.exile` | Supported windows option identified by exile. | `{"window":"exile"}` |
+| `windows.expulsion` | Supported windows option identified by expulsion. | `{"window":"expulsion"}` |
 | `windows.dusk` | Supported windows option identified by dusk. | `{"window":"dusk"}` |
 | `windows.mainEvilInfo` | Supported windows option identified by mainEvilInfo. | `{"window":"mainEvilInfo"}` |
 | `windows.gameEnd` | Supported windows option identified by gameEnd. | `{"window":"gameEnd"}` |
@@ -1456,6 +1606,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.death.fields.reminder` | Field accepted by death; its value must satisfy the typed contract. | `{"reminder":"<reminder>"}` |
 | `effects.death.fields.reminderTokens` | Field accepted by death; its value must satisfy the typed contract. | `{"reminderTokens":"<reminderTokens>"}` |
 | `effects.death.fields.spentReminder` | Field accepted by death; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
+| `effects.death.fields.attribution` | Field accepted by death; its value must satisfy the typed contract. | `{"attribution":"<attribution>"}` |
 | `effects.death.fields.bypassesDeathProtection` | Field accepted by death; its value must satisfy the typed contract. | `{"bypassesDeathProtection":"<bypassesDeathProtection>"}` |
 | `effects.death.fields.bypassesProtection` | Field accepted by death; its value must satisfy the typed contract. | `{"bypassesProtection":"<bypassesProtection>"}` |
 | `effects.death.fields.chargeReminder` | Field accepted by death; its value must satisfy the typed contract. | `{"chargeReminder":"<chargeReminder>"}` |
@@ -1517,6 +1668,17 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.setPlayerState.fields.active` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"active":"<active>"}` |
 | `effects.setPlayerState.fields.exclusive` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"exclusive":"<exclusive>"}` |
 | `effects.setPlayerState.fields.excludeInitialTargets` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"excludeInitialTargets":"<excludeInitialTargets>"}` |
+| `effects.setPlayerRelation` | Supported effects option identified by setPlayerRelation. | `{"type":"setPlayerRelation","kind":"linked","active":true,"targets":{"type":"binding","binding":"selected"}}` |
+| `effects.setPlayerRelation.fields.type` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.setPlayerRelation.fields.when` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"when":"<when>"}` |
+| `effects.setPlayerRelation.fields.delay` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
+| `effects.setPlayerRelation.fields.targets` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
+| `effects.setPlayerRelation.fields.affectedBy` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"affectedBy":"<affectedBy>"}` |
+| `effects.setPlayerRelation.fields.duration` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"duration":"<duration>"}` |
+| `effects.setPlayerRelation.fields.kind` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"kind":"<kind>"}` |
+| `effects.setPlayerRelation.fields.active` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"active":"<active>"}` |
+| `effects.setPlayerRelation.fields.markerId` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"markerId":"<markerId>"}` |
+| `effects.setPlayerRelation.fields.ownership` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"ownership":"<ownership>"}` |
 | `effects.applyMarker` | Adds or removes a reminder marker while retaining source metadata. | `{"type":"applyMarker","kind":"reminder","id":"marker","active":true,"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.applyMarker.fields.type` | Field accepted by applyMarker; its value must satisfy the typed contract. | `{"type":"<type>"}` |
 | `effects.applyMarker.fields.when` | Field accepted by applyMarker; its value must satisfy the typed contract. | `{"when":"<when>"}` |
@@ -1622,6 +1784,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.grantAbility.fields.abilityCharacterId` | Field accepted by grantAbility; its value must satisfy the typed contract. | `{"abilityCharacterId":"<abilityCharacterId>"}` |
 | `effects.grantAbility.fields.owner` | Field accepted by grantAbility; its value must satisfy the typed contract. | `{"owner":"<owner>"}` |
 | `effects.grantAbility.fields.controller` | Field accepted by grantAbility; its value must satisfy the typed contract. | `{"controller":"<controller>"}` |
+| `effects.grantAbility.fields.ownership` | Field accepted by grantAbility; its value must satisfy the typed contract. | `{"ownership":"<ownership>"}` |
 | `effects.swapSeats` | Supported effects option identified by swapSeats. | `{"type":"swapSeats"}` |
 | `effects.swapSeats.fields.type` | Field accepted by swapSeats; its value must satisfy the typed contract. | `{"type":"<type>"}` |
 | `effects.swapSeats.fields.when` | Field accepted by swapSeats; its value must satisfy the typed contract. | `{"when":"<when>"}` |
@@ -1706,6 +1869,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.resolveGameEnd.fields.winner` | Field accepted by resolveGameEnd; its value must satisfy the typed contract. | `{"winner":"<winner>"}` |
 | `effects.resolveGameEnd.fields.reason` | Field accepted by resolveGameEnd; its value must satisfy the typed contract. | `{"reason":"<reason>"}` |
 | `effects.resolveGameEnd.fields.precedence` | Field accepted by resolveGameEnd; its value must satisfy the typed contract. | `{"precedence":"<precedence>"}` |
+| `effects.resolveGameEnd.fields.activation` | Field accepted by resolveGameEnd; its value must satisfy the typed contract. | `{"activation":"<activation>"}` |
 | `effects.blockGameEnd` | Supported effects option identified by blockGameEnd. | `{"type":"blockGameEnd","winner":"good","reason":"La victoria está bloqueada."}` |
 | `effects.blockGameEnd.fields.type` | Field accepted by blockGameEnd; its value must satisfy the typed contract. | `{"type":"<type>"}` |
 | `effects.blockGameEnd.fields.when` | Field accepted by blockGameEnd; its value must satisfy the typed contract. | `{"when":"<when>"}` |
@@ -1852,6 +2016,11 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.modifyVote.fields.weight` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"weight":"<weight>"}` |
 | `effects.modifyVote.fields.pairedTargets` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"pairedTargets":"<pairedTargets>"}` |
 | `effects.modifyVote.fields.pairedWeight` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"pairedWeight":"<pairedWeight>"}` |
+| `effects.modifyVote.fields.threshold` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"threshold":"<threshold>"}` |
+| `effects.modifyVote.fields.purposes` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"purposes":"<purposes>"}` |
+| `effects.modifyVote.fields.electorate` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"electorate":"<electorate>"}` |
+| `effects.modifyVote.fields.creditRequired` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"creditRequired":"<creditRequired>"}` |
+| `effects.modifyVote.fields.tallyValidity` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"tallyValidity":"<tallyValidity>"}` |
 | `effects.modifySetup` | Supported effects option identified by modifySetup. | `{"type":"modifySetup","operations":[{"type":"adjustBucket","bucket":"setupBucket","delta":0}]}` |
 | `effects.modifySetup.fields.type` | Field accepted by modifySetup; its value must satisfy the typed contract. | `{"type":"<type>"}` |
 | `effects.modifySetup.fields.when` | Field accepted by modifySetup; its value must satisfy the typed contract. | `{"when":"<when>"}` |
@@ -1912,6 +2081,19 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.modifyNomination.fields.createsReminder` | Field accepted by modifyNomination; its value must satisfy the typed contract. | `{"createsReminder":"<createsReminder>"}` |
 | `effects.modifyNomination.fields.voteDelta` | Field accepted by modifyNomination; its value must satisfy the typed contract. | `{"voteDelta":"<voteDelta>"}` |
 | `effects.modifyNomination.fields.requiresActorAbstention` | Field accepted by modifyNomination; its value must satisfy the typed contract. | `{"requiresActorAbstention":"<requiresActorAbstention>"}` |
+| `effects.performTableAction` | Supported effects option identified by performTableAction. | `{"type":"performTableAction","action":"devour","targets":{"type":"binding","binding":"selected"},"consequences":[]}` |
+| `effects.performTableAction.fields.type` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.performTableAction.fields.when` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"when":"<when>"}` |
+| `effects.performTableAction.fields.delay` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
+| `effects.performTableAction.fields.targets` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
+| `effects.performTableAction.fields.affectedBy` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"affectedBy":"<affectedBy>"}` |
+| `effects.performTableAction.fields.duration` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"duration":"<duration>"}` |
+| `effects.performTableAction.fields.optional` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"optional":"<optional>"}` |
+| `effects.performTableAction.fields.reminder` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"reminder":"<reminder>"}` |
+| `effects.performTableAction.fields.reminderTokens` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"reminderTokens":"<reminderTokens>"}` |
+| `effects.performTableAction.fields.spentReminder` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
+| `effects.performTableAction.fields.action` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"action":"<action>"}` |
+| `effects.performTableAction.fields.consequences` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"consequences":"<consequences>"}` |
 | `effects.recordAction` | Supported effects option identified by recordAction. | `{"type":"recordAction"}` |
 | `effects.recordAction.fields.type` | Field accepted by recordAction; its value must satisfy the typed contract. | `{"type":"<type>"}` |
 | `effects.recordAction.fields.when` | Field accepted by recordAction; its value must satisfy the typed contract. | `{"when":"<when>"}` |
@@ -1950,6 +2132,21 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.storytellerDecision.fields.spentReminder` | Field accepted by storytellerDecision; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.storytellerDecision.fields.decision` | Field accepted by storytellerDecision; its value must satisfy the typed contract. | `{"decision":"<decision>"}` |
 | `effects.storytellerDecision.fields.options` | Field accepted by storytellerDecision; its value must satisfy the typed contract. | `{"options":"<options>"}` |
+| `effects.manualCheckpoint` | Supported effects option identified by manualCheckpoint. | `{"type":"manualCheckpoint","reason":"storytellerJudgment","prompt":"Confirma el resultado.","outcomes":[{"id":"confirmed","label":"Confirmado","effects":[]}],"blocking":true}` |
+| `effects.manualCheckpoint.fields.type` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.manualCheckpoint.fields.when` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"when":"<when>"}` |
+| `effects.manualCheckpoint.fields.delay` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
+| `effects.manualCheckpoint.fields.targets` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
+| `effects.manualCheckpoint.fields.affectedBy` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"affectedBy":"<affectedBy>"}` |
+| `effects.manualCheckpoint.fields.duration` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"duration":"<duration>"}` |
+| `effects.manualCheckpoint.fields.optional` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"optional":"<optional>"}` |
+| `effects.manualCheckpoint.fields.reminder` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"reminder":"<reminder>"}` |
+| `effects.manualCheckpoint.fields.reminderTokens` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"reminderTokens":"<reminderTokens>"}` |
+| `effects.manualCheckpoint.fields.spentReminder` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
+| `effects.manualCheckpoint.fields.reason` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"reason":"<reason>"}` |
+| `effects.manualCheckpoint.fields.prompt` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"prompt":"<prompt>"}` |
+| `effects.manualCheckpoint.fields.outcomes` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"outcomes":"<outcomes>"}` |
+| `effects.manualCheckpoint.fields.blocking` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"blocking":"<blocking>"}` |
 | `effects.manualInstruction` | Supported effects option identified by manualInstruction. | `{"type":"manualInstruction","instruction":"Describe cómo resolver esta regla."}` |
 | `effects.manualInstruction.fields.type` | Field accepted by manualInstruction; its value must satisfy the typed contract. | `{"type":"<type>"}` |
 | `effects.manualInstruction.fields.when` | Field accepted by manualInstruction; its value must satisfy the typed contract. | `{"when":"<when>"}` |

@@ -238,18 +238,18 @@ Un equipo proporciona términos, presentación y valores mecánicos predetermina
 | `role` | `core`, `support`, `independent` |
 | `allegiance.default` | `good`, `evil`, `neutral` |
 | `allegiance.allowed` | Alineamientos a los que puede cambiar legítimamente. |
-| `entryMode.default` | `cast` o `independent` |
+| `entryMode.default` | `cast` o `temporary` |
 | `entryMode.allowed` | Modos de entrada permitidos. |
 | `victory.type` | `withCurrentAllegiance`, `withSide` o `personal` |
 
 Antes de escribir la habilidad, decide estos ejes en este orden:
 
-1. Si entra en el reparto (`cast`), fuera del reparto como participante exiliable (`independent`) o de ambas formas.
+1. Si entra en el reparto (`cast`), como personaje temporal (`temporary`) o de ambas formas.
 2. Si ocupa un rol `core`, `support` o `independent` en la composición.
 3. Si su alineamiento es `good`, `evil` o `neutral` y a cuáles puede cambiar.
 4. Si gana con su alineamiento actual, con un bando fijo o mediante una condición personal.
 
-`teamId`, el nombre y el texto de habilidad no resuelven ninguna de esas decisiones. En contenido nuevo se declara siempre `entryMode`; `assignment` es únicamente compatibilidad de lectura para packs históricos.
+`teamId`, el nombre y el texto de habilidad no resuelven ninguna de esas decisiones. La participación se declara exclusivamente mediante `entryMode`.
 
 ### Perfiles completos habituales
 
@@ -274,7 +274,7 @@ Personaje regular de un bando:
 }
 ```
 
-Viajero o participante temporal: queda fuera del reparto base y del conteo estándar de dos vivos, puede incorporarse durante la partida y es elegible para exilio. Su alineamiento bueno o malvado se asigna de forma secreta al entrar.
+Personaje temporal: queda fuera del reparto base y del conteo estándar de vivos, puede incorporarse durante la partida y es elegible para expulsión. Su alineamiento se asigna de forma secreta al entrar. Si es malvado, el motor crea como primer paso de su primera noche aplicable una revelación de todos los malvados principales vivos; no incluye ayudantes ni faroles. Estas reglas son automáticas y no se repiten en `mechanics`.
 
 ```json
 {
@@ -285,8 +285,8 @@ Viajero o participante temporal: queda fuera del reparto base y del conteo está
       "allowed": ["neutral", "good", "evil"]
     },
     "entryMode": {
-      "default": "independent",
-      "allowed": ["independent"]
+      "default": "temporary",
+      "allowed": ["temporary"]
     },
     "victory": {
       "type": "withCurrentAllegiance"
@@ -344,7 +344,7 @@ Neutral dentro del reparto que gana siempre con un bando fijo:
 }
 ```
 
-Entrada flexible: el mismo personaje puede comportarse como parte normal del reparto o como participante independiente. El comportamiento efectivo depende del modo elegido para ese jugador.
+Entrada flexible: el mismo personaje puede comportarse como parte normal del reparto o como personaje temporal. El comportamiento efectivo depende del modo elegido para ese jugador.
 
 ```json
 {
@@ -356,7 +356,7 @@ Entrada flexible: el mismo personaje puede comportarse como parte normal del rep
     },
     "entryMode": {
       "default": "cast",
-      "allowed": ["cast", "independent"]
+      "allowed": ["cast", "temporary"]
     },
     "victory": {
       "type": "personal",
@@ -503,7 +503,7 @@ Piensa en una mecánica como una frase estructurada:
 
 ### 8.2 `when`: momento y disparador
 
-`when.window` sitúa la capacidad en `setup`, `firstNight`, `night`, `dawn`, `day`, `voting`, `speech`, `nomination`, `execution`, `exile`, `dusk`, `mainEvilInfo`, `gameEnd` o `anyTime`.
+`when.window` sitúa la capacidad en `setup`, `firstNight`, `night`, `dawn`, `day`, `voting`, `speech`, `nomination`, `execution`, `expulsion`, `dusk`, `mainEvilInfo`, `gameEnd` o `anyTime`.
 
 `cadence` es `once` o `each`. `startsAt` fija el primer día o noche. `trigger` convierte la mecánica en una reacción a un evento:
 
