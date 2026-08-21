@@ -1,6 +1,6 @@
 # Manual de autoría manual de packs de BloodScribe
 
-Esta guía explica cómo escribir a mano un pack `bloodscribe-v3`: desde la raíz del JSON hasta equipos, personajes, reglas, composiciones, votación, cuentos y programas mecánicos. Está pensada para entender cómo se combinan las primitivas, no solo para copiar campos aislados.
+Esta guía explica cómo escribir a mano un pack `bloodscribe-3.1`: desde la raíz del JSON hasta equipos, personajes, reglas, composiciones, votación, cuentos y programas mecánicos. Está pensada para entender cómo se combinan las primitivas, no solo para copiar campos aislados.
 
 Puedes consultar o descargar el [pack completo de demostración](ejemplo-pack-manual.es.bloodscribe.json). Ese archivo usa únicamente IDs y contenido inventados y se valida automáticamente con el mismo importador que usa BloodScribe.
 
@@ -93,7 +93,7 @@ La forma canónica es:
 
 ```json
 {
-  "schemaVersion": "bloodscribe-v3",
+  "schemaVersion": "bloodscribe-3.1",
   "id": "mi-juego:pack-principal",
   "key": "pack-principal",
   "version": "1.0.0",
@@ -115,9 +115,13 @@ La forma canónica es:
 }
 ```
 
+`schemaVersion` es el único dato de compatibilidad con el motor; no se añade un campo `engineVersion`. Su minor aumenta cuando se incorporan primitivas, sintaxis o campos opcionales compatibles, y su major cuando se retira o cambia el significado de una declaración o hace falta transformar la estructura existente. Las correcciones internas que no cambian el JSON no alteran esta versión. BloodScribe migra formatos históricos compatibles al importar, pero todo pack nuevo o guardado usa siempre la versión canónica actual.
+
+El campo `version` es independiente: identifica la publicación del contenido del pack, no la compatibilidad del motor.
+
 | Campo | Regla |
 |---|---|
-| `schemaVersion` | Siempre `bloodscribe-v3`. |
+| `schemaVersion` | Siempre `bloodscribe-3.1`. |
 | `id` | Identidad estable del pack. No se traduce. |
 | `key` | Minúsculas, números y guiones simples. |
 | `version` | Increméntala al cambiar comportamiento o contenido publicado. |

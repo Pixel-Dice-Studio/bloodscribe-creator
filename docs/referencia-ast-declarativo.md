@@ -1,6 +1,6 @@
 # Referencia del AST declarativo de mecánicas
 
-Esta es la referencia operativa del lenguaje declarativo de BloodScribe tras la auditoría de abstracción. Describe el contrato `mechanics-1.0` que aceptan los packs, no una API para codificar comportamientos por ID de personaje. Los packs canónicos usan `schemaVersion: "bloodscribe-v3"`; el campo `version` identifica la versión publicable del contenido.
+Esta es la referencia operativa del lenguaje declarativo de BloodScribe tras la auditoría de abstracción. Describe el contrato `mechanics-1.0` que aceptan los packs, no una API para codificar comportamientos por ID de personaje. Los packs canónicos usan `schemaVersion: "bloodscribe-3.1"`; el campo `version` identifica la versión publicable del contenido.
 
 Esta referencia describe el lenguaje declarativo que usa BloodScribe. Sus fuentes de verdad ejecutables dentro del código son:
 

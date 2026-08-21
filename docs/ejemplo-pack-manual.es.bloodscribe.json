@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "bloodscribe-v3",
+  "schemaVersion": "bloodscribe-3.1",
   "id": "demo:manual-autoria",
   "key": "manual-autoria",
   "version": "1.0.0",
