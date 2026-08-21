@@ -867,7 +867,6 @@ Leyenda de cobertura:
 | Golem | `golem:global-rule:1` | manual | `golemMayNominateOnce` |
 | Plague Doctor | `plaguedoctor:global-rule:1` | manual | `storytellerGainsMinionAbility` |
 | Politician | `politician:win-condition:1` | manual ! | Decidir si fue el principal responsable de la victoria. |
-| Zealot | `zealot:global-rule:1` | manual | `mustVoteWhenFiveOrMoreAlive` |
 | Damsel | `damsel:loss-condition:1` | manual ! | Resolver la declaración pública que identifica a Damsel. |
 | Heretic | `heretic:global-rule:1` | manual | `invertWinLoss` |
 | Fearmonger | `fearmonger:reminder-choice:1` | mixta (`applyMarker`) | `announceMarkerHolderChange` |
