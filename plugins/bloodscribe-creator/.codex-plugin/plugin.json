@@ -1,6 +1,6 @@
 {
   "name": "bloodscribe-creator",
-  "version": "1.1.0+codex.20260826185146",
+  "version": "1.1.0+codex.1ab9de8f41b",
   "description": "Create and validate BloodScribe characters with your own AI and BloodScribe Creator MCP.",
   "author": {
     "name": "Pixel Dice Studio",
@@ -26,6 +26,9 @@
       "Read"
     ],
     "websiteURL": "https://bloodscribe.app/creator",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/logo.png",
+    "logoDark": "./assets/logo-dark.png",
     "defaultPrompt": [
       "Create a BloodScribe character from my idea.",
       "Validate this BloodScribe character JSON.",
