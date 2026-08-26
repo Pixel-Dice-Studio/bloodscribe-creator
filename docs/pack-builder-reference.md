@@ -1,4 +1,4 @@
-# Referencia del Pack Builder: personajes y reglas de partida
+# Referencia de BloodScribe Creator: personajes y reglas de partida
 
 Esta referencia enumera las opciones que ofrece el editor. Para aprender a construir un pack completo paso a paso, consulta el [`manual de autoría manual`](manual-autoria-packs.es.md). La referencia de bajo nivel del lenguaje de expresiones está en [`referencia-ast-declarativo.md`](referencia-ast-declarativo.md).
 
@@ -85,7 +85,7 @@ Una regla general vive en `gameRules[]`, no se reparte a un jugador y puede ejec
 
 Por ahora, solo Fabled, Loric, Maldiciones y Bendiciones se publican como Modificadores. Violinista, por ejemplo, conserva `ruleKind: "gameEnd"`, pero no declara `systemType`; por eso no se mezcla con los finales del Sistema.
 
-El selector del Pack Builder ofrece Modificador y los cinco tipos de Sistema. Al elegir un tipo de Sistema compone el ID jerárquico, oculta el campo de icono y muestra el SVG compartido:
+El selector de Creator ofrece Modificador y los cinco tipos de Sistema. Al elegir un tipo de Sistema compone el ID jerárquico, oculta el campo de icono y muestra el SVG compartido:
 
 | `systemType` | ID | SVG automático |
 |---|---|---|
@@ -346,7 +346,7 @@ Personajes y reglas generales usan la misma estructura:
 | `mechanicId` | ID estable para persistencia y diagnóstico. No selecciona comportamiento. |
 | `tags` | Capacidades semánticas que otras reglas pueden consultar. |
 | `when` | Momento, cadencia, evento disparador y demora. |
-| `input` | Entrada que presenta el Pack Builder. |
+| `input` | Entrada que presenta Creator. |
 | `conditions` | Expresiones que deben cumplirse. |
 | `effects` | Operaciones ejecutadas en orden. |
 | `usage` | Límite y momento de consumo. |
@@ -440,7 +440,7 @@ Para consultas, predicados, relaciones de mesa, agregados y proyecciones, consul
 
 ## 4. Primitivas de efecto
 
-Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affectedBy`, `duration`, `optional`, `reminder`, `reminderTokens` y `spentReminder`. La tabla enumera las opciones propias; el Pack Builder conserva campos avanzados admitidos por el esquema.
+Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affectedBy`, `duration`, `optional`, `reminder`, `reminderTokens` y `spentReminder`. La tabla enumera las opciones propias; Creator conserva campos avanzados admitidos por el esquema.
 
 | `effects[].type` | Qué hace | Opciones propias principales | Ejemplo mínimo |
 |---|---|---|---|
@@ -455,6 +455,7 @@ Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affected
 | `changeAlignment` | Cambia el alineamiento. | `alignment`, `notifyPlayer`, perfiles y límites de objetivo. | `{"type":"changeAlignment","alignment":"evil","targets":{"type":"binding","binding":"selected"}}` |
 | `changeCharacter` | Sustituye identidad real o mostrada. | Personaje/equipo nuevo, preservación de alineamiento, límites y consecuencias. | `{"type":"changeCharacter","newCharacter":"character:ejemplo:nuevo","targets":{"type":"binding","binding":"selected"}}` |
 | `grantAbility` | Concede o retira una habilidad declarada. | `abilityCharacterId`, `active`, `owner`, `controller`, `ownership`. | `{"type":"grantAbility","abilityCharacterId":"character:ejemplo:fuente","active":true,"ownership":"sourceAbility","targets":{"type":"binding","binding":"selected"}}` |
+| `triggerAbility` | Activa una mecánica declarada del objetivo. | `mechanicTag`. | `{"type":"triggerAbility","mechanicTag":"ability-tag","targets":{"type":"binding","binding":"selected"}}` |
 | `swapSeats` | Intercambia asientos seleccionados. | Sin opciones propias. | `{"type":"swapSeats","targets":{"type":"binding","binding":"selected"}}` |
 | `swapCharacters` | Intercambia identidades entre jugadores. | `actor`, `resultingState`, `resultingStateDuration`, `swapsCharactersAndAlignments`. | `{"type":"swapCharacters","targets":{"type":"binding","binding":"selected"}}` |
 | `swapTargets` | Intercambia objetivos ya resueltos. | Sin opciones propias. | `{"type":"swapTargets","targets":{"type":"binding","binding":"selected"}}` |
@@ -531,4 +532,4 @@ La matriz exhaustiva y las recetas completas por intención están disponibles e
 - Toda decisión asistida tiene opciones y textos de presentación cerrados.
 - Las reglas generales se enlazan mediante `gameRuleBindings`; la regla de votación mediante `votingRuleId`.
 - El cuento duplicado conserva sus referencias hasta que el autor las cambie.
-- El Pack Builder valida el JSON con el mismo importador que usa la instalación.
+- Creator valida el JSON con el mismo importador que usa la instalación.

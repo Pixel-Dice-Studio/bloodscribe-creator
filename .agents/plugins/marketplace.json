@@ -1,14 +1,14 @@
 {
-  "name": "bloodscribe-pack-builder",
+  "name": "bloodscribe-creator",
   "interface": {
-    "displayName": "BloodScribe Pack Builder"
+    "displayName": "BloodScribe Creator"
   },
   "plugins": [
     {
-      "name": "bloodscribe-pack-builder",
+      "name": "bloodscribe-creator",
       "source": {
         "source": "local",
-        "path": "./plugins/bloodscribe-pack-builder"
+        "path": "./plugins/bloodscribe-creator"
       },
       "policy": {
         "installation": "AVAILABLE",

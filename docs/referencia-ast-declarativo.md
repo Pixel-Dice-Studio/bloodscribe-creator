@@ -6,7 +6,7 @@ Esta referencia describe el lenguaje declarativo que usa BloodScribe. Sus fuente
 
 - `packages/core/src/ruleLanguage.ts`: expresiones, consultas, predicados, relaciones y evaluación.
 - `packages/core/src/types.ts`: mecánicas, eventos, entradas, efectos y presentación.
-- `packages/core/src/ruleSchema.ts`: catálogo que usa el Pack Builder, campos admitidos y validación.
+- `packages/core/src/ruleSchema.ts`: catálogo que usa el BloodScribe Creator, campos admitidos y validación.
 
 Los ejemplos usan IDs inventados deliberadamente. Un cambio de ID no debe cambiar el resultado mecánico.
 

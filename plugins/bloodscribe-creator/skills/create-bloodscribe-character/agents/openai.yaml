@@ -5,8 +5,8 @@ interface:
 dependencies:
   tools:
     - type: "mcp"
-      value: "bloodscribe-pack-builder"
-      description: "Public BloodScribe mechanic catalog, recipes, and deterministic character validation"
+      value: "bloodscribe-creator"
+      description: "BloodScribe Creator mechanic catalog, recipes, and deterministic character validation"
       transport: "streamable_http"
       url: "https://bloodscribe.app/mcp"
 policy:

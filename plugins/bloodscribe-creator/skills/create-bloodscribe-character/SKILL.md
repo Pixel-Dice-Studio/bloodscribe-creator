@@ -1,6 +1,6 @@
 ---
 name: create-bloodscribe-character
-description: Create, refine, explain, or validate original BloodScribe Pack Builder characters with the user's own AI. Use when a user describes a character ability, provides character JSON, asks which mechanics represent an idea, or needs a proposal repaired against BloodScribe's public MCP.
+description: Create, refine, explain, or validate original BloodScribe Creator characters with the user's own AI. Use when a user describes a character ability, provides character JSON, asks which mechanics represent an idea, or needs a proposal repaired against BloodScribe's public MCP.
 ---
 
 # Create a BloodScribe character

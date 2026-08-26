@@ -950,7 +950,7 @@ El [pack completo de demostración](ejemplo-pack-manual.es.bloodscribe.json) inc
 
 El Cuento la selecciona con `votingRuleId`, no mediante un binding. Si falta o la regla instalada desaparece, BloodScribe usa la votación pública estándar y muestra un aviso.
 
-La [referencia del Pack Builder](pack-builder-reference.md#2-opciones-de-nominación-y-votación) enumera todos los valores y compatibilidades de votación.
+La [referencia del BloodScribe Creator](pack-builder-reference.md#2-opciones-de-nominación-y-votación) enumera todos los valores y compatibilidades de votación.
 
 ## 14. Cuentos y activación de reglas
 
@@ -1096,7 +1096,7 @@ La mecánica no contiene el nombre del personaje, del equipo malvado ni una rama
 
 ### Validación local en BloodScribe
 
-1. Abre el Pack Builder.
+1. Abre el BloodScribe Creator.
 2. Ve a **Publicación**.
 3. Abre el validador e importa o pega el JSON.
 4. Corrige todos los errores bloqueantes.
@@ -1140,7 +1140,7 @@ No hacen falta scripts remotos ni código ejecutable. BloodScribe descarga y val
 Este manual enseña el proceso y la composición. Para consultar cada opción admitida:
 
 - [Pack completo de demostración](ejemplo-pack-manual.es.bloodscribe.json): archivo importable y validado.
-- [Referencia del Pack Builder](pack-builder-reference.md): campos de personajes, reglas, votación, efectos y políticas.
+- [Referencia del BloodScribe Creator](pack-builder-reference.md): campos de personajes, reglas, votación, efectos y políticas.
 - [Matriz y recetas mecánicas](pack-builder-character-authoring.es.md): cada primitiva, subopción, campo, estado de soporte y ejemplo.
 - [Referencia del AST declarativo](referencia-ast-declarativo.md): consultas, relaciones, filtros, proyecciones, agregados y expresiones.
 - [English mechanic authoring guide](pack-builder-character-authoring.en.md): matriz y recetas en inglés.
