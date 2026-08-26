@@ -1,6 +1,8 @@
 interface:
   display_name: "Create BloodScribe Character"
   short_description: "Create and validate BloodScribe characters"
+  icon_small: "./assets/icon.png"
+  icon_large: "./assets/icon.png"
   default_prompt: "Use $create-bloodscribe-character to turn my idea into a validated BloodScribe character."
 dependencies:
   tools:
