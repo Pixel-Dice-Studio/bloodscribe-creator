@@ -28,6 +28,7 @@ Write `ability` in the output locale using the concise player-facing style share
 - Use digits for Spanish game quantities. In English, prefer idiomatic `a player` for one and concise numeric quantities where natural.
 - When a choice, condition, or trigger produces an effect, separate the result with a colon.
 - Keep the ability to one or two compact sentences when possible. Remove flavor, implementation vocabulary, redundant subjects, and optional wording when the choice is mandatory.
+- For a token or marker transferred directly to the addressed player, write `mueves la ficha/marca a ti`, never `hacia ti`; `a ti` makes clear that it goes straight to that player without passing through others.
 - Preserve any uncertainty, false information, impairment, limit, exception, duration, identity mode, alignment change, or death condition declared by the mechanics.
 
 Example: `Cada noche, eliges a 1 jugador (no a ti): queda protegido hasta el amanecer.` corresponds to `Each night, choose another player: they are protected until dawn.`

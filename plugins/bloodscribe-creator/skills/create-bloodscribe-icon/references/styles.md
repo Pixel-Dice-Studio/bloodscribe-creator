@@ -10,17 +10,33 @@ For user selection, show [style-selector-board.png](../assets/style-selector-boa
 
 Every style uses a square icon canvas and a compact, almost square subject mass. The visible bounding box should normally be at least 75% as wide as it is tall and remain balanced inside a circular crop. Prefer head-and-shoulders crops, diagonal long objects, overlapping hands or symbols, and near-circular silhouettes. Avoid full bodies, narrow standing poses, tall portrait cards, or placing the narrative object in a separate row below the character. Comparison boards use five equal square cells: each centered subject occupies about 78-84 percent of its cell at a consistent scale. The board outside subjects is pure white by default. A style with a white exterior contour may instead use a uniform neutral mid-gray inspection canvas so the contour remains visible; that gray is never part of the final icon. A material support or contextual background may exist only inside the local icon when the style explicitly requires it.
 
+## Character-type palette
+
+Use colors declared by the target pack or supplied by the user. Ask once for all five character-type colors when any are missing; accept partial overrides and fill each omitted entry with the corresponding BloodScribe default:
+
+| Character type | Default |
+|---|---|
+| Pueblerinos | `#438b54` |
+| Ayudantes | `#81942d` |
+| Errantes | `#947947` |
+| Siervos | `#a8443c` |
+| Oscuros | `#5d2618` |
+
+Always state the active character type and its exact resolved color in the image-generation prompt. Apply it primarily to clothing, trim, collar, frame, or one secondary mass. Story-defining subjects and objects keep their intuitive natural colors.
+
 ## Styles
 
 ### `cuento-infantil`
 
-The established Grimm style. Read [the reference board](../assets/cuento-infantil-style-board.png) before generating.
+The established Grimm character style, equivalent to `GRIMM-INK-V1-SCHEMATIC`. Read [the reference board](../assets/cuento-infantil-style-board.png) before generating; use it for subject scale and composition, while the locked rules below control finish and detail. This style defaults to `bajo`; for this pairing, its locked 7-11-mass definition overrides the generic 5-7-mass guidance for `bajo` below.
 
-- Rounded, schematic folklore character or object with a friendly editorial finish.
-- Heavy, smooth black exterior and important interior contours.
-- Large clean color masses with restrained soft gradients; no painted texture or scenery.
-- Expressive face built from very few marks and a dominant story object occupying roughly 30-45 percent of the composition.
-- Character-type color on clothing or the main support mass: green for Pueblerino, olive for Ayudante, ochre for Errante, red for Siervo, dark brown for Oscuro. Natural story colors still win.
+- One original folklore character, creature, or object in a centered bust or emblem, readable at 48-64 px.
+- Roughly 7-11 large, flat schematic masses and no more than 3-5 essential interior marks.
+- One consistent heavy pure-black outline, visually about 26 px on a 1254 px canvas. Exterior and important interior contours use the same weight, rounded caps and joins, smooth organic curves, and soft corners.
+- One dominant story object, garment, hairstyle, or secondary shape occupying roughly 35-50 percent of the composition.
+- No gradients, hatching, texture, tiny patterns, individual hair or fur strands, scenery, extra characters, text, logo, frame, realism, 3D, anime, faceted polygons, or blocky anatomy.
+- Use the resolved character-type palette above without recoloring story-defining subjects or objects.
+- Keep enclosed whites and creams opaque; only the exterior is transparent. Do not imitate Disney or another franchise.
 
 ### `acuarela-infantil`
 
@@ -127,7 +143,7 @@ For user selection, show [detail-selector-board.png](../assets/detail-selector-b
 
 - About 10-14 masses.
 - A few garment folds, grouped hair or beard shapes, and the important object fittings.
-- Default for every style except `polaroid-realista`.
+- Default for every style except `cuento-infantil` and `polaroid-realista`.
 
 ### `detallado`
 
@@ -137,11 +153,11 @@ For user selection, show [detail-selector-board.png](../assets/detail-selector-b
 
 ## Recommended pairings
 
-Use these only when the user asks for a recommendation; they never replace explicit selection.
+`cuento-infantil` uses its listed style-specific default. Use every other pairing only when the user asks for a recommendation; they never replace explicit selection.
 
 | Style | Detail |
 |---|---|
-| `cuento-infantil` | `medio` |
+| `cuento-infantil` | `bajo` (predeterminado) |
 | `acuarela-infantil` | `medio` |
 | `icono-representativo` | `medio` |
 | `emblema-narrativo` | `medio` |

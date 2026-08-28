@@ -259,8 +259,8 @@ Ejemplo de mayoría de vivos:
 
 | Campo | Opciones | Qué hace |
 |---|---|---|
-| `timing.open` | `perNomination`, `day`, `preDawn` | Abre por nominación, durante el día o al final de la noche. |
-| `timing.resolve` | `perNomination`, `dusk`, `preDawn` | Resuelve por nominación, al anochecer o antes del amanecer. |
+| `timing.open` | `perNomination`, `day`, `preDawn` | Abre por nominación, durante el día o en Noche Tardía. |
+| `timing.resolve` | `perNomination`, `dusk`, `preDawn` | Resuelve por nominación, al anochecer o en Noche Tardía. |
 | `disclosure.publicResult` | `resultOnly`, `totals` | Publica solo el resultado o también los totales por candidato. |
 
 `enteredBy` también define el cierre. Con `storyteller`, cerrar resuelve y aplica el resultado inmediatamente. Con `players`, cerrar bloquea las papeletas y calcula el resultado solo para el Narrador: los móviles muestran que la votación ha terminado hasta que pulse **Comunicar resultados**. Entonces se aplican las ejecuciones, se sincroniza la ruleta de 12 segundos si alguien muere y se publica el desenlace según `disclosure.publicResult`.
