@@ -8,7 +8,7 @@ For user selection, show [style-selector-board.png](../assets/style-selector-boa
 
 ## Global composition
 
-Every style uses a square icon canvas and a compact, almost square subject mass. The visible bounding box should normally be at least 75% as wide as it is tall and remain balanced inside a circular crop. Prefer head-and-shoulders crops, diagonal long objects, overlapping hands or symbols, and near-circular silhouettes. Avoid full bodies, narrow standing poses, tall portrait cards, or placing the narrative object in a separate row below the character. Comparison boards use five equal square cells: each centered subject occupies about 78-84 percent of its cell at a consistent scale. The board outside subjects is always pure white; a material support or contextual background may exist only inside the local icon when the style explicitly requires it.
+Every style uses a square icon canvas and a compact, almost square subject mass. The visible bounding box should normally be at least 75% as wide as it is tall and remain balanced inside a circular crop. Prefer head-and-shoulders crops, diagonal long objects, overlapping hands or symbols, and near-circular silhouettes. Avoid full bodies, narrow standing poses, tall portrait cards, or placing the narrative object in a separate row below the character. Comparison boards use five equal square cells: each centered subject occupies about 78-84 percent of its cell at a consistent scale. The board outside subjects is pure white by default. A style with a white exterior contour may instead use a uniform neutral mid-gray inspection canvas so the contour remains visible; that gray is never part of the final icon. A material support or contextual background may exist only inside the local icon when the style explicitly requires it.
 
 ## Styles
 
@@ -33,6 +33,24 @@ Reference: [acuarela-infantil-style-board.png](../assets/acuarela-infantil-style
 An original tabletop emblem: portrait and story object interlock into a compact near-circular silhouette. Use flat colors, strong negative space, a uniform heavy outline, and no texture, scene, or decorative frame. It may share the instant readability of social-deduction tokens but must not reproduce another game's compositions or characters.
 
 Reference: [icono-representativo-style-board.png](../assets/icono-representativo-style-board.png).
+
+### `emblema-narrativo`
+
+An original theatrical story-token emblem. Fuse a character portrait and one narrative object into a compact irregular almost-round silhouette. Use an expressive near-black hand-inked contour of naturally varied width, muted jewel colors, warm ivory highlights, restrained painterly modeling, dramatic chiaroscuro, slightly uncanny storybook expressions, and a few ornamental leaf or curl shapes. Keep the rendering hand-painted and readable rather than smooth or glossy. Do not add a circular backing disc, geometric medallion, halo, separate frame, scene, logo, or copied composition.
+
+Reference: [emblema-narrativo-style-board.png](../assets/emblema-narrativo-style-board.png).
+
+### `emblema-texturizado`
+
+A flat three-ink handmade emblem: one extra-thick irregular charcoal-brown outer keyline, warm-white primary drawing contours and highlight masses, and one muted character-type color. Use rough screenprint grain, broad interlocking shapes, imperfect hand-cut edges, and very few large divisions. The uniform mid-gray reference canvas exists only to reveal the white ink; final icons have a transparent exterior. Avoid smooth vector polish, realistic volume, gradients, gloss, cast shadows, backing circles, frames, scenery, and text.
+
+Reference: [emblema-texturizado-style-board.png](../assets/emblema-texturizado-style-board.png).
+
+### `grabado-bicolor`
+
+A strict two-ink folk-print icon using only warm white and one character-type color. The entire exterior contour is a thick continuous warm-white border; inside it, build the subject from broad colored masses, bold white cuts, and restrained mottled screenprint grain. Never introduce black, charcoal, gray, brown, skin tone, gold, or a third ink inside the icon. The uniform mid-gray reference canvas is inspection-only and the final exterior is transparent. No dark keyline, dimensional lighting, gradients, gloss, shadows, backing circles, frames, scenery, or text.
+
+Reference: [grabado-bicolor-style-board.png](../assets/grabado-bicolor-style-board.png).
 
 ### `polaroid-realista`
 
@@ -126,6 +144,9 @@ Use these only when the user asks for a recommendation; they never replace expli
 | `cuento-infantil` | `medio` |
 | `acuarela-infantil` | `medio` |
 | `icono-representativo` | `medio` |
+| `emblema-narrativo` | `medio` |
+| `emblema-texturizado` | `medio` |
+| `grabado-bicolor` | `bajo` |
 | `polaroid-realista` | `detallado` |
 | `grabado-sencillo` | `medio` |
 | `clasico-sobrio` | `detallado` |
