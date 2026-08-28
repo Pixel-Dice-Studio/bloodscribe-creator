@@ -14,7 +14,7 @@ Reply in the user's language.
 1. Confirm `get_mechanic_catalog`, `search_rule_recipes`, and `validate_content_pack_proposal` are available. Require MCP `>= 2.2.0`, mechanic `guideVersion >= 7`, `ruleAuthoring.guideVersion >= 2`, and the catalog features `contentPackTemplate`, `taleAuthoring`, `contentPackValidation`, `counterExpressions`, and `tallyElements`.
 2. If authentication is required, retry one public tool once to start OAuth. Ask the user to approve the browser flow; never request or print a token.
 3. Start from the complete attached/exported `.bloodscribe.json`; otherwise clone `contentPackTemplate`.
-4. Decide whether to create a new tale or modify an existing one. Use only characters, teams, and rules present in that pack. Preserve opaque IDs and existing references unless the user explicitly replaces them.
+4. Decide whether to create a new tale or modify an existing one. Use only characters, character types, and rules present in that pack. Preserve opaque IDs and existing references unless the user explicitly replaces them.
 5. Read `bloodscribe://pack-builder/tales/{locale}` and apply these invariants:
    - exactly one composition binding, `automatic`, with no `activeWhen`;
    - at most one voting rule through `votingRuleId`;
@@ -30,7 +30,7 @@ Reply in the user's language.
 ## Hard rules
 
 - Never call or imply access to BloodScribe's internal AI.
-- Never assume preinstalled characters, rules, teams, translations, or IDs.
+- Never assume preinstalled characters, rules, character types, translations, or IDs.
 - Never create behavior branches from a content ID, name, text, edition, or origin.
 - Never duplicate system default rule definitions inside the pack; reference their canonical IDs.
 - To publish a shared counter total, add one tale element with `kind: "tally"`, `counter`, and optional `remainderCounter`. Do not create separate `Token 1`, `Token 2`, and `Token 3` elements.

@@ -1,6 +1,6 @@
 # Manual de autoría manual de packs de BloodScribe
 
-Esta guía explica cómo escribir a mano un pack `bloodscribe-3.1`: desde la raíz del JSON hasta equipos, personajes, reglas, composiciones, votación, cuentos y programas mecánicos. Está pensada para entender cómo se combinan las primitivas, no solo para copiar campos aislados.
+Esta guía explica cómo escribir a mano un pack `bloodscribe-3.1`: desde la raíz del JSON hasta tipos de personaje, personajes, reglas, composiciones, votación, cuentos y programas mecánicos. Está pensada para entender cómo se combinan las primitivas, no solo para copiar campos aislados.
 
 Puedes consultar o descargar el [pack completo de demostración](ejemplo-pack-manual.es.bloodscribe.json). Ese archivo usa únicamente IDs y contenido inventados y se valida automáticamente con el mismo importador que usa BloodScribe.
 
@@ -11,7 +11,7 @@ Puedes consultar o descargar el [pack completo de demostración](ejemplo-pack-ma
 3. [Raíz del pack](#3-raíz-del-pack)
 4. [IDs, claves y referencias](#4-ids-claves-y-referencias)
 5. [Colecciones y Libros](#5-colecciones-y-libros)
-6. [Equipos](#6-equipos)
+6. [Tipos de personaje](#6-tipos-de-personaje)
 7. [Personajes](#7-personajes)
 8. [Cómo componer una mecánica](#8-cómo-componer-una-mecánica)
 9. [Expresiones, consultas y relaciones](#9-expresiones-consultas-y-relaciones)
@@ -20,7 +20,7 @@ Puedes consultar o descargar el [pack completo de demostración](ejemplo-pack-ma
 12. [Composición del reparto](#12-composición-del-reparto)
 13. [Nominación y votación](#13-nominación-y-votación)
 14. [Cuentos y activación de reglas](#14-cuentos-y-activación-de-reglas)
-15. [Ejemplo razonado: vecinos registrados como malvados](#15-ejemplo-razonado-vecinos-registrados-como-malvados)
+15. [Ejemplo razonado: vecinos registrados como parte del Mal](#15-ejemplo-razonado-vecinos-registrados-como-parte-del-mal)
 16. [Validar, probar y publicar](#16-validar-probar-y-publicar)
 17. [Errores habituales](#17-errores-habituales)
 18. [Referencias exhaustivas](#18-referencias-exhaustivas)
@@ -33,7 +33,7 @@ Un pack no es código. Es un documento JSON declarativo que contiene entidades y
 Pack
 ├── Libros
 │   └── Colección embebida
-├── Equipos
+├── Tipos de personaje
 ├── Personajes
 │   └── rules.mechanics[]
 ├── Reglas de partida
@@ -44,7 +44,7 @@ Pack
 │       └── rules.mechanics[]
 └── Cuentos
     ├── personajes incluidos
-    ├── copia de sus equipos
+    ├── copia de sus tipos de personaje
     └── bindings de reglas
 ```
 
@@ -55,7 +55,7 @@ Las responsabilidades están separadas:
 | Pack | Transporte, idioma, versión y autoría. |
 | Colección | Universo editorial compartido. |
 | Libro | Agrupación estable de cuentos y entidades. |
-| Equipo | Vocabulario, color y perfil mecánico predeterminado. |
+| Tipo de personaje | Vocabulario, color y perfil mecánico predeterminado. |
 | Personaje | Identidad, texto, fichas y habilidades. |
 | Regla | Comportamiento global no asignado a un jugador. |
 | Composición | Cuántos personajes de cada perfil forman la partida. |
@@ -76,8 +76,8 @@ Construir en este orden evita referencias rotas:
 
 1. Elige un namespace estable, por ejemplo `mi-juego`.
 2. Declara los metadatos raíz y la versión.
-3. Declara los equipos y sus perfiles predeterminados.
-4. Crea los personajes que usan esos equipos.
+3. Declara los tipos de personaje y sus perfiles predeterminados.
+4. Crea los personajes que usan esos tipos.
 5. Añade exactamente una regla de composición para cada Cuento.
 6. Añade una regla de votación si no quieres usar el fallback estándar.
 7. Añade reglas globales, de setup o de final.
@@ -142,7 +142,7 @@ Los IDs son referencias persistentes. No contienen lógica y no cambian al tradu
 | Colección | `collection:<namespace>` |
 | Libro | `book:<namespace>:<slug>` |
 | Cuento | `tale:<namespace>:<slug>` |
-| Equipo | `team:<namespace>:<slug>` |
+| Tipo de personaje | `team:<namespace>:<slug>` |
 | Personaje | `character:<namespace>:<slug>` |
 | Regla modificadora | `rule:<namespace>:<slug>` |
 | Regla de Sistema | `rule:<namespace>:<systemType>:<slug>` |
@@ -170,7 +170,7 @@ Al renombrar un ID hay que actualizar todas sus referencias:
 
 ## 5. Colecciones y Libros
 
-La Colección se incluye dentro de cada Libro. El Libro enumera sus Cuentos, personajes, reglas y equipos.
+La Colección se incluye dentro de cada Libro. El Libro enumera sus Cuentos, personajes, reglas y tipos de personaje.
 
 ```json
 {
@@ -193,9 +193,9 @@ La Colección se incluye dentro de cada Libro. El Libro enumera sus Cuentos, per
 
 `ContentPack` es el archivo de transporte; el Libro es la agrupación editorial. No uses `edition` para sustituir al Libro.
 
-## 6. Equipos
+## 6. Tipos de personaje
 
-Un equipo proporciona términos, presentación y valores mecánicos predeterminados.
+Un tipo de personaje proporciona términos, presentación y valores mecánicos predeterminados.
 
 ```json
 {
@@ -204,7 +204,7 @@ Un equipo proporciona términos, presentación y valores mecánicos predetermina
     "singular": "Habitante",
     "plural": "Habitantes"
   },
-  "description": "Núcleo del bando bueno.",
+  "description": "Núcleo del Bien.",
   "defaults": {
     "role": "core",
     "allegiance": {
@@ -251,13 +251,13 @@ Antes de escribir la habilidad, decide estos ejes en este orden:
 1. Si entra en el reparto (`cast`), como personaje temporal (`temporary`) o de ambas formas.
 2. Si ocupa un rol `core`, `support` o `independent` en la composición.
 3. Si su alineamiento es `good`, `evil` o `neutral` y a cuáles puede cambiar.
-4. Si gana con su alineamiento actual, con un bando fijo o mediante una condición personal.
+4. Si gana con su alineamiento actual, con un alineamiento fijo o mediante una condición personal.
 
 `teamId`, el nombre y el texto de habilidad no resuelven ninguna de esas decisiones. La participación se declara exclusivamente mediante `entryMode`.
 
 ### Perfiles completos habituales
 
-Personaje regular de un bando:
+Personaje regular de un alineamiento:
 
 ```json
 {
@@ -278,7 +278,7 @@ Personaje regular de un bando:
 }
 ```
 
-Personaje temporal: queda fuera del reparto base y del conteo estándar de vivos, puede incorporarse durante la partida y es elegible para expulsión. Su alineamiento se asigna de forma secreta al entrar. Si es malvado, el motor crea como primer paso de su primera noche aplicable una revelación de todos los malvados principales vivos; no incluye ayudantes ni faroles. Estas reglas son automáticas y no se repiten en `mechanics`.
+Personaje temporal: queda fuera del reparto base y del conteo estándar de vivos, puede incorporarse durante la partida y es elegible para expulsión. Su alineamiento se asigna de forma secreta al entrar. Si pertenece al Mal, el motor crea como primer paso de su primera noche aplicable una revelación de todos los principales del Mal vivos; no incluye ayudantes ni faroles. Estas reglas son automáticas y no se repiten en `mechanics`.
 
 ```json
 {
@@ -299,7 +299,7 @@ Personaje temporal: queda fuera del reparto base y del conteo estándar de vivos
 }
 ```
 
-Neutral dentro del reparto con victoria personal: ocupa una plaza neutral, cuenta entre los vivos regulares, muere normalmente y no gana automáticamente con bueno ni malvado.
+Neutral dentro del reparto con victoria personal: ocupa una plaza neutral, cuenta entre los vivos regulares, muere normalmente y no gana automáticamente con el Bien ni el Mal.
 
 ```json
 {
@@ -326,7 +326,7 @@ Neutral dentro del reparto con victoria personal: ocupa una plaza neutral, cuent
 
 La condición `personal` se comprueba al resolver un final. Si cumplirla debe terminar la partida por sí mismo, declara además una mecánica `resolveGameEnd`.
 
-Neutral dentro del reparto que gana siempre con un bando fijo:
+Neutral dentro del reparto que gana siempre con un alineamiento fijo:
 
 ```json
 {
@@ -373,9 +373,9 @@ Entrada flexible: el mismo personaje puede comportarse como parte normal del rep
 }
 ```
 
-Si “Universal” es solo una categoría editorial, usa un `teamId` universal pero conserva `role`, `allegiance`, `entryMode` y `victory` del comportamiento real. No conviertas la etiqueta universal en una rama mecánica.
+Si “Dual” es solo una categoría editorial, usa un `teamId` dual pero conserva `role`, `allegiance`, `entryMode` y `victory` del comportamiento real. No conviertas la etiqueta dual en una rama mecánica.
 
-La composición estándar se deriva de `role` y `allegiance`, no del nombre ni del ID del equipo:
+La composición estándar se deriva de `role` y `allegiance`, no del nombre ni del ID del tipo de personaje:
 
 | Alineamiento y rol | Eje de composición |
 |---|---|
@@ -385,11 +385,11 @@ La composición estándar se deriva de `role` y `allegiance`, no del nombre ni d
 | `evil + core` | `evil` |
 | `neutral` o `independent` | `neutral` o entrada independiente, según el perfil |
 
-Un personaje puede sobrescribir parte de `gameplay`, pero los valores comunes deben vivir en el equipo para evitar repetición.
+Un personaje puede sobrescribir parte de `gameplay`, pero los valores comunes deben vivir en el tipo de personaje para evitar repetición.
 
 Los colores son `#RRGGBB` opacos. No uses variables CSS, nombres de color ni alfa.
 
-En textos visibles puedes resolver el vocabulario del equipo con `{{team:mi-juego:habitantes}}` y su plural con `{{team:mi-juego:habitantes|plural}}`.
+En textos visibles puedes resolver el vocabulario del tipo de personaje con `{{team:mi-juego:habitantes}}` y su plural con `{{team:mi-juego:habitantes|plural}}`.
 
 ## 7. Personajes
 
@@ -1003,11 +1003,11 @@ Reglas de enlace:
 
 Temas disponibles: `ink`, `purple`, `oxblood`, `verdigris`, `midnight` y `leather`. Fondos: `none`, `astrolabe`, `orrery`, `rose`, `filigree`, `baroque`, `thorns`, `cobweb`, `ribcage`, `candelabra`, `bramble`, `sigil`, `runes`, `blood` y `plain`.
 
-## 15. Ejemplo razonado: vecinos registrados como malvados
+## 15. Ejemplo razonado: vecinos registrados como parte del Mal
 
 Petición:
 
-> Cada noche, descubre si al menos uno de tus dos vecinos vivos más cercanos se registra como malvado.
+> Cada noche, descubre si al menos uno de tus dos vecinos vivos más cercanos se registra como parte del Mal.
 
 Descomposición:
 
@@ -1091,7 +1091,7 @@ Descomposición:
 }
 ```
 
-La mecánica no contiene el nombre del personaje, del equipo malvado ni una rama especial del motor. Otro personaje puede reutilizarla cambiando textos e IDs sin cambiar su comportamiento.
+La mecánica no contiene el nombre del personaje, del tipo del Mal ni una rama especial del motor. Otro personaje puede reutilizarla cambiando textos e IDs sin cambiar su comportamiento.
 
 ## 16. Validar, probar y publicar
 
@@ -1124,8 +1124,8 @@ No hacen falta scripts remotos ni código ejecutable. BloodScribe descarga y val
 | Inventar `effects[].type` | Usa la matriz admitida o declara modelado manual. |
 | Poner `systemType` en un ID corto | Usa `rule:<namespace>:<systemType>:<slug>`. |
 | Traducir IDs entre archivos ES/EN | Conserva IDs y traduce solo textos. |
-| Declarar equipo solo dentro del Cuento | Publícalo también en `teams` raíz. |
-| Omitir la copia de equipos del Cuento | Incluye las definiciones necesarias para su snapshot. |
+| Declarar un tipo solo dentro del Cuento | Publícalo también en `teams` raíz. |
+| Omitir la copia de tipos del Cuento | Incluye las definiciones necesarias para su snapshot. |
 | Crear una composición dentro del Cuento | Declárala como Regla y enlázala automáticamente. |
 | Enlazar dos composiciones | Cada Cuento admite exactamente una. |
 | Usar un binding para votación | Usa `votingRuleId`. |

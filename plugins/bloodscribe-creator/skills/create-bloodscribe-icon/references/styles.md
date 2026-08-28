@@ -2,7 +2,13 @@
 
 `style` controls the medium and shape language. `detail` controls how much internal information appears. Never use detail as a synonym for realism.
 
-Every style board uses the same five references, left to right: Blancanieves, Enano Gruñón, Cazador de Blancanieves, Espejo Encantado, and Reina Madrastra. Use the boards to learn treatment, never as subject templates.
+Every style board uses the same five references, left to right: Blancanieves, Enano Gruñón, Cazador de Blancanieves, Espejo Encantado, and Reina Madrastra. Use the boards to learn treatment, never as subject templates. Their canvas is pure white only to compare styles without contaminating them; final icons keep a transparent exterior.
+
+For user selection, show [style-selector-board.png](../assets/style-selector-board.png); every label is an exact `style` value. If `detail` is also missing, show [detail-selector-board.png](../assets/detail-selector-board.png) and ask for both choices together.
+
+## Global composition
+
+Every style uses a square icon canvas and a compact, almost square subject mass. The visible bounding box should normally be at least 75% as wide as it is tall and remain balanced inside a circular crop. Prefer head-and-shoulders crops, diagonal long objects, overlapping hands or symbols, and near-circular silhouettes. Avoid full bodies, narrow standing poses, tall portrait cards, or placing the narrative object in a separate row below the character. Comparison boards use five equal square cells: each centered subject occupies about 78-84 percent of its cell at a consistent scale. The board outside subjects is always pure white; a material support or contextual background may exist only inside the local icon when the style explicitly requires it.
 
 ## Styles
 
@@ -14,7 +20,13 @@ The established Grimm style. Read [the reference board](../assets/cuento-infanti
 - Heavy, smooth black exterior and important interior contours.
 - Large clean color masses with restrained soft gradients; no painted texture or scenery.
 - Expressive face built from very few marks and a dominant story object occupying roughly 30-45 percent of the composition.
-- Team color on clothing or the main support mass: green for Pueblerino, olive for Ayudante, ochre for Errante, red for Siervo, dark brown for Oscuro. Natural story colors still win.
+- Character-type color on clothing or the main support mass: green for Pueblerino, olive for Ayudante, ochre for Errante, red for Siervo, dark brown for Oscuro. Natural story colors still win.
+
+### `acuarela-infantil`
+
+A warm illustrated children's-story watercolor. Use soft visible pigment over clean compact shapes, light warm-brown contours, friendly expressions, and a restrained natural palette. The white reference canvas is neutral and the final exterior is transparent; never add a paper rectangle or scene. Avoid photorealism, anime, dark horror, dense painted texture, and franchise imitation.
+
+Reference: [acuarela-infantil-style-board.png](../assets/acuarela-infantil-style-board.png).
 
 ### `icono-representativo`
 
@@ -24,25 +36,25 @@ Reference: [icono-representativo-style-board.png](../assets/icono-representativo
 
 ### `polaroid-realista`
 
-A plausible photographed character or object inside a worn instant-photo frame. Use natural adult anatomy, materials, window light, muted analog color, and a simple background. No fantasy cosplay polish. This preset is raster-first and defaults to `detallado`.
+A plausible photographed character or object inside a worn instant-photo frame. Use natural adult anatomy, materials, window light, muted analog color, and a shallow-focus contextual background inside the photograph: fresh green for Pueblerino, muted olive for Ayudante, warm ochre for Errante, restrained red for Siervo, and dark brown for Oscuro. The board outside each frame remains white and the final exterior transparent. No fantasy cosplay polish. This preset is raster-first and pairs best with `detallado`.
 
 Reference: [polaroid-realista-style-board.png](../assets/polaroid-realista-style-board.png).
 
 ### `grabado-sencillo`
 
-A clean linocut or woodcut made from bold black shapes, cream negative space, and one muted team-color ink. Use broad carved curves and sparse cut marks, never dense crosshatching or tiny noise.
+A clean linocut or woodcut made from bold black shapes, cream negative space, and one muted character-type ink. Use broad carved curves and sparse cut marks, never dense crosshatching or tiny noise.
 
 Reference: [grabado-sencillo-style-board.png](../assets/grabado-sencillo-style-board.png).
 
 ### `clasico-sobrio`
 
-A restrained nineteenth-century editorial portrait or object still life in a circular medallion. Use muted oil color, controlled soft brushwork, a dark neutral field, and one thin antique-gold rim. Avoid baroque decoration and fantasy glow.
+A restrained nineteenth-century editorial portrait or object still life with muted oil color, controlled soft brushwork, and a compact free-edged silhouette on the neutral white reference canvas. Do not add a gold halo, circular rim, medallion, frame, shine, three-dimensional support, baroque decoration, or fantasy glow.
 
 Reference: [clasico-sobrio-style-board.png](../assets/clasico-sobrio-style-board.png).
 
 ### `vidriera-narrativa`
 
-Build the character from jewel-toned translucent glass cells separated by dark lead lines. Keep the silhouette compact and the cell count controlled; use glow only to reveal the material, never as a background effect.
+Build the character from a few large, flat jewel-toned glass cells separated by bold dark lead lines. Use an irregular free outer silhouette that follows the character and narrative object, never a circular or regular window. Fill broad internal background cells with the character-type color: green, olive, ochre, muted red, or dark brown. Avoid tiny mosaic cells, crystal texture, gloss, bevel, glow, and three-dimensional depth.
 
 Reference: [vidriera-narrativa-style-board.png](../assets/vidriera-narrativa-style-board.png).
 
@@ -54,31 +66,37 @@ Reference: [papel-recortado-style-board.png](../assets/papel-recortado-style-boa
 
 ### `esmalte-cloisonne`
 
-Design the subject from scratch as a physical cloisonne plaque or brooch. Antique-brass wires must define every major color compartment, with opaque or translucent jewel-toned enamel pooled inside them and controlled highlights that reveal both glass and metal. Do not add a gold outline around an existing icon, use a thick black cartoon contour, or produce a sticker-like vector rendering.
+Design the subject from scratch as a flat matte cloisonne icon with a free outer silhouette that follows the character and narrative object. Very thick, uniform antique-gold wires define a small number of large opaque color compartments so faces, hands, clothing, and props remain readable at 48 px. Do not add a circle, oval, medallion, backing plate, glossy highlight, reflection, sparkle, bevel, embossing, shadow, metallic texture, or three-dimensional volume.
 
 Reference: [esmalte-cloisonne-style-board.png](../assets/esmalte-cloisonne-style-board.png).
 
 ### `talla-madera-pintada`
 
-Render a shallow hand-carved wooden relief with visible carved planes and grain, restrained folk paint, slight edge wear, and enough dark separation to remain readable as a token.
+Render a shallow hand-carved wooden relief with visible carved planes and grain inside the subject, restrained folk paint, slight edge wear, and enough dark separation to remain readable as a token. The relief ends in a compact free silhouette; never add a wooden panel, plank, tabletop, wall, rectangle, or background slab.
 
 Reference: [talla-madera-pintada-style-board.png](../assets/talla-madera-pintada-style-board.png).
 
 ### `manuscrito-iluminado`
 
-Use medieval illuminated-manuscript language: flat perspective, ink contours, parchment colors, compact poses, and restrained gold-leaf accents. Do not add page borders, letters, or decorative marginalia.
+Use medieval illuminated-manuscript language: flat perspective, ink contours, parchment colors within the subject, compact poses, and restrained gold-leaf accents. Place the subject directly on the neutral white reference canvas; do not add a parchment page, aged-paper field, page border, letter, or decorative marginalia.
 
 Reference: [manuscrito-iluminado-style-board.png](../assets/manuscrito-iluminado-style-board.png).
 
 ### `teatro-sombras`
 
-Use dominant cut-paper black silhouettes, one restrained team-color layer, and a few meaningful interior cutouts. Depend on negative space rather than facial rendering; do not add a stage or scenery.
+Build each icon as one connected opaque light-cream base silhouette, overlaid with almost-black blue paper shapes, one restrained character-type color layer, and a few meaningful cream interior cuts. The cream base must connect every piece and prevent white exterior gaps from breaking recognition after SVG background removal. Do not add isolated floating pieces, a stage, curtain, spotlight, scenery, background panel, texture, gradient, shadow, or three-dimensional effect.
 
 Reference: [teatro-sombras-style-board.png](../assets/teatro-sombras-style-board.png).
 
+### `retrato-robot`
+
+Use the language of a police forensic facial composite or identikit—not a mechanical robot. Draw a loose, deliberately unfinished frontal or near-frontal bust with searching graphite lines, visible construction arcs, erased marks, sparse smudges, and only a few selectively darkened features. Each icon lives on its own hand-cut, roughly square piece of warm paper with visible fibers and irregular scissor edges; the paper is a tightly fitted local support on the white reference canvas, not a full background or sticker border. Tuck the narrative object into a lower corner beside the bust so the total mass stays square-ready; an object character remains an object reconstructed front-on. Keep it monochrome and avoid polished portrait rendering, meticulous crosshatching, photorealism, cyborg parts, mugshot placards, fingerprints, dossier text, scenery, or decorative fantasy rendering.
+
+Reference: [retrato-robot-style-board.png](../assets/retrato-robot-style-board.png).
+
 ## Detail levels
 
-When visual calibration is useful, inspect [detail-levels-style-board.png](../assets/detail-levels-style-board.png): it shows the same character at `bajo`, `medio`, and `detallado` from left to right.
+For user selection, show [detail-selector-board.png](../assets/detail-selector-board.png). For generation calibration, inspect [detail-levels-style-board.png](../assets/detail-levels-style-board.png): it shows the same character at `bajo`, `medio`, and `detallado` from left to right.
 
 ### `bajo`
 
@@ -99,11 +117,14 @@ When visual calibration is useful, inspect [detail-levels-style-board.png](../as
 - More separated hair, stitching, material cues, or restrained value changes.
 - No tiny noise; the same silhouette must still read at 64 px.
 
-## Recommended defaults
+## Recommended pairings
+
+Use these only when the user asks for a recommendation; they never replace explicit selection.
 
 | Style | Detail |
 |---|---|
 | `cuento-infantil` | `medio` |
+| `acuarela-infantil` | `medio` |
 | `icono-representativo` | `medio` |
 | `polaroid-realista` | `detallado` |
 | `grabado-sencillo` | `medio` |
@@ -114,3 +135,4 @@ When visual calibration is useful, inspect [detail-levels-style-board.png](../as
 | `talla-madera-pintada` | `medio` |
 | `manuscrito-iluminado` | `medio` |
 | `teatro-sombras` | `bajo` |
+| `retrato-robot` | `medio` |

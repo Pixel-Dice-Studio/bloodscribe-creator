@@ -14,7 +14,7 @@ Los IDs son referencias estables. El runtime nunca decide un comportamiento por 
 
 ### Personajes
 
-Un personaje declara identidad, equipo, texto, presentación, fichas y cero o más programas en `rules.mechanics[]`. Cada programa usa las primitivas de la sección 4.
+Un personaje declara identidad, tipo de personaje, texto, presentación, fichas y cero o más programas en `rules.mechanics[]`. Cada programa usa las primitivas de la sección 4.
 
 ```json
 {
@@ -22,7 +22,7 @@ Un personaje declara identidad, equipo, texto, presentación, fichas y cero o m�
   "copies": 3,
   "name": "Vigía",
   "teamId": "team:ejemplo:pueblo",
-  "ability": "Cada noche descubres cuántos jugadores vivos son malos.",
+  "ability": "Cada noche descubres cuántos jugadores vivos pertenecen al Mal.",
   "rules": {
     "mechanics": [
       {
@@ -34,7 +34,7 @@ Un personaje declara identidad, equipo, texto, presentación, fichas y cero o m�
           {
             "type": "emitInformation",
             "value": { "type": "literal", "value": 2 },
-            "presentation": { "kind": "number", "title": "Malos vivos" },
+            "presentation": { "kind": "number", "title": "Jugadores vivos del Mal" },
             "delivery": { "audience": { "type": "actor" } }
           }
         ],
@@ -371,7 +371,7 @@ Ventanas de `when.window`:
 | `execution` | Ejecución. |
 | `expulsion` | Expulsión de un personaje temporal. |
 | `dusk` | Transición a la noche. |
-| `mainEvilInfo` | Información inicial del malvado principal. |
+| `mainEvilInfo` | Información inicial del principal del Mal. |
 | `gameEnd` | Comprobación del final. |
 | `anyTime` | Sin ventana concreta. |
 
@@ -458,7 +458,7 @@ Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affected
 | `moveMarker` | Mueve atómicamente una ficha existente. | `kind`, `id`, `from`; `targets` es el destino. | `{"type":"moveMarker","kind":"reminder","id":"crown","from":{"type":"binding","binding":"actor"},"targets":{"type":"binding","binding":"selected"}}` |
 | `adjustCounter` | Ajusta un contador y puede proyectar estado o encadenar varios umbrales. | `counter`, `delta`, `scope`, `bounds`, `projection`, `stateProjection`, `thresholds` (cada umbral lleva `value`, `trigger` `crossing` o `reaching`, `resetTo?` y sus `effects`). | `{"type":"adjustCounter","counter":"charges","delta":1,"targets":{"type":"binding","binding":"actor"}}` |
 | `changeAlignment` | Cambia el alineamiento. | `alignment`, `notifyPlayer`, perfiles y límites de objetivo. | `{"type":"changeAlignment","alignment":"evil","targets":{"type":"binding","binding":"selected"}}` |
-| `changeCharacter` | Sustituye identidad real o mostrada. | Personaje/equipo nuevo, preservación de alineamiento, límites y consecuencias. | `{"type":"changeCharacter","newCharacter":"character:ejemplo:nuevo","targets":{"type":"binding","binding":"selected"}}` |
+| `changeCharacter` | Sustituye identidad real o mostrada. | Personaje/tipo nuevo, preservación de alineamiento, límites y consecuencias. | `{"type":"changeCharacter","newCharacter":"character:ejemplo:nuevo","targets":{"type":"binding","binding":"selected"}}` |
 | `grantAbility` | Concede o retira una habilidad declarada. | `abilityCharacterId`, `active`, `owner`, `controller`, `ownership`. | `{"type":"grantAbility","abilityCharacterId":"character:ejemplo:fuente","active":true,"ownership":"sourceAbility","targets":{"type":"binding","binding":"selected"}}` |
 | `triggerAbility` | Activa una mecánica declarada del objetivo. | `mechanicTag`. | `{"type":"triggerAbility","mechanicTag":"ability-tag","targets":{"type":"binding","binding":"selected"}}` |
 | `swapSeats` | Intercambia asientos seleccionados. | Sin opciones propias. | `{"type":"swapSeats","targets":{"type":"binding","binding":"selected"}}` |

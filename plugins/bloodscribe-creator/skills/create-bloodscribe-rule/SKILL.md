@@ -37,7 +37,7 @@ If no supported recipe or catalog primitive represents the intention, do not add
 ## Hard rules
 
 - Never call or imply access to BloodScribe's internal AI.
-- Never assume installed Grimm, BOTC, team, character, rule, translation, or icon data.
+- Never assume installed Grimm, BOTC, character-type, character, rule, translation, or icon data.
 - Never leave behavior only in prose; explicit `source.modeling.kind: "narrator-text"` is required for intentionally manual rules.
 - Never bind voting through `gameRuleBindings` or keep two composition bindings.
 - Never add a missing primitive to the core or fake it with content-specific IDs.
