@@ -710,12 +710,13 @@ Declara primero el stock visible en `rules.reminderTokens`:
   "kind": "reminder",
   "value": "Watched",
   "label": "Vigilado",
-  "duration": "manual",
-  "count": 1
+  "duration": "manual"
 }
 ```
 
-`id`, `kind`, `value` y `label` son obligatorios. `kind` es `state` o `reminder`. `count` es un entero positivo.
+`id`, `kind`, `value` y `label` son obligatorios. `kind` es `state` o `reminder`.
+
+`count` es opcional y significa **escasez**: declara cuántos ejemplares físicos existen, y cuando se agotan no se puede colocar otro. Sin `count` la ficha no tiene reserva: el inventario ofrece siempre una copia libre y el panel manual la muestra como «sin límite». Declárala solo cuando la regla diga «como máximo N sobre la mesa»; un tope por jugador se declara en `bounds` del contador, no aquí.
 
 Después crea, retira o mueve la ficha mediante efectos:
 

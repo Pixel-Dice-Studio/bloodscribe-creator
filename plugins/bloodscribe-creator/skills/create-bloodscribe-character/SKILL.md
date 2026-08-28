@@ -11,9 +11,9 @@ Reply in the user's language.
 
 ## Workflow
 
-1. Confirm that `get_mechanic_catalog`, `search_mechanic_recipes`, and `validate_character_proposal` are available. Use the catalog version to detect an obsolete server.
+1. Confirm that `get_mechanic_catalog`, `search_mechanic_recipes`, and `validate_character_proposal` are available. Require `guideVersion >= 7` plus the catalog features `contextTemplate`, `proposalTemplate`, `personalVictoryExpressions`, `reminderTokens`, `compiledCharacter`, `validationScope`, `counterThresholds`, and `counterExpressions`. If they are missing, report the incompatible MCP and continue only from a current local BloodScribe contract; otherwise ask the user to update the server/plugin rather than treating obsolete validation as current.
 2. If authentication is required, retry one public MCP tool once so the client starts OAuth. Tell the user to sign in and approve access in the BloodScribe browser page that opens. Never ask them to paste a token into the conversation. If the client cannot start OAuth, direct them to the README's **Manual setup** section; any fallback key belongs only in the client's secure credential settings, never in chat.
-3. Get the pack context from an attached or exported `.bloodscribe.json`. If none is available, collect only the locale, collection, existing opaque IDs, and each relevant team's ID plus its `role`, `allegiance`, `entryMode`, and `victory` defaults.
+3. Get the pack context from an attached or exported `.bloodscribe.json`. Start from the catalog's `contextTemplate`; replace its locale, collection, pack metadata, complete existing character IDs, and relevant teams. Do not invent a reduced context shape.
 4. Classify the gameplay profile before modeling the ability. If the user's idea does not already answer these points, ask whether the character:
    - enters the regular cast (`entryMode.default: "cast"`), joins as a temporary character (`"temporary"`), or allows both modes with `allowed: ["cast", "temporary"]`;
    - counts in a regular composition role (`core` or `support`) or in the neutral role (`independent`);
@@ -24,11 +24,13 @@ Reply in the user's language.
    - A living evil temporary character automatically receives a first night step for that entry showing every living main evil character, never evil helpers or bluffs.
    - These are engine rules. Do not duplicate them with authored mechanics. A dual-mode character gets them only when its effective entry is `temporary`.
    - `role: "independent"` and personal victory describe composition/victory; neither makes a character temporary.
-6. Turn the ability into a mechanical brief. Ask only about choices that change behavior: timing, actor, target, identity mode, usage scope or `keyBy`, duration, visibility, and manual fallback.
-7. Call `search_mechanic_recipes` with the user's intent. Use `get_mechanic_catalog` when recipes do not cover a required primitive, field, or gameplay profile.
-8. Build one complete character using opaque invented IDs and a complete `gameplay` profile. Mechanics must come from declared data, never from the character's ID, name, description, edition, or origin.
+6. Turn the ability into a mechanical brief. Ask only about choices that change behavior: timing, actor, target, identity mode, usage scope or `keyBy`, duration, visibility, invalid or dead sources/targets, coincident triggers, and manual fallback.
+7. Call `search_mechanic_recipes` with the user's intent (`limit` is 1–5). Use `get_mechanic_catalog` when recipes do not cover a required primitive, field, or gameplay profile. For multiple mechanics, persistent state, event interception or redirection, granted/copied abilities, altered information, setup changes, or special victory, also read `bloodscribe://pack-builder/authoring/{locale}` when the client exposes MCP resources.
+8. Build one complete flat authoring character from `proposalTemplate`; do not send the canonical pack shape with `info`, `gameplay`, or `rules` to the validator. Keep `ability`, `howToPlay`, `howToRun`, `interactions`, `cues`, `reminderTokens`, and `mechanics` consistent. Every marker used by `applyMarker` must have a matching reminder token. Use only interaction IDs supplied by the pack context; otherwise return no character-specific interactions. Mechanics must come from declared data, never from the character's ID, name, description, edition, or origin.
 9. Call `validate_character_proposal`. On failure, change only the paths listed in `issues` and retry, at most three validation attempts.
-10. Return the valid JSON plus a short automation summary based on `coverage`.
+10. After structural validation succeeds, perform a semantic audit: map every rules claim in `ability`, `howToPlay`, `howToRun`, `interactions`, and `cues` to the `gameplay` profile, a declared mechanic, or explicit manual coverage. Check blocked or impaired resolution and, when relevant, source/target death or identity change, invalid targets, redirection, and coincident triggers. Fix and revalidate any mismatch.
+11. If the user requested artwork, use `$create-bloodscribe-icon` after mechanical validation. Once the user approves the PNG, return the standalone SVG and place its complete markup in `contentCharacter.icon`; if a complete pack is being returned, update the matching character and revalidate the pack. Never overwrite existing artwork without approval.
+12. Return the valid authoring JSON, `contentCharacter`, and a short automation summary based on `coverage`. Repeat the returned `validationScope`, name any manual or unresolved behavior, and do not present structural validation as proof of semantic correctness or balance.
 
 ## Unsupported intentions
 
@@ -44,4 +46,7 @@ For every intent whose recipe reports `status: "unsupported"`, list its `missing
 - Never silently choose `role`, `allegiance`, `entryMode`, or `victory` when the user's intent leaves them ambiguous.
 - Declare participation only through `entryMode`.
 - Never author mechanics that recreate temporary entry, evil-main revelation, cast-count exclusion, or expulsion.
+- When several markers represent quantities of one resource, use one `adjustCounter` and project it with `copies` or `stages`. Creating separate `Token 1`, `Token 2`, and `Token 3` markers is not recommended; use `stages` only when each level has a genuinely distinct marker identity.
+- Never leave a rules claim only in prose or describe structural validation as proof of semantic correctness or balance.
+- Character creation does not imply icon generation. Use `$create-bloodscribe-icon` only when the user asks for artwork or the target pack explicitly requires it; an icon failure never blocks a valid mechanical proposal.
 - Never store, print, or request MCP tokens or other secrets.

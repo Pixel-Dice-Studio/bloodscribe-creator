@@ -2,6 +2,22 @@
 
 Esta referencia se genera desde el mismo contrato que consume el MCP. Los ejemplos usan IDs inventados.
 
+## Reglas de autoría
+
+- Los IDs son referencias opacas; nunca seleccionan comportamiento.
+- Clasifica primero participación, alineamiento, rol y victoria; no uses teamId, nombre o texto para inferirlos.
+- Declara la participación exclusivamente con entryMode: cast, temporary o ambos.
+- La entrada temporary activa automáticamente exclusión del reparto, información nocturna malvada y expulsión; no dupliques esas reglas como mecánicas.
+- Expresa toda regla mediante when, input, usage, conditions, effects y policies.
+- Consulta recetas antes de combinar primitivas complejas y valida siempre el personaje final.
+- Si varias fichas representan cantidades del mismo recurso, usa un único adjustCounter y proyéctalo con copies o stages; crear «Token 1», «Token 2» y «Token 3» como fichas independientes no está recomendado.
+- Usa keyBy cuando un límite combina día, noche, actor, objetivo o evento.
+- Usa una duración tipada, incluida untilEvent, en vez de inferirla desde el texto.
+- Una victory personal se evalúa al finalizar la partida y puede usar cualquier ValueExpr booleana; no añadas resolveGameEnd solo para sumar ese ganador.
+- Antes de entregar, comprueba que cada afirmación de reglas en ability, howToPlay, howToRun, interactions y cues esté respaldada por gameplay, una mecánica declarada o cobertura manual explícita; el validador solo garantiza contrato e importación.
+- manualInstruction y requiresManualModeling son el último recurso y deben identificar la primitiva ausente.
+- No presupongas contenido instalado; usa IDs inventados o los IDs entregados por el contexto.
+
 ## Perfil de participación y victoria
 
 Antes de modelar la habilidad, clasifica cómo entra, cuenta y gana el personaje. Si la idea no lo deja claro, la IA debe preguntarlo. `teamId` solo agrupa y presenta contenido; nunca sustituye estos campos. Toda propuesta usa `entryMode`.
@@ -74,6 +90,7 @@ Forma parte del reparto y solo gana si se cumple su condición declarativa.
 
 - Ocupa el eje neutral de la composición y cuenta entre los vivos regulares.
 - No gana automáticamente con bueno ni malvado.
+- storytellerDecision es solo el fallback manual del perfil: sustitúyelo por una ValueExpr booleana cuando la condición sea automatizable.
 
 ```json
 {
@@ -322,9 +339,85 @@ El Narrador decide si la misma definición entra en el reparto o como personaje 
 - ¿Qué comparte el límite: día, noche, actor, objetivo o evento?
 - ¿Cuándo termina cualquier estado, restricción o ficha persistente?
 - ¿Qué debe ocurrir si la habilidad falla, se bloquea, se redirige o está perjudicada?
+- ¿Qué ocurre si la fuente o el objetivo muere, cambia de identidad o deja de ser válido, o si coinciden varios disparadores?
 - ¿Qué parte, si alguna, necesita una decisión explícita del Narrador?
 
 ## Recetas por intención
+
+### `personal-victory-by-fatal-execution-before-night` — Victoria personal por ejecución antes de una noche
+
+Ganar personalmente si el personaje muere ejecutado antes de una noche límite, independientemente del bando vencedor.
+
+- Estado: `supported`
+- Automatización: `automatic`
+- Cubre: `events.execution`, `eventFields.died`, `gameProperties.nightNumber`, `effects.applyMarker`, `valueNodes.query`
+
+Un trigger execution con died=true aplica una ficha permanente antes del límite; la victory personal consulta esa ficha cuando termina la partida. No necesita resolveGameEnd.
+
+**Preguntar**
+
+- ¿Qué noche marca el límite exclusivo?
+- ¿Debe contar una ejecución en la que el personaje no muera?
+
+**Límites**
+
+- nightNumber empieza en 1 y durante el día posterior a la noche N conserva N; para «antes de la 5.ª noche» usa nightNumber < 5.
+
+```json
+{
+  "mechanicId": "mechanic:invented:personal-execution:rule:1",
+  "tags": [
+    "execution-tracking",
+    "personal-victory"
+  ],
+  "when": {
+    "window": "anyTime",
+    "cadence": "each",
+    "trigger": {
+      "type": "event",
+      "event": "execution",
+      "bindings": {
+        "eventSubject": "actor"
+      },
+      "where": {
+        "type": "eventField",
+        "field": "died",
+        "value": true
+      }
+    }
+  },
+  "input": {
+    "kind": "none"
+  },
+  "conditions": [
+    {
+      "type": "compare",
+      "left": {
+        "type": "game",
+        "property": "nightNumber"
+      },
+      "operator": "lt",
+      "right": 5
+    }
+  ],
+  "effects": [
+    {
+      "type": "applyMarker",
+      "kind": "reminder",
+      "id": "personal-condition-met",
+      "active": true,
+      "targets": {
+        "type": "binding",
+        "binding": "actor"
+      },
+      "duration": {
+        "type": "permanent"
+      }
+    }
+  ],
+  "policies": []
+}
+```
 
 ### `registered-evil-neighbours` — Comprobar vecinos malvados
 
@@ -332,7 +425,7 @@ Saber si al menos uno de los dos vecinos vivos más cercanos se registra como ma
 
 - Estado: `supported`
 - Automatización: `automatic`
-- Cubre: `entities.players`, `relations.nearestMatching`, `identityModes.registered`, `effects.emitInformation`
+- Cubre: `entities.players`, `valueNodes.query`, `identityModes.registered`, `effects.emitInformation`
 
 nearestMatching obtiene un vecino vivo en cada dirección; la consulta proyecta su bando registrado y emitInformation entrega un sí/no.
 
@@ -416,7 +509,7 @@ Permitir una resolución independiente por actor y por día.
 
 - Estado: `supported`
 - Automatización: `automatic`
-- Cubre: `usage.keyBy`, `usageDimensions.day`, `usageDimensions.actor`, `effects.recordAction`
+- Cubre: `usageDimensions.day`, `usageDimensions.actor`, `effects.recordAction`
 
 keyBy compone las dimensiones day y actor en una única clave de uso.
 
@@ -526,7 +619,7 @@ Conocer qué jugador originó una ficha recordatoria concreta.
 
 - Estado: `supported`
 - Automatización: `automatic`
-- Cubre: `entities.markers`, `marker.project.sourcePlayerId`, `effects.applyMarker`, `effects.emitInformation`
+- Cubre: `entities.markers`, `valueNodes.query`, `effects.applyMarker`, `effects.emitInformation`
 
 Las fichas conservan sourcePlayerId y sourceCharacterId; una consulta puede proyectar esa procedencia.
 
@@ -608,7 +701,7 @@ Mover una ficha del actor a un objetivo conservando identidad, procedencia y pro
 
 - Estado: `supported`
 - Automatización: `automatic`
-- Cubre: `effects.moveMarker`, `events.markerChange`, `marker.project.ownership`
+- Cubre: `effects.moveMarker`, `events.markerChange`
 
 moveMarker emite un único cambio y conserva los metadatos de la ficha existente.
 
@@ -916,7 +1009,7 @@ Reaccionar una sola vez a la primera habilidad que termina con éxito cada noche
 
 - Estado: `supported`
 - Automatización: `automatic`
-- Cubre: `events.mechanicUse`, `eventFields.resolutionStatus`, `usage.keyBy`, `usageDimensions.night`
+- Cubre: `events.mechanicUse`, `eventFields.resolutionStatus`, `usageDimensions.night`
 
 El trigger filtra mechanicUse exitosos y keyBy night limita la reacción a una por noche.
 
@@ -1182,7 +1275,7 @@ Descubrir si un actor registrado como malvado usó una habilidad sobre alguien r
 
 - Estado: `supported`
 - Automatización: `automatic`
-- Cubre: `events.mechanicUse`, `predicates.eventParticipantIdentity`, `identityModes.registered`, `effects.emitInformation`
+- Cubre: `events.mechanicUse`, `predicateTypes.events.eventParticipantIdentity`, `identityModes.registered`, `effects.emitInformation`
 
 El evento conserva las identidades registradas del actor y del objetivo seleccionado en el momento de la resolución.
 
@@ -1273,6 +1366,1573 @@ El evento conserva las identidades registradas del actor y del objetivo seleccio
 }
 ```
 
+### `protect-selected-from-death-until-dawn` — Proteger de la muerte hasta el amanecer
+
+Elegir a un jugador por la noche y evitar que muera hasta el amanecer.
+
+- Estado: `supported`
+- Automatización: `automatic`
+- Cubre: `events.death`, `effects.applyMarker`, `effects.interceptEvent`, `durations.untilWindow`
+
+La ficha hace visible la protección y el interceptor cancela los eventos death dirigidos al objetivo durante la misma duración.
+
+**Preguntar**
+
+- ¿Debe impedir cualquier muerte o solo las causadas por un tipo de ataque?
+- ¿La protección se consume al impedir una muerte?
+
+**Límites**
+
+- Añade match si la protección solo cubre una causa de muerte; no la deduzcas desde el texto de habilidad.
+
+```json
+{
+  "mechanicId": "mechanic:invented:dawn-protection:rule:1",
+  "tags": [
+    "night-protection"
+  ],
+  "when": {
+    "window": "night",
+    "cadence": "each",
+    "startsAt": 1
+  },
+  "input": {
+    "kind": "players",
+    "min": 1,
+    "max": 1
+  },
+  "usage": {
+    "scope": "repeat"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "applyMarker",
+      "kind": "reminder",
+      "id": "invented-protected",
+      "active": true,
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      },
+      "duration": {
+        "type": "untilWindow",
+        "window": "dawn"
+      }
+    },
+    {
+      "type": "interceptEvent",
+      "event": "death",
+      "reaction": {
+        "type": "cancel"
+      },
+      "reminder": "invented-protected",
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      },
+      "duration": {
+        "type": "untilWindow",
+        "window": "dawn"
+      }
+    }
+  ],
+  "policies": []
+}
+```
+
+### `counter-threshold-triggers-effect` — Activar un efecto al alcanzar un contador
+
+Acumular progreso sobre un jugador y ejecutar un efecto una sola vez al cruzar un umbral.
+
+- Estado: `supported`
+- Automatización: `automatic`
+- Cubre: `bindings.effectTarget`, `effects.adjustCounter`, `effects.death`
+
+adjustCounter conserva el valor y sus fichas proyectadas; cada entrada de thresholds ejecuta sus effects con el jugador actualizado disponible mediante effectTarget.
+
+**Preguntar**
+
+- ¿Qué valor activa el efecto?
+- ¿El contador se reinicia o permanece en el límite?
+- ¿Hay más de una consecuencia a distintas alturas?
+
+**Límites**
+
+- trigger=crossing evita repetir el efecto en resoluciones posteriores mientras el contador siga en el umbral.
+- Si el recurso debe volver a golpear cada vez que alguien añade una unidad con el contador ya lleno, usa trigger=reaching y la receta accumulable-resource-shared-cap.
+
+```json
+{
+  "mechanicId": "mechanic:invented:pressure-threshold:rule:1",
+  "tags": [
+    "persistent-counter",
+    "threshold-effect"
+  ],
+  "when": {
+    "window": "night",
+    "cadence": "each",
+    "startsAt": 1
+  },
+  "input": {
+    "kind": "players",
+    "min": 1,
+    "max": 1
+  },
+  "usage": {
+    "scope": "repeat"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "adjustCounter",
+      "counter": "invented-pressure-count",
+      "delta": 1,
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      },
+      "bounds": {
+        "min": 0,
+        "max": 3
+      },
+      "projection": {
+        "kind": "reminder",
+        "mode": "copies",
+        "id": "invented-pressure"
+      },
+      "duration": {
+        "type": "permanent"
+      },
+      "thresholds": [
+        {
+          "operator": "gte",
+          "value": 3,
+          "trigger": "crossing",
+          "effects": [
+            {
+              "type": "death",
+              "targets": {
+                "type": "binding",
+                "binding": "effectTarget"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "policies": []
+}
+```
+
+### `accumulable-resource-shared-cap` — Recurso acumulable con tope, estado y consecuencia
+
+Modelar fichas que se acumulan sobre un jugador —una ficha por unidad—, marcan un estado mientras haya alguna y desencadenan una consecuencia al llegar al tope, aunque varias fuentes distintas alimenten o retiren el mismo recurso.
+
+- Estado: `supported`
+- Automatización: `automatic`
+- Cubre: `bindings.effectTarget`, `effects.adjustCounter`, `effects.death`, `predicateTypes.players.counter`, `valueNodes.counterValue`, `aggregates.sum`
+
+Un solo contador declara el recurso y todas las fuentes lo comparten con scope=shared; cada fuente declara su propio adjustCounter con el mismo counter, bounds y projection. bounds acota la reserva almacenada, projection.mode=copies dibuja una ficha por unidad —stages nombra niveles cuando cada peldaño tiene ficha propia— y stateProjection deriva el estado mientras el valor cumpla activeWhen. thresholds encadena las consecuencias del mismo contador: cada entrada declara su value, su trigger y sus propios effects, así que la segunda y la tercera unidad no piden un contador nuevo. trigger=reaching mantiene viva la consecuencia cuando el contador ya está en bounds.max: el tope acota la reserva, no el golpe. resetTo consume el recurso para volver a acumularlo desde abajo. Retirar unidades es el mismo efecto con delta negativo y sin umbrales. Para leer el recurso desde otra regla se pregunta por el contador —la condición counter y el valor counterValue—, nunca por qué ficha concreta hay sobre la mesa. Para sumar ese contador en todos los jugadores, usa una query de players con project.type=counter y aggregate.type=sum.
+
+**Preguntar**
+
+- ¿Varias fuentes alimentan el mismo recurso o cada fuente lleva el suyo?
+- ¿Qué ocurre si alguien añade una unidad con el recurso ya en su tope?
+- ¿El recurso se consume al desencadenar la consecuencia o permanece acumulado?
+- ¿Quien vea las fichas debe conocer la cantidad exacta?
+
+**Límites**
+
+- Crear «Token 1», «Token 2» y «Token 3» como fichas independientes para representar los valores 1, 2 y 3 no está recomendado. Usa un único contador y projection.mode=copies; usa stages solo si cada nivel necesita una ficha con identidad visual propia.
+- No declares un contador por consecuencia ni una ficha por peldaño: dos contadores que suben a la vez se desincronizan en cuanto alguien retira unidades, y una escalera de fichas obliga a cada fuente a repetir la lógica del recurso.
+- No declares count salvo que la regla imponga escasez física de la ficha: sin count el inventario nunca se queda sin ejemplar. El tope por jugador vive en bounds y el total de la mesa, en la regla de preparación.
+- countVisibility=hidden oculta la cantidad a quien vea la ficha sin cambiar el valor mecánico.
+
+```json
+{
+  "mechanicId": "mechanic:invented:shared-resource-cap:rule:1",
+  "tags": [
+    "cumulative-marker",
+    "shared-counter",
+    "threshold-effect"
+  ],
+  "when": {
+    "window": "night",
+    "cadence": "each",
+    "startsAt": 1
+  },
+  "input": {
+    "kind": "players",
+    "min": 1,
+    "max": 1
+  },
+  "usage": {
+    "scope": "repeat"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "adjustCounter",
+      "counter": "invented-resource",
+      "scope": "shared",
+      "delta": 1,
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      },
+      "bounds": {
+        "min": 0,
+        "max": 3
+      },
+      "projection": {
+        "kind": "reminder",
+        "mode": "copies",
+        "id": "invented-resource-unit"
+      },
+      "stateProjection": {
+        "state": "invented-burdened",
+        "activeWhen": {
+          "operator": "gte",
+          "value": 1
+        }
+      },
+      "duration": {
+        "type": "permanent"
+      },
+      "thresholds": [
+        {
+          "operator": "gte",
+          "value": 3,
+          "trigger": "reaching",
+          "effects": [
+            {
+              "type": "death",
+              "targets": {
+                "type": "binding",
+                "binding": "effectTarget"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "policies": []
+}
+```
+
+### `restrict-selected-ability-until-dusk` — Bloquear una habilidad hasta el siguiente anochecer
+
+Elegir a un jugador y bloquear temporalmente su habilidad, permitiendo información falsa mientras dure el bloqueo.
+
+- Estado: `supported`
+- Automatización: `assisted`
+- Cubre: `effects.applyMarker`, `effects.restrict`, `durations.untilWindow`
+
+restrict declara la restricción ability y su duración; la ficha paralela permite al Narrador ver a quién afecta.
+
+**Preguntar**
+
+- ¿El objetivo puede seguir despertando?
+- ¿La información recibida debe ser falsa o solo puede serlo?
+
+**Límites**
+
+- Restringir ability no implica por sí solo impedir wake; añade esa restricción solo si la habilidad lo exige.
+
+```json
+{
+  "mechanicId": "mechanic:invented:ability-block:rule:1",
+  "tags": [
+    "temporary-ability-restriction"
+  ],
+  "when": {
+    "window": "night",
+    "cadence": "each",
+    "startsAt": 1
+  },
+  "input": {
+    "kind": "players",
+    "min": 1,
+    "max": 1
+  },
+  "usage": {
+    "scope": "repeat"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "applyMarker",
+      "kind": "reminder",
+      "id": "invented-ability-blocked",
+      "active": true,
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      },
+      "duration": {
+        "type": "untilWindow",
+        "window": "dusk",
+        "count": 1
+      }
+    },
+    {
+      "type": "restrict",
+      "restrictions": [
+        "ability"
+      ],
+      "informationMayBeFalse": true,
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      },
+      "duration": {
+        "type": "untilWindow",
+        "window": "dusk",
+        "count": 1
+      }
+    }
+  ],
+  "policies": []
+}
+```
+
+### `gain-chosen-character-ability-tonight` — Obtener la habilidad de un personaje elegido
+
+Elegir un personaje y conceder temporalmente su habilidad al actor.
+
+- Estado: `supported`
+- Automatización: `automatic`
+- Cubre: `entities.characters`, `valueNodes.inputValue`, `inputKinds.character`, `effects.grantAbility`
+
+La entrada character entrega un characterId tipado; grantAbility lo asigna al actor como propietario y controlador hasta el amanecer.
+
+**Preguntar**
+
+- ¿Puede elegirse un personaje en juego?
+- ¿Quién controla la habilidad concedida y cuándo termina?
+
+**Límites**
+
+- Filtra candidates de forma explícita; no deduzcas candidatos permitidos desde el texto o el equipo visible.
+
+```json
+{
+  "mechanicId": "mechanic:invented:borrowed-ability:rule:1",
+  "tags": [
+    "granted-ability"
+  ],
+  "when": {
+    "window": "night",
+    "cadence": "each",
+    "startsAt": 1
+  },
+  "input": {
+    "kind": "character",
+    "candidates": {
+      "type": "query",
+      "from": {
+        "entity": "characters"
+      },
+      "where": {
+        "type": "inPlay",
+        "value": false
+      },
+      "aggregate": {
+        "type": "collect"
+      }
+    }
+  },
+  "usage": {
+    "scope": "repeat"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "grantAbility",
+      "active": true,
+      "abilityCharacterId": {
+        "type": "inputValue",
+        "valueType": "characterId"
+      },
+      "owner": "targets",
+      "controller": "owner",
+      "ownership": "sourceAbility",
+      "targets": {
+        "type": "binding",
+        "binding": "actor"
+      },
+      "duration": {
+        "type": "untilWindow",
+        "window": "dawn"
+      }
+    }
+  ],
+  "policies": []
+}
+```
+
+### `replace-one-setup-bucket-with-another` — Sustituir una categoría durante la preparación
+
+Añadir una plaza a una categoría de preparación y retirarla de otra sin cambiar el número total de jugadores.
+
+- Estado: `supported`
+- Automatización: `assisted`
+- Cubre: `windows.setup`, `effects.modifySetup`
+
+Dos operaciones adjustBucket opuestas conservan el tamaño de la partida y mantienen las categorías como datos del pack.
+
+**Preguntar**
+
+- ¿Qué categoría gana la plaza y cuál la cede?
+- ¿Qué ocurre si la categoría de origen ya está vacía?
+
+**Límites**
+
+- Los buckets son referencias del pack; sustituye los IDs inventados por categorías declaradas en el contexto.
+
+```json
+{
+  "mechanicId": "mechanic:invented:setup-swap:rule:1",
+  "tags": [
+    "setup-adjustment"
+  ],
+  "when": {
+    "window": "setup",
+    "cadence": "once"
+  },
+  "input": {
+    "kind": "none"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "modifySetup",
+      "operations": [
+        {
+          "type": "adjustBucket",
+          "bucket": "invented-added-bucket",
+          "delta": 1
+        },
+        {
+          "type": "adjustBucket",
+          "bucket": "invented-removed-bucket",
+          "delta": -1
+        }
+      ]
+    }
+  ],
+  "policies": []
+}
+```
+
+### `may-register-as-another-allegiance` — Poder registrarse con otro bando
+
+Permitir que el actor se registre como malvado y de apoyo sin cambiar su identidad real.
+
+- Estado: `supported`
+- Automatización: `assisted`
+- Cubre: `alignments.evil`, `roles.support`, `effects.registerAs`
+
+registerAs modifica únicamente la identidad registrada; mode=mayRegisterAs deja la elección al Narrador y no altera el bando real.
+
+**Preguntar**
+
+- ¿El registro alternativo es opcional o forzoso?
+- ¿Sigue funcionando después de morir?
+
+**Límites**
+
+- No uses changeAlignment para modelar registro: esa operación sí cambia el estado real del jugador.
+
+```json
+{
+  "mechanicId": "mechanic:invented:alternate-registration:rule:1",
+  "tags": [
+    "registration"
+  ],
+  "when": {
+    "window": "anyTime",
+    "cadence": "each"
+  },
+  "input": {
+    "kind": "none"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "registerAs",
+      "mode": "mayRegisterAs",
+      "alignment": [
+        "evil"
+      ],
+      "roles": [
+        "support"
+      ],
+      "targets": {
+        "type": "binding",
+        "binding": "actor"
+      },
+      "worksWhenDead": true
+    }
+  ],
+  "policies": []
+}
+```
+
+### `redirect-execution-to-selected-once` — Redirigir una ejecución una vez
+
+Durante una ejecución, elegir un sustituto vivo y redirigir hacia él el evento una vez por partida.
+
+- Estado: `supported`
+- Automatización: `automatic`
+- Cubre: `events.execution`, `eventBindings.nominee`, `effects.interceptEvent`
+
+interceptEvent conserva el evento execution pero sustituye su objetivo; el límite de uso impide redirecciones posteriores.
+
+**Preguntar**
+
+- ¿La redirección es obligatoria u opcional?
+- ¿Qué participantes pueden sustituir al nominado?
+
+**Límites**
+
+- Redirigir no equivale a crear una segunda ejecución; la reacción modifica el evento existente.
+
+```json
+{
+  "mechanicId": "mechanic:invented:execution-redirect:rule:1",
+  "tags": [
+    "execution-interception",
+    "target-redirection"
+  ],
+  "when": {
+    "window": "execution",
+    "cadence": "each"
+  },
+  "input": {
+    "kind": "players",
+    "min": 1,
+    "max": 1,
+    "candidates": {
+      "type": "query",
+      "from": {
+        "entity": "players"
+      },
+      "where": {
+        "type": "all",
+        "conditions": [
+          {
+            "type": "alive",
+            "value": true
+          },
+          {
+            "type": "not",
+            "condition": {
+              "type": "isBinding",
+              "binding": "nominee"
+            }
+          }
+        ]
+      },
+      "aggregate": {
+        "type": "collect"
+      }
+    }
+  },
+  "usage": {
+    "scope": "game",
+    "limit": {
+      "type": "literal",
+      "value": 1
+    },
+    "consumeOn": "resolution"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "interceptEvent",
+      "event": "execution",
+      "targets": {
+        "type": "binding",
+        "binding": "nominee"
+      },
+      "reaction": {
+        "type": "redirect",
+        "targets": {
+          "type": "binding",
+          "binding": "selected"
+        }
+      },
+      "optional": true
+    }
+  ],
+  "policies": []
+}
+```
+
+### `storyteller-decision-branches-effect` — Ramificar efectos por decisión del Narrador
+
+Pedir una decisión mecánica enumerada al Narrador y ejecutar un efecto solo para una de sus respuestas.
+
+- Estado: `supported`
+- Automatización: `assisted`
+- Cubre: `valueNodes.decisionValue`, `effects.storytellerDecision`, `effects.death`
+
+storytellerDecision guarda un valor tipado y decisionValue permite condicionar cualquier efecto posterior del mismo paso.
+
+**Preguntar**
+
+- ¿Cuáles son todas las respuestas válidas?
+- ¿Qué efectos corresponden a cada respuesta?
+
+**Límites**
+
+- Las opciones son datos mecánicos; no analices una explicación libre para decidir la rama.
+
+```json
+{
+  "mechanicId": "mechanic:invented:storyteller-branch:rule:1",
+  "tags": [
+    "storyteller-decision",
+    "conditional-effect"
+  ],
+  "when": {
+    "window": "day",
+    "cadence": "once"
+  },
+  "input": {
+    "kind": "players",
+    "min": 1,
+    "max": 1
+  },
+  "usage": {
+    "scope": "game",
+    "limit": {
+      "type": "literal",
+      "value": 1
+    },
+    "consumeOn": "resolution"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "storytellerDecision",
+      "decision": "invented-resolution",
+      "options": [
+        "apply",
+        "skip"
+      ]
+    },
+    {
+      "type": "death",
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      },
+      "when": [
+        {
+          "type": "compare",
+          "left": {
+            "type": "decisionValue",
+            "decision": "invented-resolution"
+          },
+          "operator": "eq",
+          "right": "apply"
+        }
+      ]
+    }
+  ],
+  "presentation": {
+    "decisionPrompts": {
+      "invented-resolution": {
+        "question": "¿Se aplica la consecuencia inventada?",
+        "options": [
+          {
+            "value": "apply",
+            "label": "Aplicar"
+          },
+          {
+            "value": "skip",
+            "label": "Omitir"
+          }
+        ]
+      }
+    }
+  },
+  "policies": []
+}
+```
+
+### `relation-and-restriction-while-source-alive` — Mantener una relación y restricción mientras viva la fuente
+
+Vincular a un jugador con el actor y bloquear su habilidad solo mientras el actor siga vivo.
+
+- Estado: `supported`
+- Automatización: `assisted`
+- Cubre: `valueNodes.query`, `durations.whileCondition`, `effects.setPlayerRelation`, `effects.restrict`
+
+La relación y la restricción comparten una duración whileCondition que consulta la vida del actor, por lo que terminan juntas.
+
+**Preguntar**
+
+- ¿La relación sobrevive a la fuente?
+- ¿Debe retirarse también si la fuente pierde su habilidad?
+
+**Límites**
+
+- ownership=independent evita que el vínculo dependa implícitamente del ID del personaje fuente; la duración declara su ciclo de vida.
+
+```json
+{
+  "mechanicId": "mechanic:invented:living-source-link:rule:1",
+  "tags": [
+    "persistent-relation",
+    "source-lifetime"
+  ],
+  "when": {
+    "window": "firstNight",
+    "cadence": "once",
+    "startsAt": 1
+  },
+  "input": {
+    "kind": "players",
+    "min": 1,
+    "max": 1
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "setPlayerRelation",
+      "kind": "invented-bound",
+      "markerId": "invented-bound",
+      "active": true,
+      "ownership": "independent",
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      },
+      "duration": {
+        "type": "whileCondition",
+        "condition": {
+          "type": "query",
+          "from": {
+            "entity": "players"
+          },
+          "where": {
+            "type": "all",
+            "conditions": [
+              {
+                "type": "isBinding",
+                "binding": "actor"
+              },
+              {
+                "type": "alive",
+                "value": true
+              }
+            ]
+          },
+          "aggregate": {
+            "type": "exists"
+          }
+        }
+      }
+    },
+    {
+      "type": "restrict",
+      "restrictions": [
+        "ability"
+      ],
+      "informationMayBeFalse": true,
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      },
+      "duration": {
+        "type": "whileCondition",
+        "condition": {
+          "type": "query",
+          "from": {
+            "entity": "players"
+          },
+          "where": {
+            "type": "all",
+            "conditions": [
+              {
+                "type": "isBinding",
+                "binding": "actor"
+              },
+              {
+                "type": "alive",
+                "value": true
+              }
+            ]
+          },
+          "aggregate": {
+            "type": "exists"
+          }
+        }
+      }
+    }
+  ],
+  "policies": []
+}
+```
+
+### `change-selected-character-preserving-alignment` — Cambiar personaje conservando el bando
+
+Elegir un jugador y un personaje fuera de juego, sustituir su identidad real y conservar su alineamiento actual.
+
+- Estado: `supported`
+- Automatización: `automatic`
+- Cubre: `entities.characters`, `valueNodes.inputValue`, `inputKinds.playerAndCharacter`, `effects.changeCharacter`
+
+playerAndCharacter produce jugador y characterId en una sola entrada; changeCharacter usa ese valor y preserveAlignment evita una conversión accidental.
+
+**Preguntar**
+
+- ¿Puede elegirse un personaje ya en juego?
+- ¿Se conserva el bando, el rol o ambos?
+
+**Límites**
+
+- No derives el nuevo personaje desde su nombre; usa el characterId tipado entregado por la entrada.
+
+```json
+{
+  "mechanicId": "mechanic:invented:identity-replacement:rule:1",
+  "tags": [
+    "character-change",
+    "preserve-alignment"
+  ],
+  "when": {
+    "window": "night",
+    "cadence": "each",
+    "startsAt": 2
+  },
+  "input": {
+    "kind": "playerAndCharacter",
+    "player": {
+      "kind": "players",
+      "min": 1,
+      "max": 1
+    },
+    "characterCandidates": {
+      "type": "query",
+      "from": {
+        "entity": "characters"
+      },
+      "where": {
+        "type": "inPlay",
+        "value": false
+      },
+      "aggregate": {
+        "type": "collect"
+      }
+    }
+  },
+  "usage": {
+    "scope": "repeat"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "changeCharacter",
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      },
+      "newCharacter": {
+        "type": "inputValue",
+        "valueType": "characterId"
+      },
+      "preserveAlignment": true
+    }
+  ],
+  "policies": []
+}
+```
+
+### `change-alignment-and-record-source-relation` — Cambiar bando y conservar la relación de origen
+
+Convertir a un jugador y registrar de forma persistente quién originó el cambio.
+
+- Estado: `supported`
+- Automatización: `automatic`
+- Cubre: `alignments.evil`, `effects.changeAlignment`, `effects.setPlayerRelation`
+
+changeAlignment modifica el estado real; setPlayerRelation conserva por separado la procedencia para consultas o efectos posteriores.
+
+**Preguntar**
+
+- ¿A qué bando cambia?
+- ¿La conversión o la relación pueden revertirse después?
+
+**Límites**
+
+- La relación no sustituye al cambio de bando y el cambio de bando no registra por sí solo quién lo causó.
+
+```json
+{
+  "mechanicId": "mechanic:invented:alignment-conversion:rule:1",
+  "tags": [
+    "alignment-change",
+    "conversion-provenance"
+  ],
+  "when": {
+    "window": "night",
+    "cadence": "once",
+    "startsAt": 1
+  },
+  "input": {
+    "kind": "players",
+    "min": 1,
+    "max": 1
+  },
+  "usage": {
+    "scope": "game",
+    "limit": {
+      "type": "literal",
+      "value": 1
+    },
+    "consumeOn": "resolution"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "changeAlignment",
+      "alignment": "evil",
+      "notifyPlayer": true,
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      }
+    },
+    {
+      "type": "setPlayerRelation",
+      "kind": "invented-converted-by",
+      "markerId": "invented-converted",
+      "active": true,
+      "ownership": "independent",
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      },
+      "duration": {
+        "type": "permanent"
+      }
+    }
+  ],
+  "policies": []
+}
+```
+
+### `invalidate-vote-when-only-one-group-votes` — Invalidar un voto si solo participa un grupo
+
+Hacer inválido un recuento si todos sus votantes pertenecen al mismo bando declarado.
+
+- Estado: `supported`
+- Automatización: `automatic`
+- Cubre: `windows.voting`, `identityModes.real`, `effects.modifyVote`
+
+tallyValidity calcula el conjunto de votantes y declara una razón mecánica cuando todos cumplen el predicado.
+
+**Preguntar**
+
+- ¿Qué grupo invalida el recuento si vota solo?
+- ¿La regla afecta a todos los tipos de votación?
+
+**Límites**
+
+- invalidWhen=allMatch no cambia pesos ni umbral: invalida el recuento completo.
+
+```json
+{
+  "mechanicId": "mechanic:invented:voter-validity:rule:1",
+  "tags": [
+    "voting-validity"
+  ],
+  "when": {
+    "window": "voting",
+    "cadence": "each"
+  },
+  "input": {
+    "kind": "none"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "modifyVote",
+      "purposes": [
+        "standard"
+      ],
+      "tallyValidity": {
+        "voters": {
+          "type": "query",
+          "from": {
+            "entity": "players"
+          },
+          "where": {
+            "type": "identity",
+            "identityMode": "real",
+            "facet": "allegiance",
+            "values": [
+              "evil"
+            ]
+          },
+          "aggregate": {
+            "type": "collect"
+          }
+        },
+        "invalidWhen": "allMatch",
+        "reason": "Solo votó el grupo declarado."
+      }
+    }
+  ],
+  "policies": []
+}
+```
+
+### `prepare-truthful-or-zero-structured-information` — Preparar información verdadera, alternativa o cero
+
+Preparar una pista estructurada con un jugador verdadero y una alternativa, o informar que no existe ninguno.
+
+- Estado: `supported`
+- Automatización: `assisted`
+- Cubre: `inputValueTypes.object`, `valueNodes.inputValue`, `effects.prepareInformation`, `effects.emitInformation`
+
+prepareInformation construye el valor y sus fichas auxiliares; emitInformation entrega después el objeto tipado sin reconstruirlo desde texto.
+
+**Preguntar**
+
+- ¿Qué identidad determina la verdad: real, registrada o mostrada?
+- ¿Cuándo debe usarse la variante cero?
+
+**Límites**
+
+- zeroWhen debe consultar el mismo universo que candidates para no contradecir la pista preparada.
+
+```json
+{
+  "mechanicId": "mechanic:invented:prepared-clue:rule:1",
+  "tags": [
+    "prepared-information",
+    "structured-information"
+  ],
+  "when": {
+    "window": "firstNight",
+    "cadence": "once",
+    "startsAt": 1
+  },
+  "input": {
+    "kind": "none"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "prepareInformation",
+      "candidates": {
+        "type": "query",
+        "from": {
+          "entity": "players"
+        },
+        "where": {
+          "type": "identity",
+          "identityMode": "registered",
+          "facet": "allegiance",
+          "values": [
+            "good"
+          ]
+        },
+        "aggregate": {
+          "type": "collect"
+        },
+        "project": {
+          "type": "entityId"
+        }
+      },
+      "modes": [
+        "pair",
+        "zero"
+      ],
+      "zeroWhen": {
+        "type": "compare",
+        "left": {
+          "type": "query",
+          "from": {
+            "entity": "players"
+          },
+          "where": {
+            "type": "identity",
+            "identityMode": "registered",
+            "facet": "allegiance",
+            "values": [
+              "good"
+            ]
+          },
+          "aggregate": {
+            "type": "exists"
+          }
+        },
+        "operator": "eq",
+        "right": false
+      },
+      "characterChoice": {
+        "source": "truthfulPlayer",
+        "identityMode": "registered"
+      },
+      "reminders": {
+        "truthful": "invented-truthful",
+        "alternative": "invented-alternative"
+      }
+    },
+    {
+      "type": "emitInformation",
+      "value": {
+        "type": "inputValue",
+        "valueType": "object"
+      },
+      "presentation": {
+        "kind": "structured",
+        "title": "Pista preparada",
+        "fields": [
+          {
+            "key": "players",
+            "label": "Jugadores",
+            "kind": "players"
+          },
+          {
+            "key": "character",
+            "label": "Personaje",
+            "kind": "character"
+          },
+          {
+            "key": "none",
+            "label": "Ninguno",
+            "kind": "boolean"
+          }
+        ]
+      },
+      "delivery": {
+        "audience": {
+          "type": "actor"
+        }
+      }
+    }
+  ],
+  "policies": []
+}
+```
+
+### `public-guess-conditionally-ends-game` — Terminar la partida tras una adivinación correcta
+
+Elegir públicamente un jugador y un personaje, registrar si coinciden y terminar la partida solo si la adivinación es correcta.
+
+- Estado: `supported`
+- Automatización: `assisted`
+- Cubre: `facts.outcome`, `valueNodes.if`, `inputKinds.playerAndCharacter`, `effects.recordAction`, `effects.resolveGameEnd`
+
+recordAction calcula un outcome tipado; resolveGameEnd consulta después facts.outcome y no repite la lógica de acierto.
+
+**Preguntar**
+
+- ¿La comparación usa identidad real, registrada o mostrada?
+- ¿Quién gana cuando el resultado es correcto?
+
+**Límites**
+
+- Declara precedence=override solo si esta victoria debe imponerse a finales estándar simultáneos.
+
+```json
+{
+  "mechanicId": "mechanic:invented:winning-guess:rule:1",
+  "tags": [
+    "public-guess",
+    "conditional-game-end"
+  ],
+  "when": {
+    "window": "day",
+    "cadence": "once"
+  },
+  "input": {
+    "kind": "playerAndCharacter",
+    "player": {
+      "kind": "players",
+      "min": 1,
+      "max": 1
+    },
+    "characterCandidates": {
+      "type": "query",
+      "from": {
+        "entity": "characters"
+      },
+      "aggregate": {
+        "type": "collect"
+      }
+    }
+  },
+  "usage": {
+    "scope": "game",
+    "limit": {
+      "type": "literal",
+      "value": 1
+    },
+    "consumeOn": "resolution"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "recordAction",
+      "actionId": "invented-public-guess",
+      "recordAs": "publicDeclaration",
+      "outcome": {
+        "type": "if",
+        "condition": {
+          "type": "query",
+          "from": {
+            "entity": "players"
+          },
+          "where": {
+            "type": "all",
+            "conditions": [
+              {
+                "type": "isBinding",
+                "binding": "selected"
+              },
+              {
+                "type": "identityMatchesInput",
+                "identityMode": "real",
+                "facet": "character"
+              }
+            ]
+          },
+          "aggregate": {
+            "type": "exists"
+          }
+        },
+        "then": {
+          "type": "literal",
+          "value": "correct"
+        },
+        "else": {
+          "type": "literal",
+          "value": "incorrect"
+        }
+      }
+    },
+    {
+      "type": "resolveGameEnd",
+      "mode": "immediate",
+      "winner": {
+        "type": "fixed",
+        "team": "good"
+      },
+      "reason": "La adivinación pública inventada fue correcta.",
+      "precedence": "override",
+      "when": [
+        {
+          "type": "compare",
+          "left": {
+            "type": "fact",
+            "fact": "outcome"
+          },
+          "operator": "eq",
+          "right": "correct"
+        }
+      ]
+    }
+  ],
+  "policies": []
+}
+```
+
+### `block-game-end-before-round-threshold` — Bloquear un final antes de una ronda límite
+
+Impedir que un bando gane antes de una noche concreta aunque se cumpla su condición normal.
+
+- Estado: `supported`
+- Automatización: `automatic`
+- Cubre: `windows.gameEnd`, `gameProperties.nightNumber`, `effects.blockGameEnd`
+
+La mecánica se evalúa en gameEnd y blockGameEnd veta solo el ganador declarado mientras nightNumber esté por debajo del límite.
+
+**Preguntar**
+
+- ¿Qué resultado se bloquea?
+- ¿La noche límite es inclusiva o exclusiva?
+
+**Límites**
+
+- nightNumber empieza en 1; documenta con precisión si el final vuelve a permitirse durante o después de la noche límite.
+
+```json
+{
+  "mechanicId": "mechanic:invented:early-ending-block:rule:1",
+  "tags": [
+    "game-end-block",
+    "round-threshold"
+  ],
+  "when": {
+    "window": "gameEnd",
+    "cadence": "each"
+  },
+  "input": {
+    "kind": "none"
+  },
+  "conditions": [
+    {
+      "type": "compare",
+      "left": {
+        "type": "game",
+        "property": "nightNumber"
+      },
+      "operator": "lt",
+      "right": 3
+    }
+  ],
+  "effects": [
+    {
+      "type": "blockGameEnd",
+      "winner": "good",
+      "reason": "La tercera noche inventada todavía no ha comenzado.",
+      "activation": {
+        "lifeState": "any",
+        "abilityState": "any"
+      }
+    }
+  ],
+  "policies": []
+}
+```
+
+### `delayed-consequence-after-death` — Programar una consecuencia después de una muerte
+
+Cuando muera el actor, elegir a un jugador vivo, marcarlo y resolver su muerte una noche después.
+
+- Estado: `supported`
+- Automatización: `automatic`
+- Cubre: `events.death`, `eventBindings.eventSubject`, `effects.applyMarker`, `effects.death`
+
+El trigger conserva al actor fallecido, la ficha hace visible la consecuencia pendiente y delay programa el efecto sin temporizadores ad hoc.
+
+**Preguntar**
+
+- ¿El retraso se mide en fases, días o noches?
+- ¿La consecuencia sigue pendiente si cambia la identidad del objetivo?
+
+**Límites**
+
+- La ficha y el efecto retrasado deben describir el mismo vencimiento para que el estado visible no se desincronice.
+
+```json
+{
+  "mechanicId": "mechanic:invented:death-delay:rule:1",
+  "tags": [
+    "event-trigger",
+    "delayed-consequence"
+  ],
+  "when": {
+    "trigger": {
+      "type": "event",
+      "event": "death",
+      "bindings": {
+        "eventSubject": "actor"
+      }
+    },
+    "delay": {
+      "unit": "phase",
+      "count": 0
+    }
+  },
+  "input": {
+    "kind": "players",
+    "min": 1,
+    "max": 1,
+    "candidates": {
+      "type": "query",
+      "from": {
+        "entity": "players"
+      },
+      "where": {
+        "type": "alive",
+        "value": true
+      },
+      "aggregate": {
+        "type": "collect"
+      }
+    }
+  },
+  "usage": {
+    "scope": "trigger",
+    "limit": {
+      "type": "literal",
+      "value": 1
+    },
+    "consumeOn": "resolution"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "applyMarker",
+      "kind": "reminder",
+      "id": "invented-delayed-consequence",
+      "active": true,
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      },
+      "duration": {
+        "type": "untilWindow",
+        "window": "dawn",
+        "count": 2
+      }
+    },
+    {
+      "type": "death",
+      "targets": {
+        "type": "binding",
+        "binding": "selected"
+      },
+      "delay": {
+        "unit": "night",
+        "count": 1
+      }
+    }
+  ],
+  "policies": []
+}
+```
+
+### `optional-setup-choice-with-remainder` — Elegir un ajuste de preparación y recalcular el resto
+
+Ofrecer al Narrador varias variaciones de una categoría y recalcular otra para conservar el total de jugadores.
+
+- Estado: `supported`
+- Automatización: `assisted`
+- Cubre: `windows.setup`, `effects.modifySetup`
+
+chooseAdjustments declara las alternativas y setBucketCount con remainder mantiene estable el tamaño final del reparto.
+
+**Preguntar**
+
+- ¿Qué ajustes puede elegir el Narrador?
+- ¿Qué categoría absorbe el resto del reparto?
+
+**Límites**
+
+- Todas las opciones deben dejar una composición válida; optional no corrige combinaciones imposibles.
+
+```json
+{
+  "mechanicId": "mechanic:invented:setup-choice:rule:1",
+  "tags": [
+    "setup-choice",
+    "stable-player-count"
+  ],
+  "when": {
+    "window": "setup",
+    "cadence": "once"
+  },
+  "input": {
+    "kind": "none"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "modifySetup",
+      "optional": true,
+      "operations": [
+        {
+          "type": "chooseAdjustments",
+          "options": [
+            {
+              "adjustments": [
+                {
+                  "bucket": "invented-variable-bucket",
+                  "delta": 0
+                }
+              ]
+            },
+            {
+              "adjustments": [
+                {
+                  "bucket": "invented-variable-bucket",
+                  "delta": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "setBucketCount",
+          "bucket": "invented-remainder-bucket",
+          "count": {
+            "type": "remainder"
+          }
+        }
+      ]
+    }
+  ],
+  "policies": []
+}
+```
+
+### `coordinate-nomination-limit-and-vote-weight` — Coordinar límite de nominaciones y peso de voto
+
+Permitir al actor nominar más veces y hacer que su voto tenga un peso distinto bajo la misma regla.
+
+- Estado: `supported`
+- Automatización: `assisted`
+- Cubre: `windows.nomination`, `effects.modifyNomination`, `effects.modifyVote`
+
+modifyNomination y modifyVote declaran por separado los dos cambios, pero se activan desde la misma superficie de nominación.
+
+**Preguntar**
+
+- ¿Cuántas nominaciones puede realizar?
+- ¿El peso especial funciona después de morir?
+
+**Límites**
+
+- No uses voteDelta para sustituir un peso persistente: el límite de nominación y el peso son contratos distintos.
+
+```json
+{
+  "mechanicId": "mechanic:invented:nomination-and-vote:rule:1",
+  "tags": [
+    "nomination-modifier",
+    "vote-modifier"
+  ],
+  "when": {
+    "window": "nomination",
+    "cadence": "each"
+  },
+  "input": {
+    "kind": "none"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "modifyNomination",
+      "maxNominationsPerDay": 2,
+      "worksWhenDead": true
+    },
+    {
+      "type": "modifyVote",
+      "targets": {
+        "type": "binding",
+        "binding": "actor"
+      },
+      "weight": 2,
+      "worksWhenDead": true
+    }
+  ],
+  "policies": []
+}
+```
+
 ### `repeat-ability-after-no-effect` — Repetir una habilidad sin efecto
 
 Volver a ejecutar de forma genérica la misma instancia de habilidad cuando no produjo efecto.
@@ -1312,6 +2972,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `valueNodes.literal` | Usa un valor declarado. | `{"type":"literal"}` |
 | `valueNodes.binding` | Usa un participante vinculado por la regla. | `{"type":"binding"}` |
 | `valueNodes.game` | Usa fase, día o noche actuales. | `{"type":"game"}` |
+| `valueNodes.counterValue` | Usa el valor acumulado de un contador de un participante; ausente vale 0. | `{"type":"counterValue"}` |
 | `valueNodes.setup` | Usa un valor preparado durante el setup. | `{"type":"setup"}` |
 | `valueNodes.fact` | Usa un resultado tipado de la resolución actual. | `{"type":"fact"}` |
 | `valueNodes.storytellerDecision` | Usa una decisión humana declarada por la regla. | `{"type":"storytellerDecision"}` |
@@ -1374,6 +3035,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `predicateTypes.players.identityMatchesInput` | Compara una faceta con el valor introducido durante la resolución. | `{"value":"identityMatchesInput"}` |
 | `predicateTypes.players.state` | Comprueba un estado persistente del jugador. | `{"value":"state"}` |
 | `predicateTypes.players.marker` | Comprueba una ficha concreta del jugador. | `{"value":"marker"}` |
+| `predicateTypes.players.counter` | Compara el valor de un contador acumulado del jugador; ausente vale 0. | `{"value":"counter"}` |
 | `predicateTypes.players.membership` | Comprueba una relación activa declarada por el pack. | `{"value":"membership"}` |
 | `predicateTypes.players.isBinding` | Comprueba si es el participante indicado. | `{"value":"isBinding"}` |
 | `predicateTypes.players.all` | Exige que se cumplan todas las condiciones. | `{"value":"all"}` |
@@ -1405,6 +3067,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `predicateTypes.markers.any` | Exige que se cumpla al menos una condición. | `{"value":"any"}` |
 | `predicateTypes.markers.not` | Invierte el resultado de otra condición. | `{"value":"not"}` |
 | `aggregates.collect` | Devuelve todos los resultados. | `{"value":"collect"}` |
+| `aggregates.sum` | Suma una proyección numérica de los resultados. | `{"value":"sum"}` |
 | `aggregates.count` | Cuenta los resultados. | `{"value":"count"}` |
 | `aggregates.exists` | Indica si hay algún resultado. | `{"value":"exists"}` |
 | `aggregates.all` | Indica si todos cumplen. | `{"value":"all"}` |
@@ -1435,7 +3098,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `inputValueTypes.characterId` | ID opaco de un personaje. | `{"value":"characterId"}` |
 | `gameProperties.phase` | Fase actual de la partida. | `{"value":"phase"}` |
 | `gameProperties.dayNumber` | Día actual. | `{"value":"dayNumber"}` |
-| `gameProperties.nightNumber` | Noche actual. | `{"value":"nightNumber"}` |
+| `gameProperties.nightNumber` | Empieza en 1 y conserva N durante el día posterior a la noche N. | `{"value":"nightNumber"}` |
 | `facts.outcome` | Resultado semántico de la resolución. | `{"value":"outcome"}` |
 | `facts.guessResult` | Resultado de una apuesta declarada. | `{"value":"guessResult"}` |
 | `facts.targetMechanicTags` | Tags mecánicos del objetivo actual. | `{"value":"targetMechanicTags"}` |
@@ -1719,7 +3382,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.moveMarker.fields.id` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"id":"<id>"}` |
 | `effects.moveMarker.fields.allProtections` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"allProtections":"<allProtections>"}` |
 | `effects.moveMarker.fields.from` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"from":"<from>"}` |
-| `effects.adjustCounter` | Ajusta un contador persistente del objetivo. | `{"type":"adjustCounter","counter":"counter","delta":1,"targets":{"type":"binding","binding":"selected"}}` |
+| `effects.adjustCounter` | Ajusta un contador persistente del objetivo. bounds acota la reserva almacenada; cada entrada de thresholds declara value, trigger y sus propios effects, de modo que un mismo contador encadena varias consecuencias sin duplicarse; trigger=crossing dispara solo al alcanzar el umbral por primera vez y trigger=reaching lo dispara en cada aumento que llegue al umbral, incluso con el contador ya en bounds.max. threshold y onThreshold son la forma histórica y se normalizan a thresholds al importar. | `{"type":"adjustCounter","counter":"counter","delta":1,"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.adjustCounter.fields.type` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `effects.adjustCounter.fields.when` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.adjustCounter.fields.delay` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
@@ -1732,6 +3395,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.adjustCounter.fields.bounds` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"bounds":"<bounds>"}` |
 | `effects.adjustCounter.fields.projection` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"projection":"<projection>"}` |
 | `effects.adjustCounter.fields.stateProjection` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"stateProjection":"<stateProjection>"}` |
+| `effects.adjustCounter.fields.thresholds` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"thresholds":"<thresholds>"}` |
 | `effects.adjustCounter.fields.threshold` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"threshold":"<threshold>"}` |
 | `effects.adjustCounter.fields.onThreshold` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"onThreshold":"<onThreshold>"}` |
 | `effects.changeAlignment` | Cambia el alineamiento de los objetivos. | `{"type":"changeAlignment"}` |

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create BloodScribe Icon"
+  short_description: "Create styled BloodScribe character icons"
+  default_prompt: "Use $create-bloodscribe-icon to create an icon for my BloodScribe character. Ask whether I want separate pack-ready SVGs, a PNG comparison sheet, or both before generating."

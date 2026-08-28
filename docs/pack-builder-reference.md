@@ -419,6 +419,7 @@ Las condiciones, objetivos, límites y valores usan `ValueExpr`. Nodos disponibl
 | `binding` | `actor`, `selected`, `source`, `nominator`, `nominee`, `eventSubject`, `effectTarget`. | `{"type":"binding","binding":"actor"}` |
 | `game` | `phase`, `dayNumber`, `nightNumber`. | `{"type":"game","property":"dayNumber"}` |
 | `setup` | Dato calculado de la preparación. | `{"type":"setup","property":"mainEvilBluffCharacterIds"}` |
+| `counterValue` | Valor acumulado de un contador del participante; ausente vale 0. | `{"type":"counterValue","counter":"recurso","scope":"shared","subject":"selected"}` |
 | `fact` | Hecho de la resolución actual. | `{"type":"fact","fact":"outcome"}` |
 | `storytellerDecision` | Booleano decidido por el Narrador. | `{"type":"storytellerDecision","decision":"isFair"}` |
 | `decisionValue` | Valor de una decisión tipada ya contestada. | `{"type":"decisionValue","decision":"fate"}` |
@@ -438,6 +439,10 @@ Las condiciones, objetivos, límites y valores usan `ValueExpr`. Nodos disponibl
 
 Para consultas, predicados, relaciones de mesa, agregados y proyecciones, consulta la [referencia AST](referencia-ast-declarativo.md#4-consultas).
 
+Un recurso acumulable usa un solo `adjustCounter`. Para consultar a un jugador usa el predicado `counter` o `counterValue`; para obtener el total de la mesa usa una `query` de `players` con `project: {"type":"counter",...}` y `aggregate: {"type":"sum"}`. Crear `Token 1`, `Token 2` y `Token 3` como fichas independientes para representar los valores 1, 2 y 3 no está recomendado.
+
+El cuento puede publicar ese total mediante un único elemento `{"id":"tally:ejemplo:recurso","kind":"tally","label":"Recurso","counter":"recurso"}`. `remainderCounter` añade un segundo contador al denominador; no declara otro nivel del mismo recurso.
+
 ## 4. Primitivas de efecto
 
 Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affectedBy`, `duration`, `optional`, `reminder`, `reminderTokens` y `spentReminder`. La tabla enumera las opciones propias; Creator conserva campos avanzados admitidos por el esquema.
@@ -451,7 +456,7 @@ Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affected
 | `setPlayerRelation` | Activa o desactiva una relación persistente entre la fuente y cada objetivo. | `kind`, `active`, `duration`, `ownership`, `markerId`. | `{"type":"setPlayerRelation","kind":"protected","active":true,"targets":{"type":"binding","binding":"selected"}}` |
 | `applyMarker` | Añade o retira una ficha. | `kind`, `id`, `active`, `exclusive`, `ownership`. | `{"type":"applyMarker","kind":"reminder","id":"watched","active":true,"targets":{"type":"binding","binding":"selected"}}` |
 | `moveMarker` | Mueve atómicamente una ficha existente. | `kind`, `id`, `from`; `targets` es el destino. | `{"type":"moveMarker","kind":"reminder","id":"crown","from":{"type":"binding","binding":"actor"},"targets":{"type":"binding","binding":"selected"}}` |
-| `adjustCounter` | Ajusta un contador y puede proyectar estado o disparar un umbral. | `counter`, `delta`, `scope`, `bounds`, `projection`, `stateProjection`, `threshold`, `onThreshold`. | `{"type":"adjustCounter","counter":"charges","delta":1,"targets":{"type":"binding","binding":"actor"}}` |
+| `adjustCounter` | Ajusta un contador y puede proyectar estado o encadenar varios umbrales. | `counter`, `delta`, `scope`, `bounds`, `projection`, `stateProjection`, `thresholds` (cada umbral lleva `value`, `trigger` `crossing` o `reaching`, `resetTo?` y sus `effects`). | `{"type":"adjustCounter","counter":"charges","delta":1,"targets":{"type":"binding","binding":"actor"}}` |
 | `changeAlignment` | Cambia el alineamiento. | `alignment`, `notifyPlayer`, perfiles y límites de objetivo. | `{"type":"changeAlignment","alignment":"evil","targets":{"type":"binding","binding":"selected"}}` |
 | `changeCharacter` | Sustituye identidad real o mostrada. | Personaje/equipo nuevo, preservación de alineamiento, límites y consecuencias. | `{"type":"changeCharacter","newCharacter":"character:ejemplo:nuevo","targets":{"type":"binding","binding":"selected"}}` |
 | `grantAbility` | Concede o retira una habilidad declarada. | `abilityCharacterId`, `active`, `owner`, `controller`, `ownership`. | `{"type":"grantAbility","abilityCharacterId":"character:ejemplo:fuente","active":true,"ownership":"sourceAbility","targets":{"type":"binding","binding":"selected"}}` |

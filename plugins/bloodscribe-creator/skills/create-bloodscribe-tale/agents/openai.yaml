@@ -1,0 +1,13 @@
+interface:
+  display_name: "Create BloodScribe Tale"
+  short_description: "Create and validate BloodScribe tales"
+  default_prompt: "Use $create-bloodscribe-tale to create or modify a tale in my BloodScribe pack."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "bloodscribe-creator"
+      description: "BloodScribe tale contracts, rule recipes, and deterministic full-pack validation"
+      transport: "streamable_http"
+      url: "https://bloodscribe.app/mcp"
+policy:
+  allow_implicit_invocation: true

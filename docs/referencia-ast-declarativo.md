@@ -117,6 +117,7 @@ Toda condición, objetivo, límite, valor informativo y parte calculada se expre
 | `binding` | Participante vinculado. | `{"type":"binding","binding":"actor"}` |
 | `game` | Dato actual de la partida. | `{"type":"game","property":"nightNumber"}` |
 | `setup` | Datos calculados de preparación. | `{"type":"setup","property":"mainEvilBluffCharacterIds"}` |
+| `counterValue` | Valor acumulado de un contador del participante vinculado; ausente vale 0. | `{"type":"counterValue","counter":"recurso","scope":"shared","subject":"selected"}` |
 | `fact` | Dato semántico de la resolución. | `{"type":"fact","fact":"guessResult"}` |
 | `storytellerDecision` | Booleano decidido por el Narrador, con parámetros opcionales. | `{"type":"storytellerDecision","decision":"isFair"}` |
 | `decisionValue` | Valor tipado de una decisión normalizada ya respondida; si falta, la resolución queda pendiente. | `{"type":"decisionValue","decision":"targetFate"}` |
@@ -219,6 +220,7 @@ Solo se aplican a `players`.
 | `identityMatchesBinding` | Compara `teamId`, `allegiance`, `role` o `character` con otro binding bajo un `identityMode`. | `{"type":"identityMatchesBinding","identityMode":"real","facet":"teamId","binding":"actor"}` |
 | `state` | `values`, `active?`, `subject?`. | `{"type":"state","values":["drunk"],"active":true}` |
 | `marker` | `markerId`, `active?`, `subject?`. | `{"type":"marker","markerId":"protected","active":true}` |
+| `counter` | `counter`, `operator`, `value`, `scope?`, `sourceCharacterId?`, `subject?`. Un contador que nadie ha tocado vale 0. | `{"type":"counter","counter":"recurso","scope":"shared","operator":"gte","value":2}` |
 | `isBinding` | `binding`, `value?`; comprueba si la entidad es ese participante. | `{"type":"isBinding","binding":"selected","value":false}` |
 | `all` | Todos los predicados de `conditions`. | `{"type":"all","conditions":[{"type":"alive","value":true}]}` |
 | `any` | Algún predicado de `conditions`. | `{"type":"any","conditions":[{"type":"alive","value":true}]}` |
@@ -263,6 +265,7 @@ Campos de `eventField`: `actionId`, `outcome`, `died`, `attribution`, `resolutio
 | `type` | Resultado | Ejemplo |
 |---|---|---|
 | `collect` | Todos los resultados. | `{"type":"collect"}` |
+| `sum` | Suma una proyección numérica; requiere `project`. | `{"type":"sum"}` |
 | `count` | Cantidad de resultados. | `{"type":"count"}` |
 | `exists` | Si existe algún resultado. | `{"type":"exists"}` |
 | `all` | Si todos los elementos de origen cumplen el filtro. | `{"type":"all"}` |
@@ -279,6 +282,7 @@ Campos de `eventField`: `actionId`, `outcome`, `died`, `attribution`, `resolutio
 |---|---|---|---|
 | `entityId` | Todas | — | `{"type":"entityId"}` |
 | `identity` | `players` | `identityMode`; `property`: `characterId`, `teamId`, `allegiance`, `role` | `{"type":"identity","identityMode":"shown","property":"characterId"}` |
+| `counter` | `players` | `counter`, `scope?`, `sourceCharacterId?` | `{"type":"counter","counter":"recurso","scope":"shared"}` |
 | `character` | `characters` | `property`: `characterId`, `teamId`, `allegiance`, `role`, `inPlay` | `{"type":"character","property":"teamId"}` |
 | `event` | `events` | `property`: `eventId`, `eventType`, `period`, `participantIds` | `{"type":"event","property":"eventType"}` |
 | `eventParticipant` | `events` | `binding` | `{"type":"eventParticipant","binding":"nominee"}` |
@@ -425,7 +429,7 @@ Los campos comunes de la mayoría de efectos son:
 | `setPlayerRelation` | Activa o desactiva una relación persistente entre la fuente y cada objetivo. | `kind`, `active`, `duration?`, `ownership?`, `markerId?`; `targets` obligatorio. | `{"type":"setPlayerRelation","targets":{"type":"binding","binding":"selected"},"kind":"protegido","active":true}` |
 | `applyMarker` | Añade o retira una ficha recordatoria. | `kind:"reminder"`, `id`, `active`, `exclusive?`, `ownership?`. | `{"type":"applyMarker","targets":{"type":"binding","binding":"selected"},"kind":"reminder","id":"watched","active":true}` |
 | `moveMarker` | Transfiere atómicamente una ficha entre jugadores. | `kind:"reminder"`, `id`, `from`; `targets` indica el destino. | `{"type":"moveMarker","kind":"reminder","id":"crown","from":{"type":"binding","binding":"actor"},"targets":{"type":"binding","binding":"selected"}}` |
-| `adjustCounter` | Ajusta un contador persistente y puede proyectar fichas/estados o disparar efectos al cruzar un umbral. | `counter`, `delta`, `scope?`, `bounds?`, `projection?`, `stateProjection?`, `threshold?`, `onThreshold?`. | `{"type":"adjustCounter","targets":{"type":"binding","binding":"actor"},"counter":"charges","delta":1,"bounds":{"max":3}}` |
+| `adjustCounter` | Ajusta un contador persistente y puede proyectar fichas/estados o disparar efectos al alcanzar sus umbrales. | `counter`, `delta`, `scope?`, `bounds?`, `projection?`, `stateProjection?`, `thresholds?` (cada entrada: `operator`, `value`, `trigger` `crossing` o `reaching`, `resetTo?`, `effects`). | `{"type":"adjustCounter","targets":{"type":"binding","binding":"actor"},"counter":"charges","delta":1,"bounds":{"max":3}}` |
 | `changeAlignment` | Cambia el alineamiento. | `alignment`, `allowsSelfTarget`, `notifyPlayer`, `setupEffect`, `targetAlignment`, `targetTeam`. | `{"type":"changeAlignment","targets":{"type":"binding","binding":"selected"},"alignment":"evil"}` |
 | `changeCharacter` | Sustituye una identidad. | Identidad real/mostrada, equipo, límites de elección y consecuencias de la sustitución. | `{"type":"changeCharacter","targets":{"type":"binding","binding":"selected"},"newCharacter":"personaje-zafiro","preserveAlignment":true}` |
 | `grantAbility` | Concede o retira una habilidad declarada. | `active`, `abilityCharacterId`, `owner`, `controller`, `ownership`. | `{"type":"grantAbility","targets":{"type":"binding","binding":"selected"},"abilityCharacterId":"habilidad-ambar","active":true,"ownership":"sourceAbility"}` |

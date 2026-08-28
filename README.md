@@ -4,7 +4,7 @@
 
 ## Español
 
-Este repositorio distribuye el plugin `bloodscribe-creator`. Creator reúne el editor web, las guías y las herramientas MCP que permiten a tu propia IA crear personajes con recetas y validación determinista. Nunca llama ni permite acceder a la IA interna de BloodScribe.
+Este repositorio distribuye el plugin `bloodscribe-creator`. Creator reúne el editor web, las guías y las herramientas MCP que permiten a tu propia IA crear personajes, iconos, reglas y cuentos con recetas y validación determinista. Nunca llama ni permite acceder a la IA interna de BloodScribe.
 
 El endpoint es `https://bloodscribe.app/mcp`. Durante la instalación o el primer uso, según el cliente, BloodScribe se abrirá en el navegador para que inicies sesión y autorices la conexión; no necesitas copiar un bearer token.
 
@@ -16,6 +16,9 @@ El endpoint es `https://bloodscribe.app/mcp`. Durante la instalación o el prime
 - [Crear manualmente un pack completo](./docs/manual-autoria-packs.es.md)
 - [Descargar un pack completo de demostración](./docs/ejemplo-pack-manual.es.bloodscribe.json)
 - [Crear personajes: matriz de mecánicas, recetas y ejemplos](./docs/pack-builder-character-authoring.es.md)
+- Crear iconos con [`create-bloodscribe-icon`](./plugins/bloodscribe-creator/skills/create-bloodscribe-icon/SKILL.md)
+- Crear reglas con [`create-bloodscribe-rule`](./plugins/bloodscribe-creator/skills/create-bloodscribe-rule/SKILL.md)
+- Crear o modificar cuentos con [`create-bloodscribe-tale`](./plugins/bloodscribe-creator/skills/create-bloodscribe-tale/SKILL.md)
 - [Usar BloodScribe Creator y componer mecánicas](./docs/pack-builder-reference.md)
 - [Consultar expresiones, relaciones, filtros y agregados](./docs/referencia-ast-declarativo.md)
 - [Ver personajes reales de ejemplo](#ejemplos-reales)
@@ -27,7 +30,7 @@ codex plugin marketplace add Pixel-Dice-Studio/bloodscribe-creator --ref main
 codex plugin add bloodscribe-creator@bloodscribe-creator
 ```
 
-Abre una tarea nueva y pide crear un personaje. Codex iniciará la autorización OAuth cuando necesite el MCP.
+Abre una tarea nueva y pide crear un personaje, un icono, una regla o un cuento. Codex iniciará la autorización OAuth cuando necesite el MCP.
 
 ### Instalar en Claude Code
 
@@ -40,7 +43,7 @@ Abre una conversación nueva y pide crear un personaje. Claude Code iniciará la
 
 ### Configuración manual
 
-Si tu cliente admite MCP pero no plugins, instala o copia el skill [`create-bloodscribe-character`](./plugins/bloodscribe-creator/skills/create-bloodscribe-character/SKILL.md) y configura `https://bloodscribe.app/mcp`. OAuth es la opción recomendada. Solo los clientes sin OAuth necesitan generar una clave en **BloodScribe Creator → Perfil → MCP de Creator**; configúrala únicamente en el almacén seguro de credenciales del cliente, nunca en un chat ni en el repositorio.
+Si tu cliente admite MCP pero no plugins, instala o copia la skill que necesites: [`create-bloodscribe-character`](./plugins/bloodscribe-creator/skills/create-bloodscribe-character/SKILL.md), [`create-bloodscribe-icon`](./plugins/bloodscribe-creator/skills/create-bloodscribe-icon/SKILL.md), [`create-bloodscribe-rule`](./plugins/bloodscribe-creator/skills/create-bloodscribe-rule/SKILL.md) o [`create-bloodscribe-tale`](./plugins/bloodscribe-creator/skills/create-bloodscribe-tale/SKILL.md); después configura `https://bloodscribe.app/mcp`. OAuth es la opción recomendada. Solo los clientes sin OAuth necesitan generar una clave en **BloodScribe Creator → Perfil → MCP de Creator**; configúrala únicamente en el almacén seguro de credenciales del cliente, nunca en un chat ni en el repositorio.
 
 ### Ejemplos reales
 
@@ -48,7 +51,7 @@ Los [packs oficiales de Grimm](https://github.com/Pixel-Dice-Studio/bloodscribe-
 
 ## English
 
-This repository distributes the `bloodscribe-creator` plugin. Creator brings together the web editor, authoring guides, and MCP tools that guide your own AI through public recipes and deterministic validation. It never calls or exposes BloodScribe's internal AI.
+This repository distributes the `bloodscribe-creator` plugin. Creator brings together the web editor, authoring guides, and MCP tools that guide your own AI through characters, icons, rules, and tales plus deterministic validation. It never calls or exposes BloodScribe's internal AI.
 
 The endpoint is `https://bloodscribe.app/mcp`. During installation or first use, depending on the client, BloodScribe opens in the browser so you can sign in and authorize the connection; no bearer token needs to be copied.
 
@@ -60,6 +63,9 @@ The endpoint is `https://bloodscribe.app/mcp`. During installation or first use,
 - [Author a complete pack manually (Spanish)](./docs/manual-autoria-packs.es.md)
 - [Download the complete demonstration pack](./docs/ejemplo-pack-manual.es.bloodscribe.json)
 - [Create characters: mechanic matrix, recipes, and examples](./docs/pack-builder-character-authoring.en.md)
+- Create icons with [`create-bloodscribe-icon`](./plugins/bloodscribe-creator/skills/create-bloodscribe-icon/SKILL.md)
+- Create rules with [`create-bloodscribe-rule`](./plugins/bloodscribe-creator/skills/create-bloodscribe-rule/SKILL.md)
+- Create or modify tales with [`create-bloodscribe-tale`](./plugins/bloodscribe-creator/skills/create-bloodscribe-tale/SKILL.md)
 - [Use BloodScribe Creator and compose mechanics (Spanish)](./docs/pack-builder-reference.md)
 - [Reference expressions, relations, filters, and aggregates (Spanish)](./docs/referencia-ast-declarativo.md)
 - [Browse real character examples](#real-examples)
@@ -71,7 +77,7 @@ codex plugin marketplace add Pixel-Dice-Studio/bloodscribe-creator --ref main
 codex plugin add bloodscribe-creator@bloodscribe-creator
 ```
 
-Start a new task and ask it to create a character. Codex starts OAuth when it first needs the MCP.
+Start a new task and ask it to create a character, icon, rule, or tale. Codex starts OAuth when it first needs the MCP.
 
 ### Install in Claude Code
 
@@ -84,7 +90,7 @@ Start a new conversation and ask it to create a character. Claude Code starts th
 
 ### Manual setup
 
-If your client supports MCP but not plugins, install or copy the [`create-bloodscribe-character`](./plugins/bloodscribe-creator/skills/create-bloodscribe-character/SKILL.md) skill and configure `https://bloodscribe.app/mcp`. OAuth is recommended. Only clients without OAuth need a key from **BloodScribe Creator → Profile → Creator MCP**; configure it only in the client's secure credential store, never in chat or in the repository.
+If your client supports MCP but not plugins, install or copy the skill you need: [`create-bloodscribe-character`](./plugins/bloodscribe-creator/skills/create-bloodscribe-character/SKILL.md), [`create-bloodscribe-icon`](./plugins/bloodscribe-creator/skills/create-bloodscribe-icon/SKILL.md), [`create-bloodscribe-rule`](./plugins/bloodscribe-creator/skills/create-bloodscribe-rule/SKILL.md), or [`create-bloodscribe-tale`](./plugins/bloodscribe-creator/skills/create-bloodscribe-tale/SKILL.md); then configure `https://bloodscribe.app/mcp`. OAuth is recommended. Only clients without OAuth need a key from **BloodScribe Creator → Profile → Creator MCP**; configure it only in the client's secure credential store, never in chat or in the repository.
 
 ### Real examples
 

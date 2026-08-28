@@ -1,7 +1,7 @@
 {
   "name": "bloodscribe-creator",
-  "version": "1.1.0+codex.c3f405b02e6b",
-  "description": "Create and validate BloodScribe characters with your own AI and BloodScribe Creator MCP.",
+  "version": "1.4.1+codex.dbe293565951",
+  "description": "Create BloodScribe characters, icons, rules, and tales with your own AI and BloodScribe Creator MCP.",
   "author": {
     "name": "Pixel Dice Studio",
     "url": "https://bloodscribe.app"
@@ -13,13 +13,16 @@
     "bloodscribe",
     "pack-builder",
     "characters",
+    "icons",
+    "rules",
+    "tales",
     "mcp"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "BloodScribe Creator",
-    "shortDescription": "Create validated BloodScribe characters",
-    "longDescription": "Guides your AI through character requirements, mechanic recipes, and deterministic Creator validation without calling BloodScribe's internal AI.",
+    "shortDescription": "Create validated BloodScribe content",
+    "longDescription": "Guides your AI through characters, icons, rules, tales, mechanic recipes, and deterministic Creator validation without calling BloodScribe's internal AI.",
     "developerName": "Pixel Dice Studio",
     "category": "DeveloperTools",
     "capabilities": [
@@ -31,8 +34,10 @@
     "logoDark": "./assets/logo-dark.png",
     "defaultPrompt": [
       "Create a BloodScribe character from my idea.",
+      "Create a styled SVG icon for my BloodScribe character and ask how I want the result delivered.",
       "Validate this BloodScribe character JSON.",
-      "Find mechanics for this character ability."
+      "Create a game-end rule and link it to my tale.",
+      "Create or modify a BloodScribe tale."
     ]
   },
   "mcpServers": "./.mcp.json"

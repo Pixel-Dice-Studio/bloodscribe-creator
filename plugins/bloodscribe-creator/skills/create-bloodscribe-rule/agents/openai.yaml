@@ -1,0 +1,13 @@
+interface:
+  display_name: "Create BloodScribe Rule"
+  short_description: "Create and validate BloodScribe game rules"
+  default_prompt: "Use $create-bloodscribe-rule to add my rule idea to a validated BloodScribe pack."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "bloodscribe-creator"
+      description: "BloodScribe rule recipes, contracts, and deterministic full-pack validation"
+      transport: "streamable_http"
+      url: "https://bloodscribe.app/mcp"
+policy:
+  allow_implicit_invocation: true
