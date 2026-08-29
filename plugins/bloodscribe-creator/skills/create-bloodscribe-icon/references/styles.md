@@ -26,15 +26,27 @@ Always state the active character type and its exact resolved color in the image
 
 ## Styles
 
-### `cuento-infantil`
+### `cuento-infantil` (compatibility selector label)
 
-The established Grimm character style, equivalent to `GRIMM-INK-V1-SCHEMATIC`. Read [the reference board](../assets/cuento-infantil-style-board.png) before generating; use it for subject scale and composition, while the locked rules below control finish and detail. This style defaults to `bajo`; for this pairing, its locked 7-11-mass definition overrides the generic 5-7-mass guidance for `bajo` below.
+The established Grimm character style, equivalent to the neutral generation seed `GRIMM-INK-V1-SCHEMATIC`. Keep `cuento-infantil` only as the accepted selector value; do not put that label or “children's story”, “cute”, or “kawaii” into the image prompt unless the user explicitly requests those traits. This style defaults to `bajo`.
+
+Send exactly one approved reference with every generation; inspecting a reference without attaching it is not enough:
+
+| Detail | Reference |
+|---|---|
+| `bajo` | [grimm-ink-character-low.png](../assets/grimm-ink-character-low.png) |
+| `medio` | [grimm-ink-character-medium.png](../assets/grimm-ink-character-medium.png) |
+| `detallado` | [grimm-ink-character-detailed.png](../assets/grimm-ink-character-detailed.png) |
+
+The references lock adult proportions, silhouette language, facial scale, tonal finish, and detail density. Increasing detail adds only internal information: it must not enlarge eyes, add circular blush, soften anatomy into childlike proportions, change pose or identity, or increase realism.
 
 - One original folklore character, creature, or object in a centered bust or emblem, readable at 48-64 px.
-- Roughly 7-11 large, flat schematic masses and no more than 3-5 essential interior marks.
+- `bajo`: roughly 7-11 large schematic masses and no more than 3-5 essential interior marks.
+- `medio`: roughly 10-14 controlled masses with a few grouped hair shapes, garment folds, object fittings, and restrained tonal divisions.
+- `detallado`: roughly 18-24 controlled masses with more separated groups, seams, material cues, and restrained value changes that remain readable at 64 px.
 - One consistent heavy pure-black outline, visually about 26 px on a 1254 px canvas. Exterior and important interior contours use the same weight, rounded caps and joins, smooth organic curves, and soft corners.
 - One dominant story object, garment, hairstyle, or secondary shape occupying roughly 35-50 percent of the composition.
-- No gradients, hatching, texture, tiny patterns, individual hair or fur strands, scenery, extra characters, text, logo, frame, realism, 3D, anime, faceted polygons, or blocky anatomy.
+- Match the selected reference's tonal finish. Do not introduce glossy or painterly gradients, hatching, noisy texture, tiny patterns, individual hair or fur strands, scenery, extra characters, text, logo, frame, realism, 3D, anime, faceted polygons, or blocky anatomy.
 - Use the resolved character-type palette above without recoloring story-defining subjects or objects.
 - Keep enclosed whites and creams opaque; only the exterior is transparent. Do not imitate Disney or another franchise.
 
