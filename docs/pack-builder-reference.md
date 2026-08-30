@@ -85,15 +85,18 @@ Una regla general vive en `gameRules[]`, no se reparte a un jugador y puede ejec
 
 Por ahora, solo Fabled, Loric, Maldiciones y Bendiciones se publican como Modificadores. Violinista, por ejemplo, conserva `ruleKind: "gameEnd"`, pero no declara `systemType`; por eso no se mezcla con los finales del Sistema.
 
-El selector de Creator ofrece Modificador y los cinco tipos de Sistema. Al elegir un tipo de Sistema compone el ID jerárquico, oculta el campo de icono y muestra el SVG compartido:
+El selector de Creator ofrece Modificador y los tipos de Sistema. Al elegir un tipo de Sistema compone el ID jerárquico, oculta el campo de icono y muestra el SVG compartido:
 
 | `systemType` | ID | SVG automático |
 |---|---|---|
 | `composition` | `rule:<propietario>:composition:<slug>` | Composición |
+| `setup` | `rule:<propietario>:setup:<slug>` | Preparación |
 | `voting` | `rule:<propietario>:voting:<slug>` | Votación |
 | `game-end` | `rule:<propietario>:game-end:<slug>` | Final de partida |
+| `interactions` | `rule:<propietario>:interactions:<slug>` | Interacciones |
 | `information` | `rule:<propietario>:information:<slug>` | Información |
-| `other` | `rule:<propietario>:other:<slug>` | Genérico |
+| `reactions` | `rule:<propietario>:reactions:<slug>` | Reacciones durante la partida |
+| `other` | `rule:<propietario>:other:<slug>` | Genérico, solo cuando no exista una familia clara |
 
 Un Modificador usa `rule:<propietario>:<slug>` y conserva el icono declarado por el contenido. Una regla de Sistema no incluye `icon` ni `category.icon`: la aplicación resuelve un único SVG autoritativo desde `systemType` y no admite overrides individuales.
 

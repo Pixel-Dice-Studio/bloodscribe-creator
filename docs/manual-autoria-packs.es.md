@@ -157,7 +157,7 @@ Si una regla declara `systemType`, su ID debe incluir ese segmento:
 }
 ```
 
-Los valores actuales de `systemType` son `composition`, `voting`, `game-end`, `information` y `other`. Una regla modificadora omite `systemType` y conserva un ID corto como `rule:mi-juego:bendicion-del-rio`.
+Los valores actuales de `systemType` son `composition`, `setup`, `voting`, `game-end`, `interactions`, `information`, `reactions` y `other`. Reserva `other` para reglas sin una familia clara. Una regla modificadora omite `systemType` y conserva un ID corto como `rule:mi-juego:bendicion-del-rio`.
 
 Al renombrar un ID hay que actualizar todas sus referencias:
 
@@ -806,7 +806,7 @@ Una Regla usa el mismo programa mecánico que un personaje, pero no tiene portad
 | Campo | Significado |
 |---|---|
 | `ruleKind` | Contrato ejecutable: `general`, `composition`, `voting`, `setup` o `gameEnd`. |
-| `systemType` | Ubicación visual en Sistema: `composition`, `voting`, `game-end`, `information` u `other`. |
+| `systemType` | Ubicación visual en Sistema: `composition`, `setup`, `voting`, `game-end`, `interactions`, `information`, `reactions` u `other`. |
 | sin `systemType` | La regla se presenta como Modificador. |
 
 `visibility: "base"` oculta la regla en superficies públicas pero conserva su ejecución. `visibility: "public"` la muestra y permite activación `automatic` o `setupChoice` desde el Cuento.
