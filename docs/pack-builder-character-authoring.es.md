@@ -4,10 +4,11 @@ Esta referencia se genera desde el mismo contrato que consume el MCP. Los ejempl
 
 ## Reglas de autoría
 
+- Cada despertar declara wake.firstTiming u otherTiming: {section, position} con posición entera 0–30 y sección del catálogo nightOrder.sections. No escribas un orden global. before e immediatelyAfter son referencias declarativas condicionales a la presencia conjunta. El cuento solo puede reordenar dentro de la misma sección mediante nightOrder.sections.first/other[section]. Información garantizada no concede veracidad; debe justificarla la mecánica. Los datos numéricos antiguos conservan su comportamiento hasta clasificarse explícitamente.
 - Los IDs son referencias opacas; nunca seleccionan comportamiento.
 - Clasifica primero participación, alineamiento, rol y victoria; no uses teamId, nombre o texto para inferirlos.
 - Declara la participación exclusivamente con entryMode: cast, temporary o ambos.
-- La entrada temporary activa automáticamente exclusión del reparto, información nocturna malvada y expulsión; no dupliques esas reglas como mecánicas.
+- La entrada temporary activa automáticamente exclusión del reparto, información nocturna del Mal y expulsión; no dupliques esas reglas como mecánicas.
 - Expresa toda regla mediante when, input, usage, conditions, effects y policies.
 - Consulta recetas antes de combinar primitivas complejas y valida siempre el personaje final.
 - Si varias fichas representan cantidades del mismo recurso, usa un único adjustCounter y proyéctalo con copies o stages; crear «Token 1», «Token 2» y «Token 3» como fichas independientes no está recomendado.
@@ -22,7 +23,7 @@ Esta referencia se genera desde el mismo contrato que consume el MCP. Los ejempl
 
 Antes de modelar la habilidad, clasifica cómo entra, cuenta y gana el personaje. Si la idea no lo deja claro, la IA debe preguntarlo. `teamId` solo agrupa y presenta contenido; nunca sustituye estos campos. Toda propuesta usa `entryMode`.
 
-### `regular-aligned` — Personaje regular de un bando
+### `regular-aligned` — Personaje regular de un alineamiento
 
 Entra en la bolsa, ocupa una plaza normal y gana con su alineamiento efectivo.
 
@@ -89,7 +90,7 @@ Entra fuera del reparto base, recibe alineamiento secreto y usa el flujo de expu
 Forma parte del reparto y solo gana si se cumple su condición declarativa.
 
 - Ocupa el eje neutral de la composición y cuenta entre los vivos regulares.
-- No gana automáticamente con bueno ni malvado.
+- No gana automáticamente con el Bien ni el Mal.
 - storytellerDecision es solo el fallback manual del perfil: sustitúyelo por una ValueExpr booleana cuando la condición sea automatizable.
 
 ```json
@@ -119,12 +120,12 @@ Forma parte del reparto y solo gana si se cumple su condición declarativa.
 }
 ```
 
-### `regular-neutral-fixed-side` — Neutral regular que gana con un bando fijo
+### `regular-neutral-fixed-side` — Neutral regular que gana con un alineamiento fijo
 
-Permanece neutral para identidad y composición, pero comparte la victoria de un bando concreto.
+Permanece neutral para identidad y composición, pero comparte la victoria de un alineamiento concreto.
 
 - Cuenta entre los vivos regulares.
-- Gana con el bando fijado aunque su alineamiento siga siendo neutral.
+- Gana con el alineamiento fijado aunque su alineamiento siga siendo neutral.
 
 ```json
 {
@@ -189,10 +190,10 @@ El Narrador decide si la misma definición entra en el reparto o como personaje 
 
 ## Ejemplos completos de gameplay
 
-### `character:invented:night-envoy` — Temporal malvado incorporado durante el día
+### `character:invented:night-envoy` — Temporal del Mal incorporado durante el día
 
-1. Entra durante el día mediante add-temporary-player. La revelación inmediata enseña personaje y alineamiento, pero no los malvados principales.
-2. La noche siguiente, su primer paso muestra por separado todos los malvados principales vivos. No muestra ayudantes ni faroles; después actúa su habilidad.
+1. Entra durante el día mediante add-temporary-player. La revelación inmediata enseña personaje y alineamiento, pero no los principales del Mal.
+2. La noche siguiente, su primer paso muestra por separado todos los principales del Mal vivos. No muestra ayudantes ni faroles; después actúa su habilidad.
 3. Una votación temporaryExpulsion aprobada genera expulsion y death. Pueden votar vivos y muertos, no se gastan últimos suspiros y todavía puede haber una ejecución ese día.
 
 ```json
@@ -226,7 +227,7 @@ El Narrador decide si la misma definición entra en el reparto o como personaje 
 ### `character:invented:two-doors` — Personaje con entrada dual
 
 1. Si entra como cast, ocupa reparto, cuenta entre los vivos normales, muere por los flujos ordinarios y no puede ser expulsado como temporal.
-2. Si entra como temporary, queda fuera de esos conteos, puede incorporarse durante la partida y usa expulsión. Solo en esta entrada recibe la información automática si es malvado.
+2. Si entra como temporary, queda fuera de esos conteos, puede incorporarse durante la partida y usa expulsión. Solo en esta entrada recibe la información automática si pertenece al Mal.
 
 ```json
 {
@@ -292,7 +293,7 @@ El Narrador decide si la misma definición entra en el reparto o como personaje 
 
 ### `character:invented:solitary-oath` — Independiente con victoria personal
 
-1. Cuenta como jugador normal porque entra como cast, pero no comparte automáticamente la victoria de ningún bando: solo gana cuando se cumple su condición personal.
+1. Cuenta como jugador normal porque entra como cast, pero no comparte automáticamente la victoria de ningún alineamiento: solo gana cuando se cumple su condición personal.
 
 ```json
 {
@@ -329,8 +330,8 @@ El Narrador decide si la misma definición entra en el reparto o como personaje 
 
 - ¿Entra en el reparto normal (cast), como personaje temporal (temporary), o puede usar ambos modos?
 - ¿Cuenta como personaje regular para la composición y el final de partida, o como participante extra fuera de ese conteo?
-- ¿Su alineamiento es bueno, malvado o neutral, y a cuáles puede cambiar?
-- ¿Gana con su alineamiento actual, con un bando fijo o solo mediante una condición personal?
+- ¿Su alineamiento es el Bien, el Mal o Neutral, y a cuáles puede cambiar?
+- ¿Gana con su alineamiento actual, con un alineamiento fijo o solo mediante una condición personal?
 - ¿Su rol de composición es core, support o independent?
 - ¿Qué resultado observable debe producir la habilidad?
 - ¿Cuándo se activa y con qué frecuencia?
@@ -346,7 +347,7 @@ El Narrador decide si la misma definición entra en el reparto o como personaje 
 
 ### `personal-victory-by-fatal-execution-before-night` — Victoria personal por ejecución antes de una noche
 
-Ganar personalmente si el personaje muere ejecutado antes de una noche límite, independientemente del bando vencedor.
+Ganar personalmente si el personaje muere ejecutado antes de una noche límite, independientemente del alineamiento vencedor.
 
 - Estado: `supported`
 - Automatización: `automatic`
@@ -419,20 +420,20 @@ Un trigger execution con died=true aplica una ficha permanente antes del límite
 }
 ```
 
-### `registered-evil-neighbours` — Comprobar vecinos malvados
+### `registered-evil-neighbours` — Comprobar vecinos del Mal
 
-Saber si al menos uno de los dos vecinos vivos más cercanos se registra como malvado.
+Saber si al menos uno de los dos vecinos vivos más cercanos se registra como parte del Mal.
 
 - Estado: `supported`
 - Automatización: `automatic`
 - Cubre: `entities.players`, `valueNodes.query`, `identityModes.registered`, `effects.emitInformation`
 
-nearestMatching obtiene un vecino vivo en cada dirección; la consulta proyecta su bando registrado y emitInformation entrega un sí/no.
+nearestMatching obtiene un vecino vivo en cada dirección; la consulta proyecta su alineamiento registrado y emitInformation entrega un sí/no.
 
 **Preguntar**
 
 - ¿Deben saltarse los vecinos muertos?
-- ¿Debe consultarse el bando real o el registrado?
+- ¿Debe consultarse el alineamiento real o el registrado?
 
 ```json
 {
@@ -490,7 +491,7 @@ nearestMatching obtiene un vecino vivo en cada dirección; la consulta proyecta 
       },
       "presentation": {
         "kind": "boolean",
-        "title": "Mal cercano"
+        "title": "El Mal cercano"
       },
       "delivery": {
         "audience": {
@@ -1269,9 +1270,9 @@ effectTarget conserva los objetivos efectivos después de protecciones y redirec
 }
 ```
 
-### `registered-evil-used-ability-on-good` — Malvado registrado actuó sobre bueno
+### `registered-evil-used-ability-on-good` — El Mal registrado actuó sobre el Bien
 
-Descubrir si un actor registrado como malvado usó una habilidad sobre alguien registrado como bueno esta noche.
+Descubrir si un actor registrado como parte del Mal usó una habilidad sobre alguien registrado como parte del Bien esta noche.
 
 - Estado: `supported`
 - Automatización: `automatic`
@@ -1353,7 +1354,7 @@ El evento conserva las identidades registradas del actor y del objetivo seleccio
       },
       "presentation": {
         "kind": "boolean",
-        "title": "Malvado sobre bueno"
+        "title": "El Mal sobre el Bien"
       },
       "delivery": {
         "audience": {
@@ -1460,7 +1461,7 @@ adjustCounter conserva el valor y sus fichas proyectadas; cada entrada de thresh
 **Límites**
 
 - trigger=crossing evita repetir el efecto en resoluciones posteriores mientras el contador siga en el umbral.
-- Si el recurso debe volver a golpear cada vez que alguien añade una unidad con el contador ya lleno, usa trigger=reaching y la receta accumulable-resource-shared-cap.
+- Usa trigger=reaching solo si la regla exige repetir el efecto al intentar añadir una unidad con el contador ya lleno.
 
 ```json
 {
@@ -1534,7 +1535,7 @@ Modelar fichas que se acumulan sobre un jugador —una ficha por unidad—, marc
 - Automatización: `automatic`
 - Cubre: `bindings.effectTarget`, `effects.adjustCounter`, `effects.death`, `predicateTypes.players.counter`, `valueNodes.counterValue`, `aggregates.sum`
 
-Un solo contador declara el recurso y todas las fuentes lo comparten con scope=shared; cada fuente declara su propio adjustCounter con el mismo counter, bounds y projection. bounds acota la reserva almacenada, projection.mode=copies dibuja una ficha por unidad —stages nombra niveles cuando cada peldaño tiene ficha propia— y stateProjection deriva el estado mientras el valor cumpla activeWhen. thresholds encadena las consecuencias del mismo contador: cada entrada declara su value, su trigger y sus propios effects, así que la segunda y la tercera unidad no piden un contador nuevo. trigger=reaching mantiene viva la consecuencia cuando el contador ya está en bounds.max: el tope acota la reserva, no el golpe. resetTo consume el recurso para volver a acumularlo desde abajo. Retirar unidades es el mismo efecto con delta negativo y sin umbrales. Para leer el recurso desde otra regla se pregunta por el contador —la condición counter y el valor counterValue—, nunca por qué ficha concreta hay sobre la mesa. Para sumar ese contador en todos los jugadores, usa una query de players con project.type=counter y aggregate.type=sum.
+Un solo contador declara el recurso y todas las fuentes lo comparten con scope=shared; cada fuente declara su propio adjustCounter con el mismo counter, bounds y projection. bounds acota la reserva almacenada, projection.mode=copies dibuja una ficha por unidad —stages nombra niveles cuando cada peldaño tiene ficha propia— y stateProjection deriva el estado mientras el valor cumpla activeWhen. thresholds encadena las consecuencias del mismo contador: cada entrada declara su value, su trigger y sus propios effects, así que la segunda y la tercera unidad no piden un contador nuevo. trigger=crossing aplica la consecuencia solo al cruzar el umbral; si una protección evita la muerte asociada, tampoco se añade la unidad que la causaría y el contador permanece debajo del límite. resetTo consume el recurso para volver a acumularlo desde abajo. Retirar unidades es el mismo efecto con delta negativo y sin umbrales. Para leer el recurso desde otra regla se pregunta por el contador —la condición counter y el valor counterValue—, nunca por qué ficha concreta hay sobre la mesa. Para sumar ese contador en todos los jugadores, usa una query de players con project.type=counter y aggregate.type=sum.
 
 **Preguntar**
 
@@ -1605,7 +1606,7 @@ Un solo contador declara el recurso y todas las fuentes lo comparten con scope=s
         {
           "operator": "gte",
           "value": 3,
-          "trigger": "reaching",
+          "trigger": "crossing",
           "effects": [
             {
               "type": "death",
@@ -1716,7 +1717,7 @@ La entrada character entrega un characterId tipado; grantAbility lo asigna al ac
 
 **Límites**
 
-- Filtra candidates de forma explícita; no deduzcas candidatos permitidos desde el texto o el equipo visible.
+- Filtra candidates de forma explícita; no deduzcas candidatos permitidos desde el texto o el tipo de personaje visible.
 
 ```json
 {
@@ -1768,6 +1769,189 @@ La entrada character entrega un characterId tipado; grantAbility lo asigna al ac
         "type": "untilWindow",
         "window": "dawn"
       }
+    }
+  ],
+  "policies": []
+}
+```
+
+### `copy-ability-from-table-zone` — Copiar una habilidad del centro de la mesa
+
+Elegir una carta de una zona declarada y conceder temporalmente su habilidad al actor.
+
+- Estado: `supported`
+- Automatización: `automatic`
+- Cubre: `predicateTypes.characters.inTableCharacterZone`, `valueNodes.inputValue`, `inputKinds.character`, `effects.grantAbility`
+
+inTableCharacterZone limita la selección a identidades persistidas en la zona; grantAbility reutiliza su habilidad sin poner esa carta en juego.
+
+**Preguntar**
+
+- ¿Qué zona puede consultarse?
+- ¿Cuándo termina la habilidad copiada?
+
+**Límites**
+
+- La carta permanece en la zona y no ejecuta su habilidad por sí misma.
+
+```json
+{
+  "mechanicId": "mechanic:invented:copy-from-zone:rule:1",
+  "tags": [
+    "granted-ability",
+    "table-character-zone"
+  ],
+  "when": {
+    "window": "night",
+    "cadence": "each",
+    "startsAt": 1
+  },
+  "input": {
+    "kind": "character",
+    "candidates": {
+      "type": "query",
+      "from": {
+        "entity": "characters"
+      },
+      "where": {
+        "type": "inTableCharacterZone",
+        "zoneId": "zone:invented:public-center"
+      },
+      "aggregate": {
+        "type": "collect"
+      }
+    }
+  },
+  "usage": {
+    "scope": "repeat"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "grantAbility",
+      "active": true,
+      "abilityCharacterId": {
+        "type": "inputValue",
+        "valueType": "characterId"
+      },
+      "owner": "targets",
+      "controller": "owner",
+      "ownership": "sourceAbility",
+      "targets": {
+        "type": "binding",
+        "binding": "actor"
+      },
+      "duration": {
+        "type": "untilWindow",
+        "window": "dawn"
+      }
+    }
+  ],
+  "policies": []
+}
+```
+
+### `exchange-character-with-table-zone` — Intercambiar personaje con una zona
+
+Cambiar la identidad del actor por una carta de una zona y devolver a ella su personaje anterior.
+
+- Estado: `supported`
+- Automatización: `automatic`
+- Cubre: `predicateTypes.characters.inTableCharacterZone`, `valueNodes.inputValue`, `inputKinds.character`, `effects.exchangeCharacterWithTableZone`
+
+El intercambio es atómico, conserva vida y estados y limpia concesiones ligadas a la habilidad abandonada. requiredWhen puede convertir una entrada opcional en obligatoria.
+
+**Preguntar**
+
+- ¿Conserva o adopta el alineamiento?
+- ¿Cuándo deja de ser opcional la elección?
+
+**Límites**
+
+- Usa el mismo zoneId en la entrada y el efecto; una elección obsoleta se rechaza.
+
+```json
+{
+  "mechanicId": "mechanic:invented:exchange-with-zone:rule:1",
+  "tags": [
+    "character-change",
+    "table-character-zone"
+  ],
+  "when": {
+    "window": "firstNight",
+    "cadence": "once",
+    "startsAt": 1
+  },
+  "input": {
+    "kind": "character",
+    "optional": true,
+    "candidates": {
+      "type": "query",
+      "from": {
+        "entity": "characters"
+      },
+      "where": {
+        "type": "inTableCharacterZone",
+        "zoneId": "zone:invented:secret-reserve"
+      },
+      "aggregate": {
+        "type": "collect"
+      }
+    },
+    "requiredWhen": {
+      "type": "compare",
+      "left": {
+        "type": "query",
+        "from": {
+          "entity": "characters"
+        },
+        "where": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "inTableCharacterZone",
+              "zoneId": "zone:invented:secret-reserve"
+            },
+            {
+              "type": "identity",
+              "facet": "teamId",
+              "values": [
+                "team:invented:wolves"
+              ]
+            }
+          ]
+        },
+        "aggregate": {
+          "type": "count"
+        }
+      },
+      "operator": "eq",
+      "right": 2
+    }
+  },
+  "usage": {
+    "scope": "game",
+    "limit": {
+      "type": "literal",
+      "value": 1
+    },
+    "consumeOn": "resolution"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "exchangeCharacterWithTableZone",
+      "zoneId": "zone:invented:secret-reserve",
+      "incomingCharacter": {
+        "type": "inputValue",
+        "valueType": "characterId"
+      },
+      "alignmentMode": "adoptCharacter",
+      "targets": {
+        "type": "binding",
+        "binding": "actor"
+      },
+      "optional": true
     }
   ],
   "policies": []
@@ -1828,15 +2012,15 @@ Dos operaciones adjustBucket opuestas conservan el tamaño de la partida y manti
 }
 ```
 
-### `may-register-as-another-allegiance` — Poder registrarse con otro bando
+### `may-register-as-another-allegiance` — Poder registrarse con otro alineamiento
 
-Permitir que el actor se registre como malvado y de apoyo sin cambiar su identidad real.
+Permitir que el actor se registre como parte del Mal y de apoyo sin cambiar su identidad real.
 
 - Estado: `supported`
 - Automatización: `assisted`
 - Cubre: `alignments.evil`, `roles.support`, `effects.registerAs`
 
-registerAs modifica únicamente la identidad registrada; mode=mayRegisterAs deja la elección al Narrador y no altera el bando real.
+registerAs modifica únicamente la identidad registrada; mode=mayRegisterAs deja la elección al Narrador y no altera el alineamiento real.
 
 **Preguntar**
 
@@ -2181,7 +2365,7 @@ La relación y la restricción comparten una duración whileCondition que consul
 }
 ```
 
-### `change-selected-character-preserving-alignment` — Cambiar personaje conservando el bando
+### `change-selected-character-preserving-alignment` — Cambiar personaje conservando el alineamiento
 
 Elegir un jugador y un personaje fuera de juego, sustituir su identidad real y conservar su alineamiento actual.
 
@@ -2194,7 +2378,7 @@ playerAndCharacter produce jugador y characterId en una sola entrada; changeChar
 **Preguntar**
 
 - ¿Puede elegirse un personaje ya en juego?
-- ¿Se conserva el bando, el rol o ambos?
+- ¿Se conserva el alineamiento, el rol o ambos?
 
 **Límites**
 
@@ -2255,7 +2439,7 @@ playerAndCharacter produce jugador y characterId en una sola entrada; changeChar
 }
 ```
 
-### `change-alignment-and-record-source-relation` — Cambiar bando y conservar la relación de origen
+### `change-alignment-and-record-source-relation` — Cambiar alineamiento y conservar la relación de origen
 
 Convertir a un jugador y registrar de forma persistente quién originó el cambio.
 
@@ -2267,12 +2451,12 @@ changeAlignment modifica el estado real; setPlayerRelation conserva por separado
 
 **Preguntar**
 
-- ¿A qué bando cambia?
+- ¿A qué alineamiento cambia?
 - ¿La conversión o la relación pueden revertirse después?
 
 **Límites**
 
-- La relación no sustituye al cambio de bando y el cambio de bando no registra por sí solo quién lo causó.
+- La relación no sustituye al cambio de alineamiento y el cambio de alineamiento no registra por sí solo quién lo causó.
 
 ```json
 {
@@ -2331,7 +2515,7 @@ changeAlignment modifica el estado real; setPlayerRelation conserva por separado
 
 ### `invalidate-vote-when-only-one-group-votes` — Invalidar un voto si solo participa un grupo
 
-Hacer inválido un recuento si todos sus votantes pertenecen al mismo bando declarado.
+Hacer inválido un recuento si todos sus votantes pertenecen al mismo alineamiento declarado.
 
 - Estado: `supported`
 - Automatización: `automatic`
@@ -2650,7 +2834,7 @@ recordAction calcula un outcome tipado; resolveGameEnd consulta después facts.o
 
 ### `block-game-end-before-round-threshold` — Bloquear un final antes de una ronda límite
 
-Impedir que un bando gane antes de una noche concreta aunque se cumpla su condición normal.
+Impedir que un alineamiento gane antes de una noche concreta aunque se cumpla su condición normal.
 
 - Estado: `supported`
 - Automatización: `automatic`
@@ -3042,6 +3226,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `predicateTypes.players.any` | Exige que se cumpla al menos una condición. | `{"value":"any"}` |
 | `predicateTypes.players.not` | Invierte el resultado de otra condición. | `{"value":"not"}` |
 | `predicateTypes.characters.inPlay` | Comprueba si el personaje está en juego. | `{"value":"inPlay"}` |
+| `predicateTypes.characters.inTableCharacterZone` | Comprueba si el personaje ocupa una zona declarada del centro de la mesa. | `{"value":"inTableCharacterZone"}` |
 | `predicateTypes.characters.identity` | Compara una faceta de la identidad del personaje. | `{"value":"identity"}` |
 | `predicateTypes.characters.identityMatchesBinding` | Compara una faceta del personaje con un participante vinculado. | `{"value":"identityMatchesBinding"}` |
 | `predicateTypes.characters.identityMatchesInput` | Compara una faceta del personaje con el valor introducido durante la resolución. | `{"value":"identityMatchesInput"}` |
@@ -3103,6 +3288,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `facts.guessResult` | Resultado de una apuesta declarada. | `{"value":"guessResult"}` |
 | `facts.targetMechanicTags` | Tags mecánicos del objetivo actual. | `{"value":"targetMechanicTags"}` |
 | `facts.operationWouldEndGame` | Indica si la operación pendiente podría activar un final estándar. | `{"value":"operationWouldEndGame"}` |
+| `facts.informationMayBeFalse` | Indica si la resolución actual permite información no fiable. | `{"value":"informationMayBeFalse"}` |
 | `setOperations.union` | Combina valores sin duplicados. | `{"value":"union"}` |
 | `setOperations.intersection` | Conserva valores comunes. | `{"value":"intersection"}` |
 | `setOperations.difference` | Retira valores presentes en otras listas. | `{"value":"difference"}` |
@@ -3112,24 +3298,24 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `mathOperations.max` | Devuelve el mayor valor numérico. | `{"value":"max"}` |
 | `identityModes.real` | Consulta la identidad mecánica real. | `{"identityMode":"real"}` |
 | `identityModes.initial` | Consulta la identidad asignada al comienzo de la partida. | `{"identityMode":"initial"}` |
-| `identityModes.base` | Consulta la identidad declarada por el personaje antes de cambios de bando. | `{"identityMode":"base"}` |
+| `identityModes.base` | Consulta la identidad declarada por el personaje antes de cambios de alineamiento. | `{"identityMode":"base"}` |
 | `identityModes.shown` | Consulta la identidad mostrada al jugador. | `{"identityMode":"shown"}` |
 | `identityModes.apparent` | Consulta la identidad pública confirmada o, si no existe, la mostrada. | `{"identityMode":"apparent"}` |
 | `identityModes.registered` | Aplica decisiones de registro antes de consultar. | `{"identityMode":"registered"}` |
 | `identityFacets.teamId` | Categoría visible estable del pack. | `{"value":"teamId"}` |
-| `identityFacets.allegiance` | Bando bueno, malo o neutral. | `{"value":"allegiance"}` |
-| `identityFacets.role` | Función mecánica dentro del bando. | `{"value":"role"}` |
+| `identityFacets.allegiance` | Alineamiento con el Bien, el Mal o Neutral. | `{"value":"allegiance"}` |
+| `identityFacets.role` | Función mecánica dentro del alineamiento. | `{"value":"role"}` |
 | `identityFacets.character` | Identidad concreta declarada por el pack. | `{"value":"character"}` |
 | `identityFacets.mechanicTags` | Tags mecánicos declarados. | `{"value":"mechanicTags"}` |
 | `comparableIdentityFacets.teamId` | Categoría visible estable del pack. | `{"value":"teamId"}` |
-| `comparableIdentityFacets.allegiance` | Bando bueno, malo o neutral. | `{"value":"allegiance"}` |
-| `comparableIdentityFacets.role` | Función mecánica dentro del bando. | `{"value":"role"}` |
+| `comparableIdentityFacets.allegiance` | Alineamiento con el Bien, el Mal o Neutral. | `{"value":"allegiance"}` |
+| `comparableIdentityFacets.role` | Función mecánica dentro del alineamiento. | `{"value":"role"}` |
 | `comparableIdentityFacets.character` | Identidad concreta declarada por el pack. | `{"value":"character"}` |
-| `alignments.good` | Bando bueno. | `{"value":"good"}` |
-| `alignments.evil` | Bando malo. | `{"value":"evil"}` |
-| `alignments.neutral` | Bando neutral. | `{"value":"neutral"}` |
-| `roles.core` | Pieza principal de su bando. | `{"value":"core"}` |
-| `roles.support` | Pieza de apoyo de su bando. | `{"value":"support"}` |
+| `alignments.good` | Alineamiento con el Bien. | `{"value":"good"}` |
+| `alignments.evil` | Alineamiento con el Mal. | `{"value":"evil"}` |
+| `alignments.neutral` | Alineamiento neutral. | `{"value":"neutral"}` |
+| `roles.core` | Pieza principal de su alineamiento. | `{"value":"core"}` |
+| `roles.support` | Pieza de apoyo de su alineamiento. | `{"value":"support"}` |
 | `roles.independent` | Participa con una política propia. | `{"value":"independent"}` |
 | `entryModes.cast` | Ocupa una plaza normal del reparto. | `{"value":"cast"}` |
 | `entryModes.temporary` | Se incorpora temporalmente a la partida. | `{"value":"temporary"}` |
@@ -3146,7 +3332,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `eventFields.outcome` | Resultado semántico del evento. | `{"type":"eventField","field":"outcome","value":"<value>"}` |
 | `eventFields.guessResult` | Número de conjeturas correctas registradas. | `{"type":"eventField","field":"guessResult","value":"<value>"}` |
 | `eventFields.died` | Indica si la ejecución produjo muerte. | `{"type":"eventField","field":"died","value":"<value>"}` |
-| `eventFields.attribution` | Bando mecánico al que se atribuye la muerte. | `{"type":"eventField","field":"attribution","value":"<value>"}` |
+| `eventFields.attribution` | Alineamiento mecánico al que se atribuye la muerte. | `{"type":"eventField","field":"attribution","value":"<value>"}` |
 | `eventFields.resolution` | Flujo mecánico que está resolviendo el evento candidato. | `{"type":"eventField","field":"resolution","value":"<value>"}` |
 | `eventFields.known` | Indica si el evento era conocido. | `{"type":"eventField","field":"known","value":"<value>"}` |
 | `eventFields.occurrence` | Ocurrencia semántica registrada. | `{"type":"eventField","field":"occurrence","value":"<value>"}` |
@@ -3154,7 +3340,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `eventFields.characterId` | ID del personaje relacionado. | `{"type":"eventField","field":"characterId","value":"<value>"}` |
 | `eventFields.sourceCharacterId` | ID del personaje cuya mecánica originó el evento. | `{"type":"eventField","field":"sourceCharacterId","value":"<value>"}` |
 | `eventFields.targetCount` | Cantidad exacta de jugadores elegidos por la mecánica. | `{"type":"eventField","field":"targetCount","value":"<value>"}` |
-| `eventFields.targetAlignment` | Bando capturado al elegir. | `{"type":"eventField","field":"targetAlignment","value":"<value>"}` |
+| `eventFields.targetAlignment` | Alineamiento capturado al elegir. | `{"type":"eventField","field":"targetAlignment","value":"<value>"}` |
 | `eventFields.targetAlive` | Estado vital capturado. | `{"type":"eventField","field":"targetAlive","value":"<value>"}` |
 | `eventFields.state` | Estado que cambió. | `{"type":"eventField","field":"state","value":"<value>"}` |
 | `eventFields.active` | Valor activo del cambio. | `{"type":"eventField","field":"active","value":"<value>"}` |
@@ -3240,7 +3426,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `windows.execution` | Durante la resolución de una ejecución. | `{"window":"execution"}` |
 | `windows.expulsion` | Durante la resolución de una expulsión. | `{"window":"expulsion"}` |
 | `windows.dusk` | En la transición del día a la noche. | `{"window":"dusk"}` |
-| `windows.mainEvilInfo` | Durante el paso de información inicial del malvado principal. | `{"window":"mainEvilInfo"}` |
+| `windows.mainEvilInfo` | Durante el paso de información inicial del principal del Mal. | `{"window":"mainEvilInfo"}` |
 | `windows.gameEnd` | Cuando se comprueban condiciones de victoria. | `{"window":"gameEnd"}` |
 | `windows.anyTime` | Sin restringir la regla a una fase concreta. | `{"window":"anyTime"}` |
 | `cadences.once` | La agenda se activa una única vez. | `{"cadence":"once"}` |
@@ -3277,6 +3463,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `durations.untilEvent` | Termina cuando coincide un patrón de evento tipado. | `{"type":"untilEvent","event":"death"}` |
 | `effects.death` | Mata los objetivos resueltos. | `{"type":"death"}` |
 | `effects.death.fields.type` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.death.fields.polarity` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.death.fields.when` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.death.fields.delay` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.death.fields.targets` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3314,6 +3501,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.death.fields.useRegisteredIdentity` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"useRegisteredIdentity":"<useRegisteredIdentity>"}` |
 | `effects.resurrect` | Devuelve a la vida los objetivos resueltos. | `{"type":"resurrect"}` |
 | `effects.resurrect.fields.type` | Campo admitido por resurrect; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.resurrect.fields.polarity` | Campo admitido por resurrect; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.resurrect.fields.when` | Campo admitido por resurrect; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.resurrect.fields.delay` | Campo admitido por resurrect; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.resurrect.fields.targets` | Campo admitido por resurrect; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3325,6 +3513,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.resurrect.fields.spentReminder` | Campo admitido por resurrect; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.execute` | Ejecuta los objetivos resueltos. | `{"type":"execute"}` |
 | `effects.execute.fields.type` | Campo admitido por execute; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.execute.fields.polarity` | Campo admitido por execute; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.execute.fields.when` | Campo admitido por execute; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.execute.fields.delay` | Campo admitido por execute; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.execute.fields.targets` | Campo admitido por execute; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3339,6 +3528,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.execute.fields.targetReminder` | Campo admitido por execute; su valor debe cumplir el contrato tipado. | `{"targetReminder":"<targetReminder>"}` |
 | `effects.setPlayerState` | Crea o actualiza un estado explícito. | `{"type":"setPlayerState","state":"state","active":true,"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.setPlayerState.fields.type` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.setPlayerState.fields.polarity` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.setPlayerState.fields.when` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.setPlayerState.fields.delay` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.setPlayerState.fields.targets` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3346,11 +3536,13 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.setPlayerState.fields.duration` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"duration":"<duration>"}` |
 | `effects.setPlayerState.fields.state` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"state":"<state>"}` |
 | `effects.setPlayerState.fields.active` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"active":"<active>"}` |
+| `effects.setPlayerState.fields.informationMayBeFalse` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"informationMayBeFalse":"<informationMayBeFalse>"}` |
 | `effects.setPlayerState.fields.ownership` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"ownership":"<ownership>"}` |
 | `effects.setPlayerState.fields.exclusive` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"exclusive":"<exclusive>"}` |
 | `effects.setPlayerState.fields.excludeInitialTargets` | Campo admitido por setPlayerState; su valor debe cumplir el contrato tipado. | `{"excludeInitialTargets":"<excludeInitialTargets>"}` |
 | `effects.setPlayerRelation` | Crea o retira una relación mecánica tipada. | `{"type":"setPlayerRelation","kind":"linked","active":true,"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.setPlayerRelation.fields.type` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.setPlayerRelation.fields.polarity` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.setPlayerRelation.fields.when` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.setPlayerRelation.fields.delay` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.setPlayerRelation.fields.targets` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3362,6 +3554,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.setPlayerRelation.fields.ownership` | Campo admitido por setPlayerRelation; su valor debe cumplir el contrato tipado. | `{"ownership":"<ownership>"}` |
 | `effects.applyMarker` | Añade o retira una ficha recordatoria. | `{"type":"applyMarker","kind":"reminder","id":"marker","active":true,"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.applyMarker.fields.type` | Campo admitido por applyMarker; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.applyMarker.fields.polarity` | Campo admitido por applyMarker; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.applyMarker.fields.when` | Campo admitido por applyMarker; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.applyMarker.fields.delay` | Campo admitido por applyMarker; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.applyMarker.fields.targets` | Campo admitido por applyMarker; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3374,6 +3567,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.applyMarker.fields.ownership` | Campo admitido por applyMarker; su valor debe cumplir el contrato tipado. | `{"ownership":"<ownership>"}` |
 | `effects.moveMarker` | Transfiere atómicamente una ficha concreta o todas las protecciones transferibles. | `{"type":"moveMarker","kind":"reminder","id":"marker","from":{"type":"binding","binding":"actor"},"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.moveMarker.fields.type` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.moveMarker.fields.polarity` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.moveMarker.fields.when` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.moveMarker.fields.delay` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.moveMarker.fields.targets` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3382,8 +3576,9 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.moveMarker.fields.id` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"id":"<id>"}` |
 | `effects.moveMarker.fields.allProtections` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"allProtections":"<allProtections>"}` |
 | `effects.moveMarker.fields.from` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"from":"<from>"}` |
-| `effects.adjustCounter` | Ajusta un contador persistente del objetivo. bounds acota la reserva almacenada; cada entrada de thresholds declara value, trigger y sus propios effects, de modo que un mismo contador encadena varias consecuencias sin duplicarse; trigger=crossing dispara solo al alcanzar el umbral por primera vez y trigger=reaching lo dispara en cada aumento que llegue al umbral, incluso con el contador ya en bounds.max. threshold y onThreshold son la forma histórica y se normalizan a thresholds al importar. | `{"type":"adjustCounter","counter":"counter","delta":1,"targets":{"type":"binding","binding":"selected"}}` |
+| `effects.adjustCounter` | Ajusta un contador persistente del objetivo. Un umbral de muerte actúa como máximo efectivo del recurso; crossing dispara al alcanzarlo. transferFrom mueve la cantidad de forma atómica. | `{"type":"adjustCounter","counter":"counter","delta":1,"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.adjustCounter.fields.type` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.adjustCounter.fields.polarity` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.adjustCounter.fields.when` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.adjustCounter.fields.delay` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.adjustCounter.fields.targets` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3391,6 +3586,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.adjustCounter.fields.duration` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"duration":"<duration>"}` |
 | `effects.adjustCounter.fields.counter` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"counter":"<counter>"}` |
 | `effects.adjustCounter.fields.delta` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"delta":"<delta>"}` |
+| `effects.adjustCounter.fields.transferFrom` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"transferFrom":"<transferFrom>"}` |
 | `effects.adjustCounter.fields.scope` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"scope":"<scope>"}` |
 | `effects.adjustCounter.fields.bounds` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"bounds":"<bounds>"}` |
 | `effects.adjustCounter.fields.projection` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"projection":"<projection>"}` |
@@ -3400,6 +3596,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.adjustCounter.fields.onThreshold` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"onThreshold":"<onThreshold>"}` |
 | `effects.changeAlignment` | Cambia el alineamiento de los objetivos. | `{"type":"changeAlignment"}` |
 | `effects.changeAlignment.fields.type` | Campo admitido por changeAlignment; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.changeAlignment.fields.polarity` | Campo admitido por changeAlignment; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.changeAlignment.fields.when` | Campo admitido por changeAlignment; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.changeAlignment.fields.delay` | Campo admitido por changeAlignment; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.changeAlignment.fields.targets` | Campo admitido por changeAlignment; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3418,6 +3615,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.changeAlignment.fields.targetProfile` | Campo admitido por changeAlignment; su valor debe cumplir el contrato tipado. | `{"targetProfile":"<targetProfile>"}` |
 | `effects.changeCharacter` | Sustituye una identidad de personaje. | `{"type":"changeCharacter"}` |
 | `effects.changeCharacter.fields.type` | Campo admitido por changeCharacter; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.changeCharacter.fields.polarity` | Campo admitido por changeCharacter; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.changeCharacter.fields.when` | Campo admitido por changeCharacter; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.changeCharacter.fields.delay` | Campo admitido por changeCharacter; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.changeCharacter.fields.targets` | Campo admitido por changeCharacter; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3453,8 +3651,24 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.changeCharacter.fields.result` | Campo admitido por changeCharacter; su valor debe cumplir el contrato tipado. | `{"result":"<result>"}` |
 | `effects.changeCharacter.fields.shownAs` | Campo admitido por changeCharacter; su valor debe cumplir el contrato tipado. | `{"shownAs":"<shownAs>"}` |
 | `effects.changeCharacter.fields.targetCharacter` | Campo admitido por changeCharacter; su valor debe cumplir el contrato tipado. | `{"targetCharacter":"<targetCharacter>"}` |
+| `effects.exchangeCharacterWithTableZone` | Intercambia atómicamente un personaje con una carta de una zona declarada. | `{"type":"exchangeCharacterWithTableZone","zoneId":"zone:invented","incomingCharacter":{"type":"inputValue","valueType":"characterId"},"alignmentMode":"preserve"}` |
+| `effects.exchangeCharacterWithTableZone.fields.type` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.polarity` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.when` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.delay` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.targets` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.affectedBy` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"affectedBy":"<affectedBy>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.duration` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"duration":"<duration>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.optional` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"optional":"<optional>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.reminder` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"reminder":"<reminder>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.reminderTokens` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"reminderTokens":"<reminderTokens>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.spentReminder` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.zoneId` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"zoneId":"<zoneId>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.incomingCharacter` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"incomingCharacter":"<incomingCharacter>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.alignmentMode` | Campo admitido por exchangeCharacterWithTableZone; su valor debe cumplir el contrato tipado. | `{"alignmentMode":"<alignmentMode>"}` |
 | `effects.grantAbility` | Concede una habilidad declarada. | `{"type":"grantAbility"}` |
 | `effects.grantAbility.fields.type` | Campo admitido por grantAbility; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.grantAbility.fields.polarity` | Campo admitido por grantAbility; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.grantAbility.fields.when` | Campo admitido por grantAbility; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.grantAbility.fields.delay` | Campo admitido por grantAbility; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.grantAbility.fields.targets` | Campo admitido por grantAbility; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3471,6 +3685,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.grantAbility.fields.ownership` | Campo admitido por grantAbility; su valor debe cumplir el contrato tipado. | `{"ownership":"<ownership>"}` |
 | `effects.triggerAbility` | Activa una mecánica declarada del objetivo por etiqueta. | `{"type":"triggerAbility","mechanicTag":"ability-tag"}` |
 | `effects.triggerAbility.fields.type` | Campo admitido por triggerAbility; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.triggerAbility.fields.polarity` | Campo admitido por triggerAbility; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.triggerAbility.fields.when` | Campo admitido por triggerAbility; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.triggerAbility.fields.delay` | Campo admitido por triggerAbility; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.triggerAbility.fields.targets` | Campo admitido por triggerAbility; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3483,6 +3698,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.triggerAbility.fields.mechanicTag` | Campo admitido por triggerAbility; su valor debe cumplir el contrato tipado. | `{"mechanicTag":"<mechanicTag>"}` |
 | `effects.swapSeats` | Intercambia posiciones en el círculo. | `{"type":"swapSeats"}` |
 | `effects.swapSeats.fields.type` | Campo admitido por swapSeats; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.swapSeats.fields.polarity` | Campo admitido por swapSeats; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.swapSeats.fields.when` | Campo admitido por swapSeats; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.swapSeats.fields.delay` | Campo admitido por swapSeats; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.swapSeats.fields.targets` | Campo admitido por swapSeats; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3494,6 +3710,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.swapSeats.fields.spentReminder` | Campo admitido por swapSeats; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.swapCharacters` | Intercambia identidades entre participantes. | `{"type":"swapCharacters"}` |
 | `effects.swapCharacters.fields.type` | Campo admitido por swapCharacters; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.swapCharacters.fields.polarity` | Campo admitido por swapCharacters; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.swapCharacters.fields.when` | Campo admitido por swapCharacters; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.swapCharacters.fields.delay` | Campo admitido por swapCharacters; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.swapCharacters.fields.targets` | Campo admitido por swapCharacters; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3505,10 +3722,12 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.swapCharacters.fields.spentReminder` | Campo admitido por swapCharacters; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.swapCharacters.fields.actor` | Campo admitido por swapCharacters; su valor debe cumplir el contrato tipado. | `{"actor":"<actor>"}` |
 | `effects.swapCharacters.fields.resultingState` | Campo admitido por swapCharacters; su valor debe cumplir el contrato tipado. | `{"resultingState":"<resultingState>"}` |
+| `effects.swapCharacters.fields.informationMayBeFalse` | Campo admitido por swapCharacters; su valor debe cumplir el contrato tipado. | `{"informationMayBeFalse":"<informationMayBeFalse>"}` |
 | `effects.swapCharacters.fields.resultingStateDuration` | Campo admitido por swapCharacters; su valor debe cumplir el contrato tipado. | `{"resultingStateDuration":"<resultingStateDuration>"}` |
 | `effects.swapCharacters.fields.swapsCharactersAndAlignments` | Campo admitido por swapCharacters; su valor debe cumplir el contrato tipado. | `{"swapsCharactersAndAlignments":"<swapsCharactersAndAlignments>"}` |
 | `effects.swapTargets` | Intercambia objetivos ya resueltos. | `{"type":"swapTargets"}` |
 | `effects.swapTargets.fields.type` | Campo admitido por swapTargets; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.swapTargets.fields.polarity` | Campo admitido por swapTargets; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.swapTargets.fields.when` | Campo admitido por swapTargets; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.swapTargets.fields.delay` | Campo admitido por swapTargets; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.swapTargets.fields.targets` | Campo admitido por swapTargets; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3520,6 +3739,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.swapTargets.fields.spentReminder` | Campo admitido por swapTargets; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.emitInformation` | Calcula y entrega información tipada. | `{"type":"emitInformation","value":{"type":"literal","value":""},"presentation":{"kind":"text","title":"Información"},"delivery":{"audience":{"type":"storyteller"}}}` |
 | `effects.emitInformation.fields.type` | Campo admitido por emitInformation; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.emitInformation.fields.polarity` | Campo admitido por emitInformation; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.emitInformation.fields.when` | Campo admitido por emitInformation; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.emitInformation.fields.delay` | Campo admitido por emitInformation; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.emitInformation.fields.targets` | Campo admitido por emitInformation; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3535,6 +3755,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.emitInformation.fields.transform` | Campo admitido por emitInformation; su valor debe cumplir el contrato tipado. | `{"transform":"<transform>"}` |
 | `effects.prepareInformation` | Prepara información verdadera y alternativa para una entrega posterior. | `{"type":"prepareInformation","candidates":{"type":"array","items":[]},"modes":["pair"],"characterChoice":{"source":"truthfulPlayer","identityMode":"real"},"reminders":{"truthful":"Verdadero","alternative":"Alternativa"}}` |
 | `effects.prepareInformation.fields.type` | Campo admitido por prepareInformation; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.prepareInformation.fields.polarity` | Campo admitido por prepareInformation; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.prepareInformation.fields.when` | Campo admitido por prepareInformation; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.prepareInformation.fields.delay` | Campo admitido por prepareInformation; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.prepareInformation.fields.targets` | Campo admitido por prepareInformation; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3552,6 +3773,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.prepareInformation.fields.shownIdentityOverride` | Campo admitido por prepareInformation; su valor debe cumplir el contrato tipado. | `{"shownIdentityOverride":"<shownIdentityOverride>"}` |
 | `effects.resolveGameEnd` | Declara un ganador inmediato o programa una resolución declarativa. | `{"type":"resolveGameEnd","mode":"immediate","winner":{"type":"fixed","team":"good"},"reason":"Describe por qué termina la partida."}` |
 | `effects.resolveGameEnd.fields.type` | Campo admitido por resolveGameEnd; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.resolveGameEnd.fields.polarity` | Campo admitido por resolveGameEnd; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.resolveGameEnd.fields.when` | Campo admitido por resolveGameEnd; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.resolveGameEnd.fields.delay` | Campo admitido por resolveGameEnd; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.resolveGameEnd.fields.targets` | Campo admitido por resolveGameEnd; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3568,6 +3790,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.resolveGameEnd.fields.activation` | Campo admitido por resolveGameEnd; su valor debe cumplir el contrato tipado. | `{"activation":"<activation>"}` |
 | `effects.blockGameEnd` | Impide cerrar un resultado mientras esta política siga activa. | `{"type":"blockGameEnd","winner":"good","reason":"La victoria está bloqueada."}` |
 | `effects.blockGameEnd.fields.type` | Campo admitido por blockGameEnd; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.blockGameEnd.fields.polarity` | Campo admitido por blockGameEnd; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.blockGameEnd.fields.when` | Campo admitido por blockGameEnd; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.blockGameEnd.fields.delay` | Campo admitido por blockGameEnd; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.blockGameEnd.fields.targets` | Campo admitido por blockGameEnd; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3583,6 +3806,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.blockGameEnd.fields.activation` | Campo admitido por blockGameEnd; su valor debe cumplir el contrato tipado. | `{"activation":"<activation>"}` |
 | `effects.transformGameEnd` | Transforma el conjunto definitivo de ganadores. | `{"type":"transformGameEnd","operation":"invertWinners","reason":"Se invierten ganadores y perdedores."}` |
 | `effects.transformGameEnd.fields.type` | Campo admitido por transformGameEnd; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.transformGameEnd.fields.polarity` | Campo admitido por transformGameEnd; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.transformGameEnd.fields.when` | Campo admitido por transformGameEnd; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.transformGameEnd.fields.delay` | Campo admitido por transformGameEnd; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.transformGameEnd.fields.targets` | Campo admitido por transformGameEnd; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3598,6 +3822,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.transformGameEnd.fields.activation` | Campo admitido por transformGameEnd; su valor debe cumplir el contrato tipado. | `{"activation":"<activation>"}` |
 | `effects.startActionSequence` | Mantiene una cadena de acciones abierta hasta cumplir su condición de salida. | `{"type":"startActionSequence","action":"nomination","onAction":"killNominee","nextActor":"nominee","fallbackActor":"storyteller","repeatUntil":{"type":"literal","value":false}}` |
 | `effects.startActionSequence.fields.type` | Campo admitido por startActionSequence; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.startActionSequence.fields.polarity` | Campo admitido por startActionSequence; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.startActionSequence.fields.when` | Campo admitido por startActionSequence; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.startActionSequence.fields.delay` | Campo admitido por startActionSequence; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.startActionSequence.fields.targets` | Campo admitido por startActionSequence; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3615,6 +3840,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.startActionSequence.fields.repeatUntil` | Campo admitido por startActionSequence; su valor debe cumplir el contrato tipado. | `{"repeatUntil":"<repeatUntil>"}` |
 | `effects.interceptEvent` | Cancela, redirige o sustituye un evento que coincide con un patrón semántico. | `{"type":"interceptEvent","event":"death","reaction":{"type":"cancel"}}` |
 | `effects.interceptEvent.fields.type` | Campo admitido por interceptEvent; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.interceptEvent.fields.polarity` | Campo admitido por interceptEvent; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.interceptEvent.fields.when` | Campo admitido por interceptEvent; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.interceptEvent.fields.delay` | Campo admitido por interceptEvent; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.interceptEvent.fields.targets` | Campo admitido por interceptEvent; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3631,8 +3857,10 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.interceptEvent.fields.consumption` | Campo admitido por interceptEvent; su valor debe cumplir el contrato tipado. | `{"consumption":"<consumption>"}` |
 | `effects.interceptEvent.fields.appliesWhenProtectionBypassed` | Campo admitido por interceptEvent; su valor debe cumplir el contrato tipado. | `{"appliesWhenProtectionBypassed":"<appliesWhenProtectionBypassed>"}` |
 | `effects.interceptEvent.fields.scope` | Campo admitido por interceptEvent; su valor debe cumplir el contrato tipado. | `{"scope":"<scope>"}` |
+| `effects.interceptEvent.fields.effectPolarity` | Campo admitido por interceptEvent; su valor debe cumplir el contrato tipado. | `{"effectPolarity":"<effectPolarity>"}` |
 | `effects.disableAbility` | Desactiva una habilidad según el contrato. | `{"type":"disableAbility"}` |
 | `effects.disableAbility.fields.type` | Campo admitido por disableAbility; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.disableAbility.fields.polarity` | Campo admitido por disableAbility; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.disableAbility.fields.when` | Campo admitido por disableAbility; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.disableAbility.fields.delay` | Campo admitido por disableAbility; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.disableAbility.fields.targets` | Campo admitido por disableAbility; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3647,6 +3875,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.disableAbility.fields.informationMayBeFalse` | Campo admitido por disableAbility; su valor debe cumplir el contrato tipado. | `{"informationMayBeFalse":"<informationMayBeFalse>"}` |
 | `effects.restrict` | Limita acciones disponibles para los objetivos. | `{"type":"restrict"}` |
 | `effects.restrict.fields.type` | Campo admitido por restrict; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.restrict.fields.polarity` | Campo admitido por restrict; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.restrict.fields.when` | Campo admitido por restrict; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.restrict.fields.delay` | Campo admitido por restrict; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.restrict.fields.targets` | Campo admitido por restrict; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3664,6 +3893,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.restrict.fields.exception` | Campo admitido por restrict; su valor debe cumplir el contrato tipado. | `{"exception":"<exception>"}` |
 | `effects.registerAs` | Cambia cómo se registra una identidad. | `{"type":"registerAs"}` |
 | `effects.registerAs.fields.type` | Campo admitido por registerAs; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.registerAs.fields.polarity` | Campo admitido por registerAs; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.registerAs.fields.when` | Campo admitido por registerAs; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.registerAs.fields.delay` | Campo admitido por registerAs; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.registerAs.fields.targets` | Campo admitido por registerAs; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3686,6 +3916,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.registerAs.fields.worksWhenDead` | Campo admitido por registerAs; su valor debe cumplir el contrato tipado. | `{"worksWhenDead":"<worksWhenDead>"}` |
 | `effects.modifyTargets` | Amplía, reduce o restringe los candidatos de habilidades que cumplan el perfil declarado. | `{"type":"modifyTargets","delta":1}` |
 | `effects.modifyTargets.fields.type` | Campo admitido por modifyTargets; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.modifyTargets.fields.polarity` | Campo admitido por modifyTargets; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.modifyTargets.fields.when` | Campo admitido por modifyTargets; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.modifyTargets.fields.delay` | Campo admitido por modifyTargets; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.modifyTargets.fields.targets` | Campo admitido por modifyTargets; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3701,6 +3932,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.modifyTargets.fields.targetMechanicTags` | Campo admitido por modifyTargets; su valor debe cumplir el contrato tipado. | `{"targetMechanicTags":"<targetMechanicTags>"}` |
 | `effects.modifyVote` | Cambia peso, electorado, recursos o validez del recuento, o avisa de participación obligatoria. | `{"type":"modifyVote","targets":{"type":"binding","binding":"selected"},"weight":2}` |
 | `effects.modifyVote.fields.type` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.modifyVote.fields.polarity` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.modifyVote.fields.when` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.modifyVote.fields.delay` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.modifyVote.fields.targets` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3722,6 +3954,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.modifyVote.fields.worksWhenDead` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"worksWhenDead":"<worksWhenDead>"}` |
 | `effects.modifySetup` | Aplica operaciones tipadas a cantidades o asignaciones del setup. | `{"type":"modifySetup","operations":[{"type":"adjustBucket","bucket":"setupBucket","delta":0}]}` |
 | `effects.modifySetup.fields.type` | Campo admitido por modifySetup; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.modifySetup.fields.polarity` | Campo admitido por modifySetup; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.modifySetup.fields.when` | Campo admitido por modifySetup; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.modifySetup.fields.delay` | Campo admitido por modifySetup; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.modifySetup.fields.targets` | Campo admitido por modifySetup; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3739,6 +3972,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.restrictSetupCombination.fields.maximum` | Campo admitido por restrictSetupCombination; su valor debe cumplir el contrato tipado. | `{"maximum":"<maximum>"}` |
 | `effects.modifyInformation` | Transforma o redacta información antes de entregarla. | `{"type":"modifyInformation"}` |
 | `effects.modifyInformation.fields.type` | Campo admitido por modifyInformation; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.modifyInformation.fields.polarity` | Campo admitido por modifyInformation; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.modifyInformation.fields.when` | Campo admitido por modifyInformation; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.modifyInformation.fields.delay` | Campo admitido por modifyInformation; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.modifyInformation.fields.targets` | Campo admitido por modifyInformation; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3756,6 +3990,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.modifyInformation.fields.sourceCharacterIds` | Campo admitido por modifyInformation; su valor debe cumplir el contrato tipado. | `{"sourceCharacterIds":"<sourceCharacterIds>"}` |
 | `effects.modifyStartingKnowledge` | Activa o desactiva pasos tipados de conocimiento inicial. | `{"type":"modifyStartingKnowledge","steps":["evilTeamRecognition"],"active":false}` |
 | `effects.modifyStartingKnowledge.fields.type` | Campo admitido por modifyStartingKnowledge; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.modifyStartingKnowledge.fields.polarity` | Campo admitido por modifyStartingKnowledge; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.modifyStartingKnowledge.fields.when` | Campo admitido por modifyStartingKnowledge; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.modifyStartingKnowledge.fields.delay` | Campo admitido por modifyStartingKnowledge; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.modifyStartingKnowledge.fields.targets` | Campo admitido por modifyStartingKnowledge; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3769,6 +4004,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.modifyStartingKnowledge.fields.active` | Campo admitido por modifyStartingKnowledge; su valor debe cumplir el contrato tipado. | `{"active":"<active>"}` |
 | `effects.modifyNomination` | Cambia la resolución de una nominación. | `{"type":"modifyNomination"}` |
 | `effects.modifyNomination.fields.type` | Campo admitido por modifyNomination; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.modifyNomination.fields.polarity` | Campo admitido por modifyNomination; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.modifyNomination.fields.when` | Campo admitido por modifyNomination; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.modifyNomination.fields.delay` | Campo admitido por modifyNomination; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.modifyNomination.fields.targets` | Campo admitido por modifyNomination; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3788,6 +4024,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.modifyNomination.fields.worksWhenDead` | Campo admitido por modifyNomination; su valor debe cumplir el contrato tipado. | `{"worksWhenDead":"<worksWhenDead>"}` |
 | `effects.performTableAction` | Registra una acción física tipada y aplica sus consecuencias solo si no es interceptada. | `{"type":"performTableAction","action":"devour","targets":{"type":"binding","binding":"selected"},"consequences":[]}` |
 | `effects.performTableAction.fields.type` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.performTableAction.fields.polarity` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.performTableAction.fields.when` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.performTableAction.fields.delay` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.performTableAction.fields.targets` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3801,6 +4038,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.performTableAction.fields.consequences` | Campo admitido por performTableAction; su valor debe cumplir el contrato tipado. | `{"consequences":"<consequences>"}` |
 | `effects.recordAction` | Registra una acción y su resultado. | `{"type":"recordAction"}` |
 | `effects.recordAction.fields.type` | Campo admitido por recordAction; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.recordAction.fields.polarity` | Campo admitido por recordAction; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.recordAction.fields.when` | Campo admitido por recordAction; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.recordAction.fields.delay` | Campo admitido por recordAction; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.recordAction.fields.targets` | Campo admitido por recordAction; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3827,6 +4065,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.recordAction.fields.recordCorrectGuesses` | Campo admitido por recordAction; su valor debe cumplir el contrato tipado. | `{"recordCorrectGuesses":"<recordCorrectGuesses>"}` |
 | `effects.storytellerDecision` | Solicita una decisión humana declarada. | `{"type":"storytellerDecision","decision":"decision"}` |
 | `effects.storytellerDecision.fields.type` | Campo admitido por storytellerDecision; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.storytellerDecision.fields.polarity` | Campo admitido por storytellerDecision; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.storytellerDecision.fields.when` | Campo admitido por storytellerDecision; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.storytellerDecision.fields.delay` | Campo admitido por storytellerDecision; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.storytellerDecision.fields.targets` | Campo admitido por storytellerDecision; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3840,6 +4079,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.storytellerDecision.fields.options` | Campo admitido por storytellerDecision; su valor debe cumplir el contrato tipado. | `{"options":"<options>"}` |
 | `effects.manualCheckpoint` | Registra un juicio o acción humana con resultados mecánicos cerrados. | `{"type":"manualCheckpoint","reason":"storytellerJudgment","prompt":"Confirma el resultado.","outcomes":[{"id":"confirmed","label":"Confirmado","effects":[]}],"blocking":true}` |
 | `effects.manualCheckpoint.fields.type` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.manualCheckpoint.fields.polarity` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.manualCheckpoint.fields.when` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.manualCheckpoint.fields.delay` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.manualCheckpoint.fields.targets` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3855,6 +4095,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.manualCheckpoint.fields.blocking` | Campo admitido por manualCheckpoint; su valor debe cumplir el contrato tipado. | `{"blocking":"<blocking>"}` |
 | `effects.manualInstruction` | Muestra una resolución guiada no automatizada. | `{"type":"manualInstruction","instruction":"Describe cómo resolver esta regla."}` |
 | `effects.manualInstruction.fields.type` | Campo admitido por manualInstruction; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.manualInstruction.fields.polarity` | Campo admitido por manualInstruction; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.manualInstruction.fields.when` | Campo admitido por manualInstruction; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.manualInstruction.fields.delay` | Campo admitido por manualInstruction; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
 | `effects.manualInstruction.fields.targets` | Campo admitido por manualInstruction; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
@@ -3886,7 +4127,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `policies.grantSelectedAbility.fields.abilityAlignment` | Campo admitido por grantSelectedAbility; su valor debe cumplir el contrato tipado. | `{"abilityAlignment":"<abilityAlignment>"}` |
 | `policies.grantSelectedAbility.fields.duration` | Campo admitido por grantSelectedAbility; su valor debe cumplir el contrato tipado. | `{"duration":"<duration>"}` |
 | `policies.grantSelectedAbility.fields.requireInPlay` | Campo admitido por grantSelectedAbility; su valor debe cumplir el contrato tipado. | `{"requireInPlay":"<requireInPlay>"}` |
-| `policies.overrideChooserAlignment` | Fija el bando usado por el selector. | `{"type":"overrideChooserAlignment"}` |
+| `policies.overrideChooserAlignment` | Fija el alineamiento usado por el selector. | `{"type":"overrideChooserAlignment"}` |
 | `policies.overrideChooserAlignment.fields.type` | Campo admitido por overrideChooserAlignment; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `policies.overrideChooserAlignment.fields.alignment` | Campo admitido por overrideChooserAlignment; su valor debe cumplir el contrato tipado. | `{"alignment":"<alignment>"}` |
 | `policies.continueAfterTargetReaction` | Continúa después de la reacción del objetivo. | `{"type":"continueAfterTargetReaction"}` |
@@ -3898,7 +4139,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `policies.allowDeadActorWithPendingAction` | Mantiene una acción pendiente tras la muerte. | `{"type":"allowDeadActorWithPendingAction"}` |
 | `policies.allowDeadActorWithPendingAction.fields.type` | Campo admitido por allowDeadActorWithPendingAction; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `policies.allowDeadActorWithPendingAction.fields.actionId` | Campo admitido por allowDeadActorWithPendingAction; su valor debe cumplir el contrato tipado. | `{"actionId":"<actionId>"}` |
-| `policies.requireRecordedTargetAlignment` | Exige el bando capturado en la acción. | `{"type":"requireRecordedTargetAlignment"}` |
+| `policies.requireRecordedTargetAlignment` | Exige el alineamiento capturado en la acción. | `{"type":"requireRecordedTargetAlignment"}` |
 | `policies.requireRecordedTargetAlignment.fields.type` | Campo admitido por requireRecordedTargetAlignment; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `policies.requireRecordedTargetAlignment.fields.actionId` | Campo admitido por requireRecordedTargetAlignment; su valor debe cumplir el contrato tipado. | `{"actionId":"<actionId>"}` |
 | `policies.requireRecordedTargetAlignment.fields.alignment` | Campo admitido por requireRecordedTargetAlignment; su valor debe cumplir el contrato tipado. | `{"alignment":"<alignment>"}` |

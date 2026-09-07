@@ -9,9 +9,17 @@ Use the user's current AI to compose the tale. The public BloodScribe MCP suppli
 
 Reply in the user's language.
 
+## Night order sections
+
+Require the catalog feature `nightOrderSections`. Every enabled wake uses `firstTiming` or `otherTiming` with a catalog `section` and integer `position` from 0 to 30. These are independent between the first night and later nights. Never invent a global rank or infer a section from a legacy number. Preserve mixed abilities within one wake.
+
+A tale may only override `nightOrder.sections.first[section]` or `.other[section]` with a permutation of IDs belonging to that exact section. A principal section and its exception are different boundaries. More than 31 members are allowed. Reset by removing the override; preserve remaining relative order when changing the cast and place additions at the latest legal position.
+
+Declare required `before: [id]` and `immediatelyAfter: id` relationships. References apply when both entries are present, must remain compatible with the timeline, and must not form cycles. Mandatory dependencies beat user changes and random ties. Ties are randomized once per game and stored in its content snapshot. Guaranteed information remains unassigned until mechanics prove the guarantee; the label itself grants no truthfulness. Validate the complete pack, including rule wakes and additional private deliveries.
+
 ## Workflow
 
-1. Confirm `get_mechanic_catalog`, `search_rule_recipes`, and `validate_content_pack_proposal` are available. Require MCP `>= 2.2.0`, mechanic `guideVersion >= 7`, `ruleAuthoring.guideVersion >= 2`, and the catalog features `contentPackTemplate`, `taleAuthoring`, `contentPackValidation`, `counterExpressions`, and `tallyElements`.
+1. Confirm `get_mechanic_catalog`, `search_rule_recipes`, and `validate_content_pack_proposal` are available. Require MCP `>= 2.2.0`, mechanic `guideVersion >= 9`, `ruleAuthoring.guideVersion >= 2`, and the catalog features `contentPackTemplate`, `taleAuthoring`, `contentPackValidation`, `counterExpressions`, and `tallyElements`.
 2. If authentication is required, retry one public tool once to start OAuth. Ask the user to approve the browser flow; never request or print a token.
 3. Start from the complete attached/exported `.bloodscribe.json`; otherwise clone `contentPackTemplate`.
 4. Decide whether to create a new tale or modify an existing one. Use only characters, character types, and rules present in that pack. Preserve opaque IDs and existing references unless the user explicitly replaces them.

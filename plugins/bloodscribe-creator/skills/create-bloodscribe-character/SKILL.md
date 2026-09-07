@@ -9,6 +9,14 @@ Use the user's current AI to author the character. The public BloodScribe MCP is
 
 Reply in the user's language.
 
+## Night order sections
+
+Require the catalog feature `nightOrderSections`. Every enabled wake uses `firstTiming` or `otherTiming` with a catalog `section` and integer `position` from 0 to 30. These are independent between the first night and later nights. Never invent a global rank or infer a section from a legacy number. Preserve mixed abilities within one wake.
+
+A tale may only override `nightOrder.sections.first[section]` or `.other[section]` with a permutation of IDs belonging to that exact section. A principal section and its exception are different boundaries. More than 31 members are allowed. Reset by removing the override; preserve remaining relative order when changing the cast and place additions at the latest legal position.
+
+Declare required `before: [id]` and `immediatelyAfter: id` relationships. References apply when both entries are present, must remain compatible with the timeline, and must not form cycles. Mandatory dependencies beat user changes and random ties. Ties are randomized once per game and stored in its content snapshot. Guaranteed information remains unassigned until mechanics prove the guarantee; the label itself grants no truthfulness. Validate the complete pack, including rule wakes and additional private deliveries.
+
 ## Ability text style
 
 Write `ability` in the output locale using the concise player-facing style shared by Blood on the Clocktower and the Grimm collection. Use idiomatic equivalents rather than literal translations:
@@ -37,7 +45,7 @@ Apply this wording pass after the mechanics are defined and before validation. I
 
 ## Workflow
 
-1. Confirm that `get_mechanic_catalog`, `search_mechanic_recipes`, and `validate_character_proposal` are available. Require `guideVersion >= 7` plus the catalog features `contextTemplate`, `proposalTemplate`, `personalVictoryExpressions`, `reminderTokens`, `compiledCharacter`, `validationScope`, `counterThresholds`, and `counterExpressions`. If they are missing, report the incompatible MCP and continue only from a current local BloodScribe contract; otherwise ask the user to update the server/plugin rather than treating obsolete validation as current.
+1. Confirm that `get_mechanic_catalog`, `search_mechanic_recipes`, and `validate_character_proposal` are available. Require `guideVersion >= 9` plus the catalog features `contextTemplate`, `proposalTemplate`, `personalVictoryExpressions`, `reminderTokens`, `compiledCharacter`, `validationScope`, `counterThresholds`, and `counterExpressions`. If they are missing, report the incompatible MCP and continue only from a current local BloodScribe contract; otherwise ask the user to update the server/plugin rather than treating obsolete validation as current.
 2. If authentication is required, retry one public MCP tool once so the client starts OAuth. Tell the user to sign in and approve access in the BloodScribe browser page that opens. Never ask them to paste a token into the conversation. If the client cannot start OAuth, direct them to the README's **Manual setup** section; any fallback key belongs only in the client's secure credential settings, never in chat.
 3. Get the pack context from an attached or exported `.bloodscribe.json`. Start from the catalog's `contextTemplate`; replace its locale, collection, pack metadata, complete existing character IDs, and relevant character types. Do not invent a reduced context shape.
 4. Classify the gameplay profile before modeling the ability. If the user's idea does not already answer these points, ask whether the character:

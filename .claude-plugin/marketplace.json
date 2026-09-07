@@ -9,7 +9,7 @@
       "name": "bloodscribe-creator",
       "source": "./plugins/bloodscribe-creator",
       "description": "Guided character, icon, rule, and tale authoring with the public BloodScribe MCP",
-      "version": "1.4.7",
+      "version": "1.5.0",
       "category": "development"
     }
   ]

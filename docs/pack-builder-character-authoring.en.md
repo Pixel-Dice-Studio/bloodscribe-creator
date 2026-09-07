@@ -4,6 +4,7 @@ This reference is generated from the same contract used by the MCP. Examples use
 
 ## Authoring rules
 
+- Each wake declares wake.firstTiming or otherTiming: {section, position}, with an integer position 0–30 and a section from nightOrder.sections. Do not author a global rank. before and immediatelyAfter are declarative references conditional on co-presence. Tales may only reorder within the same section through nightOrder.sections.first/other[section]. Guaranteed information does not grant truthfulness; mechanics must justify it. Legacy numeric wakes retain their behavior until explicitly classified.
 - IDs are opaque references; they never select behavior.
 - Classify participation, alignment, role, and victory first; never infer them from teamId, names, or prose.
 - Declare participation exclusively with entryMode: cast, temporary, or both.
@@ -119,7 +120,7 @@ Belongs to the regular cast and wins only when its declarative condition is met.
 }
 ```
 
-### `regular-neutral-fixed-side` — Regular neutral that wins with a fixed side
+### `regular-neutral-fixed-side` — Regular neutral that wins with a fixed alignment
 
 Remains neutral for identity and composition but shares one fixed side's victory.
 
@@ -490,7 +491,7 @@ nearestMatching finds one living neighbour in each direction; the query projects
       },
       "presentation": {
         "kind": "boolean",
-        "title": "Mal cercano"
+        "title": "El Mal cercano"
       },
       "delivery": {
         "audience": {
@@ -1353,7 +1354,7 @@ The event retains the actor's and selected target's registered identities at res
       },
       "presentation": {
         "kind": "boolean",
-        "title": "Malvado sobre bueno"
+        "title": "El Mal sobre el Bien"
       },
       "delivery": {
         "audience": {
@@ -1460,7 +1461,7 @@ adjustCounter stores the value and its projected markers; each thresholds entry 
 **Limits**
 
 - trigger=crossing prevents later resolutions from repeating the effect while the counter remains at the threshold.
-- If the resource must strike again whenever a unit is added with the counter already full, use trigger=reaching and the accumulable-resource-shared-cap recipe.
+- Use trigger=reaching only when the rule explicitly repeats the effect after an attempted unit is added to an already full counter.
 
 ```json
 {
@@ -1534,7 +1535,7 @@ Model markers that accumulate on a player —one marker per unit—, flag a stat
 - Automation: `automatic`
 - Covers: `bindings.effectTarget`, `effects.adjustCounter`, `effects.death`, `predicateTypes.players.counter`, `valueNodes.counterValue`, `aggregates.sum`
 
-A single counter declares the resource and every source shares it with scope=shared; each source declares its own adjustCounter with the same counter, bounds and projection. bounds caps the stored reserve, projection.mode=copies draws one marker per unit —stages names levels when each step has its own marker— and stateProjection derives the state while the value satisfies activeWhen. thresholds chains the consequences of the same counter: each entry declares its value, its trigger and its own effects, so the second and third unit need no extra counter. trigger=reaching keeps the consequence alive once the counter sits at bounds.max: the cap limits the reserve, not the hit. resetTo consumes the resource so it can accumulate again from below. Removing units is the same effect with a negative delta and no thresholds. To read the resource from another rule, ask the counter —the counter condition and the counterValue value—, never which marker happens to be on the table. To sum that counter across all players, use a players query with project.type=counter and aggregate.type=sum.
+A single counter declares the resource and every source shares it with scope=shared; each source declares its own adjustCounter with the same counter, bounds and projection. bounds caps the stored reserve, projection.mode=copies draws one marker per unit —stages names levels when each step has its own marker— and stateProjection derives the state while the value satisfies activeWhen. thresholds chains the consequences of the same counter: each entry declares its value, its trigger and its own effects, so the second and third unit need no extra counter. trigger=crossing applies the consequence only when the threshold is crossed; if protection prevents the associated death, the unit that would cause it is not added either and the counter remains below the limit. resetTo consumes the resource so it can accumulate again from below. Removing units is the same effect with a negative delta and no thresholds. To read the resource from another rule, ask the counter —the counter condition and the counterValue value—, never which marker happens to be on the table. To sum that counter across all players, use a players query with project.type=counter and aggregate.type=sum.
 
 **Ask**
 
@@ -1605,7 +1606,7 @@ A single counter declares the resource and every source shares it with scope=sha
         {
           "operator": "gte",
           "value": 3,
-          "trigger": "reaching",
+          "trigger": "crossing",
           "effects": [
             {
               "type": "death",
@@ -1716,7 +1717,7 @@ The character input yields a typed characterId; grantAbility assigns it to the a
 
 **Limits**
 
-- Filter candidates explicitly; never infer allowed choices from prose or a visible team label.
+- Filter candidates explicitly; never infer allowed choices from prose or a visible character-type label.
 
 ```json
 {
@@ -1768,6 +1769,189 @@ The character input yields a typed characterId; grantAbility assigns it to the a
         "type": "untilWindow",
         "window": "dawn"
       }
+    }
+  ],
+  "policies": []
+}
+```
+
+### `copy-ability-from-table-zone` — Copy an ability from a table zone
+
+Choose a card from a declared table zone and temporarily grant its ability to the actor.
+
+- Status: `supported`
+- Automation: `automatic`
+- Covers: `predicateTypes.characters.inTableCharacterZone`, `valueNodes.inputValue`, `inputKinds.character`, `effects.grantAbility`
+
+inTableCharacterZone limits selection to identities persisted in the zone; grantAbility reuses the ability without putting that card in play.
+
+**Ask**
+
+- Which zone may be queried?
+- When does the copied ability expire?
+
+**Limits**
+
+- The card remains in the zone and does not run its ability by itself.
+
+```json
+{
+  "mechanicId": "mechanic:invented:copy-from-zone:rule:1",
+  "tags": [
+    "granted-ability",
+    "table-character-zone"
+  ],
+  "when": {
+    "window": "night",
+    "cadence": "each",
+    "startsAt": 1
+  },
+  "input": {
+    "kind": "character",
+    "candidates": {
+      "type": "query",
+      "from": {
+        "entity": "characters"
+      },
+      "where": {
+        "type": "inTableCharacterZone",
+        "zoneId": "zone:invented:public-center"
+      },
+      "aggregate": {
+        "type": "collect"
+      }
+    }
+  },
+  "usage": {
+    "scope": "repeat"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "grantAbility",
+      "active": true,
+      "abilityCharacterId": {
+        "type": "inputValue",
+        "valueType": "characterId"
+      },
+      "owner": "targets",
+      "controller": "owner",
+      "ownership": "sourceAbility",
+      "targets": {
+        "type": "binding",
+        "binding": "actor"
+      },
+      "duration": {
+        "type": "untilWindow",
+        "window": "dawn"
+      }
+    }
+  ],
+  "policies": []
+}
+```
+
+### `exchange-character-with-table-zone` — Exchange a character with a table zone
+
+Replace the actor's identity with a zone card and return their previous character to that zone.
+
+- Status: `supported`
+- Automation: `automatic`
+- Covers: `predicateTypes.characters.inTableCharacterZone`, `valueNodes.inputValue`, `inputKinds.character`, `effects.exchangeCharacterWithTableZone`
+
+The exchange is atomic, preserves life and states, and clears grants tied to the abandoned ability. requiredWhen may turn an optional input into a mandatory one.
+
+**Ask**
+
+- Does it preserve or adopt alignment?
+- When does the choice become mandatory?
+
+**Limits**
+
+- Use the same zoneId in the input and effect; stale selections are rejected.
+
+```json
+{
+  "mechanicId": "mechanic:invented:exchange-with-zone:rule:1",
+  "tags": [
+    "character-change",
+    "table-character-zone"
+  ],
+  "when": {
+    "window": "firstNight",
+    "cadence": "once",
+    "startsAt": 1
+  },
+  "input": {
+    "kind": "character",
+    "optional": true,
+    "candidates": {
+      "type": "query",
+      "from": {
+        "entity": "characters"
+      },
+      "where": {
+        "type": "inTableCharacterZone",
+        "zoneId": "zone:invented:secret-reserve"
+      },
+      "aggregate": {
+        "type": "collect"
+      }
+    },
+    "requiredWhen": {
+      "type": "compare",
+      "left": {
+        "type": "query",
+        "from": {
+          "entity": "characters"
+        },
+        "where": {
+          "type": "all",
+          "conditions": [
+            {
+              "type": "inTableCharacterZone",
+              "zoneId": "zone:invented:secret-reserve"
+            },
+            {
+              "type": "identity",
+              "facet": "teamId",
+              "values": [
+                "team:invented:wolves"
+              ]
+            }
+          ]
+        },
+        "aggregate": {
+          "type": "count"
+        }
+      },
+      "operator": "eq",
+      "right": 2
+    }
+  },
+  "usage": {
+    "scope": "game",
+    "limit": {
+      "type": "literal",
+      "value": 1
+    },
+    "consumeOn": "resolution"
+  },
+  "conditions": [],
+  "effects": [
+    {
+      "type": "exchangeCharacterWithTableZone",
+      "zoneId": "zone:invented:secret-reserve",
+      "incomingCharacter": {
+        "type": "inputValue",
+        "valueType": "characterId"
+      },
+      "alignmentMode": "adoptCharacter",
+      "targets": {
+        "type": "binding",
+        "binding": "actor"
+      },
+      "optional": true
     }
   ],
   "policies": []
@@ -3042,6 +3226,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `predicateTypes.players.any` | Supported players option identified by any. | `{"value":"any"}` |
 | `predicateTypes.players.not` | Supported players option identified by not. | `{"value":"not"}` |
 | `predicateTypes.characters.inPlay` | Supported characters option identified by inPlay. | `{"value":"inPlay"}` |
+| `predicateTypes.characters.inTableCharacterZone` | Supported characters option identified by inTableCharacterZone. | `{"value":"inTableCharacterZone"}` |
 | `predicateTypes.characters.identity` | Supported characters option identified by identity. | `{"value":"identity"}` |
 | `predicateTypes.characters.identityMatchesBinding` | Supported characters option identified by identityMatchesBinding. | `{"value":"identityMatchesBinding"}` |
 | `predicateTypes.characters.identityMatchesInput` | Supported characters option identified by identityMatchesInput. | `{"value":"identityMatchesInput"}` |
@@ -3103,6 +3288,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `facts.guessResult` | Supported facts option identified by guessResult. | `{"value":"guessResult"}` |
 | `facts.targetMechanicTags` | Supported facts option identified by targetMechanicTags. | `{"value":"targetMechanicTags"}` |
 | `facts.operationWouldEndGame` | Supported facts option identified by operationWouldEndGame. | `{"value":"operationWouldEndGame"}` |
+| `facts.informationMayBeFalse` | Supported facts option identified by informationMayBeFalse. | `{"value":"informationMayBeFalse"}` |
 | `setOperations.union` | Supported set operations option identified by union. | `{"value":"union"}` |
 | `setOperations.intersection` | Supported set operations option identified by intersection. | `{"value":"intersection"}` |
 | `setOperations.difference` | Supported set operations option identified by difference. | `{"value":"difference"}` |
@@ -3277,6 +3463,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `durations.untilEvent` | Ends when a typed event pattern matches. | `{"type":"untilEvent","event":"death"}` |
 | `effects.death` | Supported effects option identified by death. | `{"type":"death"}` |
 | `effects.death.fields.type` | Field accepted by death; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.death.fields.polarity` | Field accepted by death; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.death.fields.when` | Field accepted by death; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.death.fields.delay` | Field accepted by death; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.death.fields.targets` | Field accepted by death; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3314,6 +3501,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.death.fields.useRegisteredIdentity` | Field accepted by death; its value must satisfy the typed contract. | `{"useRegisteredIdentity":"<useRegisteredIdentity>"}` |
 | `effects.resurrect` | Supported effects option identified by resurrect. | `{"type":"resurrect"}` |
 | `effects.resurrect.fields.type` | Field accepted by resurrect; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.resurrect.fields.polarity` | Field accepted by resurrect; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.resurrect.fields.when` | Field accepted by resurrect; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.resurrect.fields.delay` | Field accepted by resurrect; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.resurrect.fields.targets` | Field accepted by resurrect; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3325,6 +3513,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.resurrect.fields.spentReminder` | Field accepted by resurrect; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.execute` | Supported effects option identified by execute. | `{"type":"execute"}` |
 | `effects.execute.fields.type` | Field accepted by execute; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.execute.fields.polarity` | Field accepted by execute; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.execute.fields.when` | Field accepted by execute; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.execute.fields.delay` | Field accepted by execute; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.execute.fields.targets` | Field accepted by execute; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3339,6 +3528,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.execute.fields.targetReminder` | Field accepted by execute; its value must satisfy the typed contract. | `{"targetReminder":"<targetReminder>"}` |
 | `effects.setPlayerState` | Supported effects option identified by setPlayerState. | `{"type":"setPlayerState","state":"state","active":true,"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.setPlayerState.fields.type` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.setPlayerState.fields.polarity` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.setPlayerState.fields.when` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.setPlayerState.fields.delay` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.setPlayerState.fields.targets` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3346,11 +3536,13 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.setPlayerState.fields.duration` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"duration":"<duration>"}` |
 | `effects.setPlayerState.fields.state` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"state":"<state>"}` |
 | `effects.setPlayerState.fields.active` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"active":"<active>"}` |
+| `effects.setPlayerState.fields.informationMayBeFalse` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"informationMayBeFalse":"<informationMayBeFalse>"}` |
 | `effects.setPlayerState.fields.ownership` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"ownership":"<ownership>"}` |
 | `effects.setPlayerState.fields.exclusive` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"exclusive":"<exclusive>"}` |
 | `effects.setPlayerState.fields.excludeInitialTargets` | Field accepted by setPlayerState; its value must satisfy the typed contract. | `{"excludeInitialTargets":"<excludeInitialTargets>"}` |
 | `effects.setPlayerRelation` | Supported effects option identified by setPlayerRelation. | `{"type":"setPlayerRelation","kind":"linked","active":true,"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.setPlayerRelation.fields.type` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.setPlayerRelation.fields.polarity` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.setPlayerRelation.fields.when` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.setPlayerRelation.fields.delay` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.setPlayerRelation.fields.targets` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3362,6 +3554,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.setPlayerRelation.fields.ownership` | Field accepted by setPlayerRelation; its value must satisfy the typed contract. | `{"ownership":"<ownership>"}` |
 | `effects.applyMarker` | Adds or removes a reminder marker while retaining source metadata. | `{"type":"applyMarker","kind":"reminder","id":"marker","active":true,"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.applyMarker.fields.type` | Field accepted by applyMarker; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.applyMarker.fields.polarity` | Field accepted by applyMarker; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.applyMarker.fields.when` | Field accepted by applyMarker; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.applyMarker.fields.delay` | Field accepted by applyMarker; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.applyMarker.fields.targets` | Field accepted by applyMarker; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3374,6 +3567,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.applyMarker.fields.ownership` | Field accepted by applyMarker; its value must satisfy the typed contract. | `{"ownership":"<ownership>"}` |
 | `effects.moveMarker` | Atomically transfers an existing marker or all marker-backed cancellation protections between players. | `{"type":"moveMarker","kind":"reminder","id":"marker","from":{"type":"binding","binding":"actor"},"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.moveMarker.fields.type` | Field accepted by moveMarker; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.moveMarker.fields.polarity` | Field accepted by moveMarker; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.moveMarker.fields.when` | Field accepted by moveMarker; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.moveMarker.fields.delay` | Field accepted by moveMarker; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.moveMarker.fields.targets` | Field accepted by moveMarker; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3384,6 +3578,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.moveMarker.fields.from` | Field accepted by moveMarker; its value must satisfy the typed contract. | `{"from":"<from>"}` |
 | `effects.adjustCounter` | Supported effects option identified by adjustCounter. | `{"type":"adjustCounter","counter":"counter","delta":1,"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.adjustCounter.fields.type` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.adjustCounter.fields.polarity` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.adjustCounter.fields.when` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.adjustCounter.fields.delay` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.adjustCounter.fields.targets` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3391,6 +3586,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.adjustCounter.fields.duration` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"duration":"<duration>"}` |
 | `effects.adjustCounter.fields.counter` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"counter":"<counter>"}` |
 | `effects.adjustCounter.fields.delta` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"delta":"<delta>"}` |
+| `effects.adjustCounter.fields.transferFrom` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"transferFrom":"<transferFrom>"}` |
 | `effects.adjustCounter.fields.scope` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"scope":"<scope>"}` |
 | `effects.adjustCounter.fields.bounds` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"bounds":"<bounds>"}` |
 | `effects.adjustCounter.fields.projection` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"projection":"<projection>"}` |
@@ -3400,6 +3596,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.adjustCounter.fields.onThreshold` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"onThreshold":"<onThreshold>"}` |
 | `effects.changeAlignment` | Supported effects option identified by changeAlignment. | `{"type":"changeAlignment"}` |
 | `effects.changeAlignment.fields.type` | Field accepted by changeAlignment; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.changeAlignment.fields.polarity` | Field accepted by changeAlignment; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.changeAlignment.fields.when` | Field accepted by changeAlignment; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.changeAlignment.fields.delay` | Field accepted by changeAlignment; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.changeAlignment.fields.targets` | Field accepted by changeAlignment; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3418,6 +3615,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.changeAlignment.fields.targetProfile` | Field accepted by changeAlignment; its value must satisfy the typed contract. | `{"targetProfile":"<targetProfile>"}` |
 | `effects.changeCharacter` | Supported effects option identified by changeCharacter. | `{"type":"changeCharacter"}` |
 | `effects.changeCharacter.fields.type` | Field accepted by changeCharacter; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.changeCharacter.fields.polarity` | Field accepted by changeCharacter; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.changeCharacter.fields.when` | Field accepted by changeCharacter; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.changeCharacter.fields.delay` | Field accepted by changeCharacter; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.changeCharacter.fields.targets` | Field accepted by changeCharacter; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3453,8 +3651,24 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.changeCharacter.fields.result` | Field accepted by changeCharacter; its value must satisfy the typed contract. | `{"result":"<result>"}` |
 | `effects.changeCharacter.fields.shownAs` | Field accepted by changeCharacter; its value must satisfy the typed contract. | `{"shownAs":"<shownAs>"}` |
 | `effects.changeCharacter.fields.targetCharacter` | Field accepted by changeCharacter; its value must satisfy the typed contract. | `{"targetCharacter":"<targetCharacter>"}` |
+| `effects.exchangeCharacterWithTableZone` | Supported effects option identified by exchangeCharacterWithTableZone. | `{"type":"exchangeCharacterWithTableZone","zoneId":"zone:invented","incomingCharacter":{"type":"inputValue","valueType":"characterId"},"alignmentMode":"preserve"}` |
+| `effects.exchangeCharacterWithTableZone.fields.type` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.polarity` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.when` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"when":"<when>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.delay` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.targets` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.affectedBy` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"affectedBy":"<affectedBy>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.duration` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"duration":"<duration>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.optional` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"optional":"<optional>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.reminder` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"reminder":"<reminder>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.reminderTokens` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"reminderTokens":"<reminderTokens>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.spentReminder` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.zoneId` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"zoneId":"<zoneId>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.incomingCharacter` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"incomingCharacter":"<incomingCharacter>"}` |
+| `effects.exchangeCharacterWithTableZone.fields.alignmentMode` | Field accepted by exchangeCharacterWithTableZone; its value must satisfy the typed contract. | `{"alignmentMode":"<alignmentMode>"}` |
 | `effects.grantAbility` | Supported effects option identified by grantAbility. | `{"type":"grantAbility"}` |
 | `effects.grantAbility.fields.type` | Field accepted by grantAbility; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.grantAbility.fields.polarity` | Field accepted by grantAbility; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.grantAbility.fields.when` | Field accepted by grantAbility; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.grantAbility.fields.delay` | Field accepted by grantAbility; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.grantAbility.fields.targets` | Field accepted by grantAbility; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3471,6 +3685,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.grantAbility.fields.ownership` | Field accepted by grantAbility; its value must satisfy the typed contract. | `{"ownership":"<ownership>"}` |
 | `effects.triggerAbility` | Supported effects option identified by triggerAbility. | `{"type":"triggerAbility","mechanicTag":"ability-tag"}` |
 | `effects.triggerAbility.fields.type` | Field accepted by triggerAbility; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.triggerAbility.fields.polarity` | Field accepted by triggerAbility; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.triggerAbility.fields.when` | Field accepted by triggerAbility; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.triggerAbility.fields.delay` | Field accepted by triggerAbility; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.triggerAbility.fields.targets` | Field accepted by triggerAbility; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3483,6 +3698,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.triggerAbility.fields.mechanicTag` | Field accepted by triggerAbility; its value must satisfy the typed contract. | `{"mechanicTag":"<mechanicTag>"}` |
 | `effects.swapSeats` | Supported effects option identified by swapSeats. | `{"type":"swapSeats"}` |
 | `effects.swapSeats.fields.type` | Field accepted by swapSeats; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.swapSeats.fields.polarity` | Field accepted by swapSeats; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.swapSeats.fields.when` | Field accepted by swapSeats; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.swapSeats.fields.delay` | Field accepted by swapSeats; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.swapSeats.fields.targets` | Field accepted by swapSeats; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3494,6 +3710,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.swapSeats.fields.spentReminder` | Field accepted by swapSeats; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.swapCharacters` | Supported effects option identified by swapCharacters. | `{"type":"swapCharacters"}` |
 | `effects.swapCharacters.fields.type` | Field accepted by swapCharacters; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.swapCharacters.fields.polarity` | Field accepted by swapCharacters; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.swapCharacters.fields.when` | Field accepted by swapCharacters; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.swapCharacters.fields.delay` | Field accepted by swapCharacters; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.swapCharacters.fields.targets` | Field accepted by swapCharacters; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3505,10 +3722,12 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.swapCharacters.fields.spentReminder` | Field accepted by swapCharacters; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.swapCharacters.fields.actor` | Field accepted by swapCharacters; its value must satisfy the typed contract. | `{"actor":"<actor>"}` |
 | `effects.swapCharacters.fields.resultingState` | Field accepted by swapCharacters; its value must satisfy the typed contract. | `{"resultingState":"<resultingState>"}` |
+| `effects.swapCharacters.fields.informationMayBeFalse` | Field accepted by swapCharacters; its value must satisfy the typed contract. | `{"informationMayBeFalse":"<informationMayBeFalse>"}` |
 | `effects.swapCharacters.fields.resultingStateDuration` | Field accepted by swapCharacters; its value must satisfy the typed contract. | `{"resultingStateDuration":"<resultingStateDuration>"}` |
 | `effects.swapCharacters.fields.swapsCharactersAndAlignments` | Field accepted by swapCharacters; its value must satisfy the typed contract. | `{"swapsCharactersAndAlignments":"<swapsCharactersAndAlignments>"}` |
 | `effects.swapTargets` | Supported effects option identified by swapTargets. | `{"type":"swapTargets"}` |
 | `effects.swapTargets.fields.type` | Field accepted by swapTargets; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.swapTargets.fields.polarity` | Field accepted by swapTargets; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.swapTargets.fields.when` | Field accepted by swapTargets; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.swapTargets.fields.delay` | Field accepted by swapTargets; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.swapTargets.fields.targets` | Field accepted by swapTargets; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3520,6 +3739,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.swapTargets.fields.spentReminder` | Field accepted by swapTargets; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.emitInformation` | Calculates and delivers typed information. | `{"type":"emitInformation","value":{"type":"literal","value":""},"presentation":{"kind":"text","title":"Información"},"delivery":{"audience":{"type":"storyteller"}}}` |
 | `effects.emitInformation.fields.type` | Field accepted by emitInformation; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.emitInformation.fields.polarity` | Field accepted by emitInformation; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.emitInformation.fields.when` | Field accepted by emitInformation; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.emitInformation.fields.delay` | Field accepted by emitInformation; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.emitInformation.fields.targets` | Field accepted by emitInformation; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3535,6 +3755,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.emitInformation.fields.transform` | Field accepted by emitInformation; its value must satisfy the typed contract. | `{"transform":"<transform>"}` |
 | `effects.prepareInformation` | Supported effects option identified by prepareInformation. | `{"type":"prepareInformation","candidates":{"type":"array","items":[]},"modes":["pair"],"characterChoice":{"source":"truthfulPlayer","identityMode":"real"},"reminders":{"truthful":"Verdadero","alternative":"Alternativa"}}` |
 | `effects.prepareInformation.fields.type` | Field accepted by prepareInformation; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.prepareInformation.fields.polarity` | Field accepted by prepareInformation; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.prepareInformation.fields.when` | Field accepted by prepareInformation; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.prepareInformation.fields.delay` | Field accepted by prepareInformation; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.prepareInformation.fields.targets` | Field accepted by prepareInformation; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3552,6 +3773,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.prepareInformation.fields.shownIdentityOverride` | Field accepted by prepareInformation; its value must satisfy the typed contract. | `{"shownIdentityOverride":"<shownIdentityOverride>"}` |
 | `effects.resolveGameEnd` | Supported effects option identified by resolveGameEnd. | `{"type":"resolveGameEnd","mode":"immediate","winner":{"type":"fixed","team":"good"},"reason":"Describe por qué termina la partida."}` |
 | `effects.resolveGameEnd.fields.type` | Field accepted by resolveGameEnd; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.resolveGameEnd.fields.polarity` | Field accepted by resolveGameEnd; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.resolveGameEnd.fields.when` | Field accepted by resolveGameEnd; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.resolveGameEnd.fields.delay` | Field accepted by resolveGameEnd; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.resolveGameEnd.fields.targets` | Field accepted by resolveGameEnd; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3568,6 +3790,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.resolveGameEnd.fields.activation` | Field accepted by resolveGameEnd; its value must satisfy the typed contract. | `{"activation":"<activation>"}` |
 | `effects.blockGameEnd` | Supported effects option identified by blockGameEnd. | `{"type":"blockGameEnd","winner":"good","reason":"La victoria está bloqueada."}` |
 | `effects.blockGameEnd.fields.type` | Field accepted by blockGameEnd; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.blockGameEnd.fields.polarity` | Field accepted by blockGameEnd; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.blockGameEnd.fields.when` | Field accepted by blockGameEnd; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.blockGameEnd.fields.delay` | Field accepted by blockGameEnd; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.blockGameEnd.fields.targets` | Field accepted by blockGameEnd; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3583,6 +3806,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.blockGameEnd.fields.activation` | Field accepted by blockGameEnd; its value must satisfy the typed contract. | `{"activation":"<activation>"}` |
 | `effects.transformGameEnd` | Supported effects option identified by transformGameEnd. | `{"type":"transformGameEnd","operation":"invertWinners","reason":"Se invierten ganadores y perdedores."}` |
 | `effects.transformGameEnd.fields.type` | Field accepted by transformGameEnd; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.transformGameEnd.fields.polarity` | Field accepted by transformGameEnd; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.transformGameEnd.fields.when` | Field accepted by transformGameEnd; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.transformGameEnd.fields.delay` | Field accepted by transformGameEnd; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.transformGameEnd.fields.targets` | Field accepted by transformGameEnd; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3598,6 +3822,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.transformGameEnd.fields.activation` | Field accepted by transformGameEnd; its value must satisfy the typed contract. | `{"activation":"<activation>"}` |
 | `effects.startActionSequence` | Supported effects option identified by startActionSequence. | `{"type":"startActionSequence","action":"nomination","onAction":"killNominee","nextActor":"nominee","fallbackActor":"storyteller","repeatUntil":{"type":"literal","value":false}}` |
 | `effects.startActionSequence.fields.type` | Field accepted by startActionSequence; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.startActionSequence.fields.polarity` | Field accepted by startActionSequence; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.startActionSequence.fields.when` | Field accepted by startActionSequence; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.startActionSequence.fields.delay` | Field accepted by startActionSequence; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.startActionSequence.fields.targets` | Field accepted by startActionSequence; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3615,6 +3840,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.startActionSequence.fields.repeatUntil` | Field accepted by startActionSequence; its value must satisfy the typed contract. | `{"repeatUntil":"<repeatUntil>"}` |
 | `effects.interceptEvent` | Cancels, redirects, or replaces a matching typed event. | `{"type":"interceptEvent","event":"death","reaction":{"type":"cancel"}}` |
 | `effects.interceptEvent.fields.type` | Field accepted by interceptEvent; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.interceptEvent.fields.polarity` | Field accepted by interceptEvent; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.interceptEvent.fields.when` | Field accepted by interceptEvent; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.interceptEvent.fields.delay` | Field accepted by interceptEvent; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.interceptEvent.fields.targets` | Field accepted by interceptEvent; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3631,8 +3857,10 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.interceptEvent.fields.consumption` | Field accepted by interceptEvent; its value must satisfy the typed contract. | `{"consumption":"<consumption>"}` |
 | `effects.interceptEvent.fields.appliesWhenProtectionBypassed` | Field accepted by interceptEvent; its value must satisfy the typed contract. | `{"appliesWhenProtectionBypassed":"<appliesWhenProtectionBypassed>"}` |
 | `effects.interceptEvent.fields.scope` | Field accepted by interceptEvent; its value must satisfy the typed contract. | `{"scope":"<scope>"}` |
+| `effects.interceptEvent.fields.effectPolarity` | Field accepted by interceptEvent; its value must satisfy the typed contract. | `{"effectPolarity":"<effectPolarity>"}` |
 | `effects.disableAbility` | Supported effects option identified by disableAbility. | `{"type":"disableAbility"}` |
 | `effects.disableAbility.fields.type` | Field accepted by disableAbility; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.disableAbility.fields.polarity` | Field accepted by disableAbility; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.disableAbility.fields.when` | Field accepted by disableAbility; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.disableAbility.fields.delay` | Field accepted by disableAbility; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.disableAbility.fields.targets` | Field accepted by disableAbility; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3647,6 +3875,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.disableAbility.fields.informationMayBeFalse` | Field accepted by disableAbility; its value must satisfy the typed contract. | `{"informationMayBeFalse":"<informationMayBeFalse>"}` |
 | `effects.restrict` | Supported effects option identified by restrict. | `{"type":"restrict"}` |
 | `effects.restrict.fields.type` | Field accepted by restrict; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.restrict.fields.polarity` | Field accepted by restrict; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.restrict.fields.when` | Field accepted by restrict; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.restrict.fields.delay` | Field accepted by restrict; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.restrict.fields.targets` | Field accepted by restrict; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3664,6 +3893,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.restrict.fields.exception` | Field accepted by restrict; its value must satisfy the typed contract. | `{"exception":"<exception>"}` |
 | `effects.registerAs` | Supported effects option identified by registerAs. | `{"type":"registerAs"}` |
 | `effects.registerAs.fields.type` | Field accepted by registerAs; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.registerAs.fields.polarity` | Field accepted by registerAs; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.registerAs.fields.when` | Field accepted by registerAs; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.registerAs.fields.delay` | Field accepted by registerAs; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.registerAs.fields.targets` | Field accepted by registerAs; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3686,6 +3916,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.registerAs.fields.worksWhenDead` | Field accepted by registerAs; its value must satisfy the typed contract. | `{"worksWhenDead":"<worksWhenDead>"}` |
 | `effects.modifyTargets` | Supported effects option identified by modifyTargets. | `{"type":"modifyTargets","delta":1}` |
 | `effects.modifyTargets.fields.type` | Field accepted by modifyTargets; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.modifyTargets.fields.polarity` | Field accepted by modifyTargets; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.modifyTargets.fields.when` | Field accepted by modifyTargets; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.modifyTargets.fields.delay` | Field accepted by modifyTargets; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.modifyTargets.fields.targets` | Field accepted by modifyTargets; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3701,6 +3932,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.modifyTargets.fields.targetMechanicTags` | Field accepted by modifyTargets; its value must satisfy the typed contract. | `{"targetMechanicTags":"<targetMechanicTags>"}` |
 | `effects.modifyVote` | Supported effects option identified by modifyVote. | `{"type":"modifyVote","targets":{"type":"binding","binding":"selected"},"weight":2}` |
 | `effects.modifyVote.fields.type` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.modifyVote.fields.polarity` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.modifyVote.fields.when` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.modifyVote.fields.delay` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.modifyVote.fields.targets` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3722,6 +3954,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.modifyVote.fields.worksWhenDead` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"worksWhenDead":"<worksWhenDead>"}` |
 | `effects.modifySetup` | Supported effects option identified by modifySetup. | `{"type":"modifySetup","operations":[{"type":"adjustBucket","bucket":"setupBucket","delta":0}]}` |
 | `effects.modifySetup.fields.type` | Field accepted by modifySetup; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.modifySetup.fields.polarity` | Field accepted by modifySetup; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.modifySetup.fields.when` | Field accepted by modifySetup; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.modifySetup.fields.delay` | Field accepted by modifySetup; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.modifySetup.fields.targets` | Field accepted by modifySetup; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3739,6 +3972,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.restrictSetupCombination.fields.maximum` | Field accepted by restrictSetupCombination; its value must satisfy the typed contract. | `{"maximum":"<maximum>"}` |
 | `effects.modifyInformation` | Supported effects option identified by modifyInformation. | `{"type":"modifyInformation"}` |
 | `effects.modifyInformation.fields.type` | Field accepted by modifyInformation; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.modifyInformation.fields.polarity` | Field accepted by modifyInformation; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.modifyInformation.fields.when` | Field accepted by modifyInformation; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.modifyInformation.fields.delay` | Field accepted by modifyInformation; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.modifyInformation.fields.targets` | Field accepted by modifyInformation; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3756,6 +3990,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.modifyInformation.fields.sourceCharacterIds` | Field accepted by modifyInformation; its value must satisfy the typed contract. | `{"sourceCharacterIds":"<sourceCharacterIds>"}` |
 | `effects.modifyStartingKnowledge` | Supported effects option identified by modifyStartingKnowledge. | `{"type":"modifyStartingKnowledge","steps":["evilTeamRecognition"],"active":false}` |
 | `effects.modifyStartingKnowledge.fields.type` | Field accepted by modifyStartingKnowledge; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.modifyStartingKnowledge.fields.polarity` | Field accepted by modifyStartingKnowledge; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.modifyStartingKnowledge.fields.when` | Field accepted by modifyStartingKnowledge; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.modifyStartingKnowledge.fields.delay` | Field accepted by modifyStartingKnowledge; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.modifyStartingKnowledge.fields.targets` | Field accepted by modifyStartingKnowledge; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3769,6 +4004,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.modifyStartingKnowledge.fields.active` | Field accepted by modifyStartingKnowledge; its value must satisfy the typed contract. | `{"active":"<active>"}` |
 | `effects.modifyNomination` | Supported effects option identified by modifyNomination. | `{"type":"modifyNomination"}` |
 | `effects.modifyNomination.fields.type` | Field accepted by modifyNomination; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.modifyNomination.fields.polarity` | Field accepted by modifyNomination; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.modifyNomination.fields.when` | Field accepted by modifyNomination; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.modifyNomination.fields.delay` | Field accepted by modifyNomination; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.modifyNomination.fields.targets` | Field accepted by modifyNomination; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3788,6 +4024,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.modifyNomination.fields.worksWhenDead` | Field accepted by modifyNomination; its value must satisfy the typed contract. | `{"worksWhenDead":"<worksWhenDead>"}` |
 | `effects.performTableAction` | Supported effects option identified by performTableAction. | `{"type":"performTableAction","action":"devour","targets":{"type":"binding","binding":"selected"},"consequences":[]}` |
 | `effects.performTableAction.fields.type` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.performTableAction.fields.polarity` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.performTableAction.fields.when` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.performTableAction.fields.delay` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.performTableAction.fields.targets` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3801,6 +4038,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.performTableAction.fields.consequences` | Field accepted by performTableAction; its value must satisfy the typed contract. | `{"consequences":"<consequences>"}` |
 | `effects.recordAction` | Supported effects option identified by recordAction. | `{"type":"recordAction"}` |
 | `effects.recordAction.fields.type` | Field accepted by recordAction; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.recordAction.fields.polarity` | Field accepted by recordAction; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.recordAction.fields.when` | Field accepted by recordAction; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.recordAction.fields.delay` | Field accepted by recordAction; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.recordAction.fields.targets` | Field accepted by recordAction; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3827,6 +4065,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.recordAction.fields.recordCorrectGuesses` | Field accepted by recordAction; its value must satisfy the typed contract. | `{"recordCorrectGuesses":"<recordCorrectGuesses>"}` |
 | `effects.storytellerDecision` | Supported effects option identified by storytellerDecision. | `{"type":"storytellerDecision","decision":"decision"}` |
 | `effects.storytellerDecision.fields.type` | Field accepted by storytellerDecision; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.storytellerDecision.fields.polarity` | Field accepted by storytellerDecision; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.storytellerDecision.fields.when` | Field accepted by storytellerDecision; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.storytellerDecision.fields.delay` | Field accepted by storytellerDecision; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.storytellerDecision.fields.targets` | Field accepted by storytellerDecision; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3840,6 +4079,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.storytellerDecision.fields.options` | Field accepted by storytellerDecision; its value must satisfy the typed contract. | `{"options":"<options>"}` |
 | `effects.manualCheckpoint` | Supported effects option identified by manualCheckpoint. | `{"type":"manualCheckpoint","reason":"storytellerJudgment","prompt":"Confirma el resultado.","outcomes":[{"id":"confirmed","label":"Confirmado","effects":[]}],"blocking":true}` |
 | `effects.manualCheckpoint.fields.type` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.manualCheckpoint.fields.polarity` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.manualCheckpoint.fields.when` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.manualCheckpoint.fields.delay` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.manualCheckpoint.fields.targets` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
@@ -3855,6 +4095,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.manualCheckpoint.fields.blocking` | Field accepted by manualCheckpoint; its value must satisfy the typed contract. | `{"blocking":"<blocking>"}` |
 | `effects.manualInstruction` | Supported effects option identified by manualInstruction. | `{"type":"manualInstruction","instruction":"Describe cómo resolver esta regla."}` |
 | `effects.manualInstruction.fields.type` | Field accepted by manualInstruction; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.manualInstruction.fields.polarity` | Field accepted by manualInstruction; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
 | `effects.manualInstruction.fields.when` | Field accepted by manualInstruction; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.manualInstruction.fields.delay` | Field accepted by manualInstruction; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
 | `effects.manualInstruction.fields.targets` | Field accepted by manualInstruction; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
