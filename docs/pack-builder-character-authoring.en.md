@@ -6,6 +6,11 @@ This reference is generated from the same contract used by the MCP. Examples use
 
 - Each wake declares wake.firstTiming or otherTiming: {section, position}, with an integer position 0–30 and a section from nightOrder.sections. Do not author a global rank. before and immediatelyAfter are declarative references conditional on co-presence. Tales may only reorder within the same section through nightOrder.sections.first/other[section]. Guaranteed information does not grant truthfulness; mechanics must justify it. Legacy numeric wakes retain their behavior until explicitly classified.
 - IDs are opaque references; they never select behavior.
+- nightHistory links deathNight to selections, attempts and causes in an absolute night. nightTargets deduplicates selected players; abilityUsed counts confirmed actions rather than wakes. ability.maxNightTargets queries potential selection capacity while ignoring target impairment; identityMode selects real or registered identity. ability.activeProtection queries functional defenses.
+- interceptEvent with reaction.skipProtection skips one defense of the declared allegiance and continues evaluating other defenses. moveMarker.choose asks the storyteller for an eligible physical instance, preserving its source, duration and identity. Counters are not physical objects.
+- Public voting/beforeVote and voting/beforeExecution actions retain their candidate context and are revalidated on save. modifyVote.multiplier applies after vote weight: zero remains zero. Prevented executions retain an execution event with died=false.
+- voting.exhaustedDeadVoters returns selected player IDs that are dead and have spent all dead votes under the current voting rule. voting.executionPending checks that the candidate leads a qualifying nomination with no execution yet that day. Combine them with allEffectiveYes to avoid resolving a victory before a pending execution that could still prevent it.
+- restrictSetupCombination.minimum and maximum constrain a cast group, including automatic recommendations. when.skipIfNoCandidates skips impossible required selections. dawn/dusk with stage=boundary resolves effects before expiring durations at that boundary.
 - Classify participation, alignment, role, and victory first; never infer them from teamId, names, or prose.
 - Declare participation exclusively with entryMode: cast, temporary, or both.
 - A temporary entry automatically enables cast exclusion, evil night information, and expulsion; do not duplicate those rules as mechanics.
@@ -13,6 +18,7 @@ This reference is generated from the same contract used by the MCP. Examples use
 - Search recipes before composing complex primitives and always validate the final character.
 - When several markers represent quantities of the same resource, use one adjustCounter and project it with copies or stages; creating separate Token 1, Token 2, and Token 3 markers is not recommended.
 - Use keyBy when a limit combines day, night, actor, target, or triggering event.
+- usage.optional: false makes a limited use mandatory, without offering to postpone initial revelations or pending consequences. Omission preserves legacy voluntary confirmation.
 - Use a typed duration, including untilEvent, instead of inferring duration from prose.
 - A personal victory is evaluated when the game ends and may use any boolean ValueExpr; do not add resolveGameEnd merely to add that winner.
 - Before delivery, verify that every rules claim in ability, howToPlay, howToRun, interactions, and cues is backed by gameplay, a declared mechanic, or explicit manual coverage; validation guarantees only contract and importability.
@@ -3153,6 +3159,9 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 
 | ID | Purpose | Fragment |
 |---|---|---|
+| `valueNodes.nightHistory` | Builds a typed night history value expression. | `{"type":"nightHistory"}` |
+| `valueNodes.ability` | Builds a typed ability value expression. | `{"type":"ability"}` |
+| `valueNodes.voting` | Builds a typed voting value expression. | `{"type":"voting"}` |
 | `valueNodes.literal` | Builds a typed literal value expression. | `{"type":"literal"}` |
 | `valueNodes.binding` | Builds a typed binding value expression. | `{"type":"binding"}` |
 | `valueNodes.game` | Builds a typed game value expression. | `{"type":"game"}` |
@@ -3473,6 +3482,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.death.fields.reminder` | Field accepted by death; its value must satisfy the typed contract. | `{"reminder":"<reminder>"}` |
 | `effects.death.fields.reminderTokens` | Field accepted by death; its value must satisfy the typed contract. | `{"reminderTokens":"<reminderTokens>"}` |
 | `effects.death.fields.spentReminder` | Field accepted by death; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
+| `effects.death.fields.deferInterception` | Field accepted by death; its value must satisfy the typed contract. | `{"deferInterception":"<deferInterception>"}` |
 | `effects.death.fields.attribution` | Field accepted by death; its value must satisfy the typed contract. | `{"attribution":"<attribution>"}` |
 | `effects.death.fields.bypassesDeathProtection` | Field accepted by death; its value must satisfy the typed contract. | `{"bypassesDeathProtection":"<bypassesDeathProtection>"}` |
 | `effects.death.fields.bypassesProtection` | Field accepted by death; its value must satisfy the typed contract. | `{"bypassesProtection":"<bypassesProtection>"}` |
@@ -3575,6 +3585,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.moveMarker.fields.kind` | Field accepted by moveMarker; its value must satisfy the typed contract. | `{"kind":"<kind>"}` |
 | `effects.moveMarker.fields.id` | Field accepted by moveMarker; its value must satisfy the typed contract. | `{"id":"<id>"}` |
 | `effects.moveMarker.fields.allProtections` | Field accepted by moveMarker; its value must satisfy the typed contract. | `{"allProtections":"<allProtections>"}` |
+| `effects.moveMarker.fields.choose` | Field accepted by moveMarker; its value must satisfy the typed contract. | `{"choose":"<choose>"}` |
 | `effects.moveMarker.fields.from` | Field accepted by moveMarker; its value must satisfy the typed contract. | `{"from":"<from>"}` |
 | `effects.adjustCounter` | Supported effects option identified by adjustCounter. | `{"type":"adjustCounter","counter":"counter","delta":1,"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.adjustCounter.fields.type` | Field accepted by adjustCounter; its value must satisfy the typed contract. | `{"type":"<type>"}` |
@@ -3943,6 +3954,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.modifyVote.fields.reminderTokens` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"reminderTokens":"<reminderTokens>"}` |
 | `effects.modifyVote.fields.spentReminder` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.modifyVote.fields.weight` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"weight":"<weight>"}` |
+| `effects.modifyVote.fields.multiplier` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"multiplier":"<multiplier>"}` |
 | `effects.modifyVote.fields.pairedTargets` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"pairedTargets":"<pairedTargets>"}` |
 | `effects.modifyVote.fields.pairedWeight` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"pairedWeight":"<pairedWeight>"}` |
 | `effects.modifyVote.fields.threshold` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"threshold":"<threshold>"}` |
@@ -3952,6 +3964,8 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.modifyVote.fields.requiredVoters` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"requiredVoters":"<requiredVoters>"}` |
 | `effects.modifyVote.fields.tallyValidity` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"tallyValidity":"<tallyValidity>"}` |
 | `effects.modifyVote.fields.worksWhenDead` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"worksWhenDead":"<worksWhenDead>"}` |
+| `effects.modifyVote.fields.decision` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"decision":"<decision>"}` |
+| `effects.modifyVote.fields.breaksSequence` | Field accepted by modifyVote; its value must satisfy the typed contract. | `{"breaksSequence":"<breaksSequence>"}` |
 | `effects.modifySetup` | Supported effects option identified by modifySetup. | `{"type":"modifySetup","operations":[{"type":"adjustBucket","bucket":"setupBucket","delta":0}]}` |
 | `effects.modifySetup.fields.type` | Field accepted by modifySetup; its value must satisfy the typed contract. | `{"type":"<type>"}` |
 | `effects.modifySetup.fields.polarity` | Field accepted by modifySetup; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
@@ -3970,6 +3984,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.restrictSetupCombination.fields.when` | Field accepted by restrictSetupCombination; its value must satisfy the typed contract. | `{"when":"<when>"}` |
 | `effects.restrictSetupCombination.fields.characterIds` | Field accepted by restrictSetupCombination; its value must satisfy the typed contract. | `{"characterIds":"<characterIds>"}` |
 | `effects.restrictSetupCombination.fields.maximum` | Field accepted by restrictSetupCombination; its value must satisfy the typed contract. | `{"maximum":"<maximum>"}` |
+| `effects.restrictSetupCombination.fields.minimum` | Field accepted by restrictSetupCombination; its value must satisfy the typed contract. | `{"minimum":"<minimum>"}` |
 | `effects.modifyInformation` | Supported effects option identified by modifyInformation. | `{"type":"modifyInformation"}` |
 | `effects.modifyInformation.fields.type` | Field accepted by modifyInformation; its value must satisfy the typed contract. | `{"type":"<type>"}` |
 | `effects.modifyInformation.fields.polarity` | Field accepted by modifyInformation; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |

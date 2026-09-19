@@ -501,6 +501,24 @@ La audiencia puede ser `actor`, `selected`, `eventSubject`, `public`, `storytell
 
 Las operaciones de `modifySetup` son `adjustBucket`, `chooseAdjustments`, `replaceBucket`, `setBucketCount`, `allowDuplicates`, `requireCharacter`, `requireBucket`, `removeCharacters` y `configureDeal`. Los recuentos pueden ser literales, una elección, el número de jugadores, una mayoría, la suma de categorías, copias de la fuente o el resto disponible.
 
+### Historial nocturno, objetos e intervenciones
+
+`nightHistory` consulta una noche absoluta (`night`) o la actual. `deathNight` obtiene la noche de la muerte de `players`; `nightDeathPlayers` excluye ejecuciones; `deathSource` conserva la identidad real de la causa. `nightTargets` cuenta jugadores distintos elegidos por fuentes filtradas mediante `sourceProfile`; una selección y la resolución de ese mismo ataque no se cuentan dos veces. `abilityUsed` distingue una acción confirmada de un simple despertar o entrega de información. `deathAttempts` incluye intentos impedidos; `deathCount` y `nightDeathCount` cuentan muertes efectivas.
+
+`ability` admite `maxNightTargets` y `activeProtection`, con `players` e `identityMode` (`real` o `registered`). La capacidad potencial respeta noche, recursos, candidatos y usos restantes, ignorando bloqueos o intoxicación del objetivo. La información emitida conserva las reglas ordinarias de intoxicación de su observador. Las protecciones consultadas deben estar vigentes y funcionar en el estado actual.
+
+`interceptEvent.reaction: {type: "skipProtection", allegiance: "good"}` omite la primera defensa coincidente que cancelaría la muerte y continúa evaluando las demás. Se consume solo al omitirla. `death.deferInterception: true` deja la intercepción para el procesamiento de cada evento, después de las consecuencias del anterior.
+
+`moveMarker` acepta exactamente uno de `id`, `allProtections: true` o `choose: {decision, prompt, ids?, protections?}`. `choose` presenta una decisión privada sobre instancias elegibles; mueve una sola conservando clave, fuente, propiedad, caducidad y efectos. No admite contadores o notas por inferencia de su texto. Las reacciones inmediatas cerradas no pueden abrir esta decisión.
+
+Las acciones con `when.window: "voting"` y `stage: "beforeVote"` o `"beforeExecution"` conservan el candidato y se validan de nuevo al guardar. `modifyVote.multiplier` se aplica después de los pesos y no cambia el umbral: un voto de valor cero permanece en cero. Las consultas `voting.actionExecutionSurvived` y `voting.allEffectiveYes` enlazan acciones, candidato, votos efectivos y ejecución sin muerte.
+
+`voting.exhaustedDeadVoters` devuelve los IDs de `players` que están muertos y han gastado todos sus votos de muerto según la regla guardada en la partida. No incluye vivos, jugadores con votos restantes ni reglas que no conceden esos votos. Usa `length` para contar el resultado. `voting.executionPending`, con `candidate`, indica si ese jugador encabeza una nominación válida durante el día sin ejecución resuelta todavía; una ejecución sin muerte también cierra esa ventana. Ambas consultas son genéricas y pueden combinarse con `allEffectiveYes` en condiciones de `gameEnd`: un último voto puede habilitar una ejecución pendiente que debe resolverse antes de declarar una victoria alternativa.
+
+`restrictSetupCombination` admite `minimum` y/o `maximum` sobre `characterIds`, tanto en preparación manual como automática. `when.skipIfNoCandidates: true` omite una selección obligatoria cuando no hay suficientes candidatos legales. `dawn`/`dusk` con `stage: "boundary"` ejecuta efectos antes de retirar las marcas que caducan en esa frontera.
+
+`usage.optional: false` declara que un uso limitado es obligatorio, por ejemplo una revelación inicial o una penalización. El asistente no ofrece reservarlo para otra noche. Omitirlo conserva la confirmación voluntaria de los packs anteriores.
+
 ## 5. Políticas
 
 Las políticas conectan una mecánica con los asistentes sin crear comportamiento por personaje.

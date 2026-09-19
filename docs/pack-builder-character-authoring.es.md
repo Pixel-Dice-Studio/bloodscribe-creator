@@ -6,6 +6,11 @@ Esta referencia se genera desde el mismo contrato que consume el MCP. Los ejempl
 
 - Cada despertar declara wake.firstTiming u otherTiming: {section, position} con posición entera 0–30 y sección del catálogo nightOrder.sections. No escribas un orden global. before e immediatelyAfter son referencias declarativas condicionales a la presencia conjunta. El cuento solo puede reordenar dentro de la misma sección mediante nightOrder.sections.first/other[section]. Información garantizada no concede veracidad; debe justificarla la mecánica. Los datos numéricos antiguos conservan su comportamiento hasta clasificarse explícitamente.
 - Los IDs son referencias opacas; nunca seleccionan comportamiento.
+- nightHistory enlaza deathNight con elecciones, intentos y causas de una noche absoluta. nightTargets deduplica jugadores elegidos y abilityUsed cuenta acciones confirmadas, no despertares. ability.maxNightTargets consulta capacidad potencial sin bloqueos del objetivo; identityMode decide identidad real o registrada. ability.activeProtection consulta defensas funcionales.
+- interceptEvent con reaction.skipProtection omite una sola defensa del alineamiento declarado y continúa con las demás. moveMarker.choose pide al Narrador una instancia elegible; conserva fuente, duración e identidad al transferirla. No uses contadores como objetos físicos.
+- Las acciones públicas voting/beforeVote y voting/beforeExecution se vinculan a su candidato y se revalidan al guardar. modifyVote.multiplier se aplica después del peso: cero sigue siendo cero. Conserva la ejecución con died=false cuando se impide la muerte.
+- voting.exhaustedDeadVoters devuelve los IDs seleccionados que están muertos y han gastado todos sus votos de muerto según la regla vigente. voting.executionPending comprueba que el candidato lidera una nominación válida todavía sin ejecución ese día. Combínalas con allEffectiveYes para no resolver una victoria antes de una ejecución pendiente que todavía podría impedirla.
+- restrictSetupCombination.minimum y maximum acotan un grupo de IDs del reparto; se aplican también a recomendaciones. when.skipIfNoCandidates omite selecciones obligatorias imposibles. dawn/dusk con stage=boundary resuelve efectos antes de retirar duraciones de esa frontera.
 - Clasifica primero participación, alineamiento, rol y victoria; no uses teamId, nombre o texto para inferirlos.
 - Declara la participación exclusivamente con entryMode: cast, temporary o ambos.
 - La entrada temporary activa automáticamente exclusión del reparto, información nocturna del Mal y expulsión; no dupliques esas reglas como mecánicas.
@@ -13,6 +18,7 @@ Esta referencia se genera desde el mismo contrato que consume el MCP. Los ejempl
 - Consulta recetas antes de combinar primitivas complejas y valida siempre el personaje final.
 - Si varias fichas representan cantidades del mismo recurso, usa un único adjustCounter y proyéctalo con copies o stages; crear «Token 1», «Token 2» y «Token 3» como fichas independientes no está recomendado.
 - Usa keyBy cuando un límite combina día, noche, actor, objetivo o evento.
+- usage.optional: false hace obligatorio un uso limitado y evita ofrecer reservar revelaciones iniciales o consecuencias pendientes. Omitirlo conserva la confirmación voluntaria anterior.
 - Usa una duración tipada, incluida untilEvent, en vez de inferirla desde el texto.
 - Una victory personal se evalúa al finalizar la partida y puede usar cualquier ValueExpr booleana; no añadas resolveGameEnd solo para sumar ese ganador.
 - Antes de entregar, comprueba que cada afirmación de reglas en ability, howToPlay, howToRun, interactions y cues esté respaldada por gameplay, una mecánica declarada o cobertura manual explícita; el validador solo garantiza contrato e importación.
@@ -3153,6 +3159,9 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 
 | ID | Qué hace | Fragmento |
 |---|---|---|
+| `valueNodes.nightHistory` | Consulta una noche absoluta, sus intentos, elecciones y muertes efectivas. | `{"type":"nightHistory"}` |
+| `valueNodes.ability` | Consulta selecciones nocturnas potenciales o una protección funcional. | `{"type":"ability"}` |
+| `valueNodes.voting` | Consulta votos finales y ejecuciones vinculadas, conservando los asientos históricos. | `{"type":"voting"}` |
 | `valueNodes.literal` | Usa un valor declarado. | `{"type":"literal"}` |
 | `valueNodes.binding` | Usa un participante vinculado por la regla. | `{"type":"binding"}` |
 | `valueNodes.game` | Usa fase, día o noche actuales. | `{"type":"game"}` |
@@ -3473,6 +3482,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.death.fields.reminder` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"reminder":"<reminder>"}` |
 | `effects.death.fields.reminderTokens` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"reminderTokens":"<reminderTokens>"}` |
 | `effects.death.fields.spentReminder` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
+| `effects.death.fields.deferInterception` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"deferInterception":"<deferInterception>"}` |
 | `effects.death.fields.attribution` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"attribution":"<attribution>"}` |
 | `effects.death.fields.bypassesDeathProtection` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"bypassesDeathProtection":"<bypassesDeathProtection>"}` |
 | `effects.death.fields.bypassesProtection` | Campo admitido por death; su valor debe cumplir el contrato tipado. | `{"bypassesProtection":"<bypassesProtection>"}` |
@@ -3565,7 +3575,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.applyMarker.fields.active` | Campo admitido por applyMarker; su valor debe cumplir el contrato tipado. | `{"active":"<active>"}` |
 | `effects.applyMarker.fields.exclusive` | Campo admitido por applyMarker; su valor debe cumplir el contrato tipado. | `{"exclusive":"<exclusive>"}` |
 | `effects.applyMarker.fields.ownership` | Campo admitido por applyMarker; su valor debe cumplir el contrato tipado. | `{"ownership":"<ownership>"}` |
-| `effects.moveMarker` | Transfiere atómicamente una ficha concreta o todas las protecciones transferibles. | `{"type":"moveMarker","kind":"reminder","id":"marker","from":{"type":"binding","binding":"actor"},"targets":{"type":"binding","binding":"selected"}}` |
+| `effects.moveMarker` | Transfiere una instancia elegida en privado, una ficha concreta o todas las protecciones transferibles. | `{"type":"moveMarker","kind":"reminder","id":"marker","from":{"type":"binding","binding":"actor"},"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.moveMarker.fields.type` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `effects.moveMarker.fields.polarity` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
 | `effects.moveMarker.fields.when` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
@@ -3575,6 +3585,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.moveMarker.fields.kind` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"kind":"<kind>"}` |
 | `effects.moveMarker.fields.id` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"id":"<id>"}` |
 | `effects.moveMarker.fields.allProtections` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"allProtections":"<allProtections>"}` |
+| `effects.moveMarker.fields.choose` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"choose":"<choose>"}` |
 | `effects.moveMarker.fields.from` | Campo admitido por moveMarker; su valor debe cumplir el contrato tipado. | `{"from":"<from>"}` |
 | `effects.adjustCounter` | Ajusta un contador persistente del objetivo. Un umbral de muerte actúa como máximo efectivo del recurso; crossing dispara al alcanzarlo. transferFrom mueve la cantidad de forma atómica. | `{"type":"adjustCounter","counter":"counter","delta":1,"targets":{"type":"binding","binding":"selected"}}` |
 | `effects.adjustCounter.fields.type` | Campo admitido por adjustCounter; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
@@ -3943,6 +3954,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.modifyVote.fields.reminderTokens` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"reminderTokens":"<reminderTokens>"}` |
 | `effects.modifyVote.fields.spentReminder` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.modifyVote.fields.weight` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"weight":"<weight>"}` |
+| `effects.modifyVote.fields.multiplier` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"multiplier":"<multiplier>"}` |
 | `effects.modifyVote.fields.pairedTargets` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"pairedTargets":"<pairedTargets>"}` |
 | `effects.modifyVote.fields.pairedWeight` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"pairedWeight":"<pairedWeight>"}` |
 | `effects.modifyVote.fields.threshold` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"threshold":"<threshold>"}` |
@@ -3952,6 +3964,8 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.modifyVote.fields.requiredVoters` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"requiredVoters":"<requiredVoters>"}` |
 | `effects.modifyVote.fields.tallyValidity` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"tallyValidity":"<tallyValidity>"}` |
 | `effects.modifyVote.fields.worksWhenDead` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"worksWhenDead":"<worksWhenDead>"}` |
+| `effects.modifyVote.fields.decision` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"decision":"<decision>"}` |
+| `effects.modifyVote.fields.breaksSequence` | Campo admitido por modifyVote; su valor debe cumplir el contrato tipado. | `{"breaksSequence":"<breaksSequence>"}` |
 | `effects.modifySetup` | Aplica operaciones tipadas a cantidades o asignaciones del setup. | `{"type":"modifySetup","operations":[{"type":"adjustBucket","bucket":"setupBucket","delta":0}]}` |
 | `effects.modifySetup.fields.type` | Campo admitido por modifySetup; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `effects.modifySetup.fields.polarity` | Campo admitido por modifySetup; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
@@ -3970,6 +3984,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.restrictSetupCombination.fields.when` | Campo admitido por restrictSetupCombination; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
 | `effects.restrictSetupCombination.fields.characterIds` | Campo admitido por restrictSetupCombination; su valor debe cumplir el contrato tipado. | `{"characterIds":"<characterIds>"}` |
 | `effects.restrictSetupCombination.fields.maximum` | Campo admitido por restrictSetupCombination; su valor debe cumplir el contrato tipado. | `{"maximum":"<maximum>"}` |
+| `effects.restrictSetupCombination.fields.minimum` | Campo admitido por restrictSetupCombination; su valor debe cumplir el contrato tipado. | `{"minimum":"<minimum>"}` |
 | `effects.modifyInformation` | Transforma o redacta información antes de entregarla. | `{"type":"modifyInformation"}` |
 | `effects.modifyInformation.fields.type` | Campo admitido por modifyInformation; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `effects.modifyInformation.fields.polarity` | Campo admitido por modifyInformation; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
