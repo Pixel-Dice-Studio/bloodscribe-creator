@@ -3235,6 +3235,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `predicateTypes.players.any` | Exige que se cumpla al menos una condición. | `{"value":"any"}` |
 | `predicateTypes.players.not` | Invierte el resultado de otra condición. | `{"value":"not"}` |
 | `predicateTypes.characters.inPlay` | Comprueba si el personaje está en juego. | `{"value":"inPlay"}` |
+| `predicateTypes.characters.onScript` | Comprueba si el personaje figura en el guion de la partida. | `{"value":"onScript"}` |
 | `predicateTypes.characters.inTableCharacterZone` | Comprueba si el personaje ocupa una zona declarada del centro de la mesa. | `{"value":"inTableCharacterZone"}` |
 | `predicateTypes.characters.identity` | Compara una faceta de la identidad del personaje. | `{"value":"identity"}` |
 | `predicateTypes.characters.identityMatchesBinding` | Compara una faceta del personaje con un participante vinculado. | `{"value":"identityMatchesBinding"}` |
@@ -3344,7 +3345,8 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `eventFields.attribution` | Alineamiento mecánico al que se atribuye la muerte. | `{"type":"eventField","field":"attribution","value":"<value>"}` |
 | `eventFields.resolution` | Flujo mecánico que está resolviendo el evento candidato. | `{"type":"eventField","field":"resolution","value":"<value>"}` |
 | `eventFields.known` | Indica si el evento era conocido. | `{"type":"eventField","field":"known","value":"<value>"}` |
-| `eventFields.occurrence` | Ocurrencia semántica registrada. | `{"type":"eventField","field":"occurrence","value":"<value>"}` |
+| `eventFields.occurrence` | Ocurrencia semántica registrada; en una muerte, la muerte número N de ese jugador. | `{"type":"eventField","field":"occurrence","value":"<value>"}` |
+| `eventFields.playerDeathOrder` | En la primera muerte de un jugador, su posición entre los jugadores que han muerto en la partida. | `{"type":"eventField","field":"playerDeathOrder","value":"<value>"}` |
 | `eventFields.signal` | Señal semántica del Narrador. | `{"type":"eventField","field":"signal","value":"<value>"}` |
 | `eventFields.characterId` | ID del personaje relacionado. | `{"type":"eventField","field":"characterId","value":"<value>"}` |
 | `eventFields.sourceCharacterId` | ID del personaje cuya mecánica originó el evento. | `{"type":"eventField","field":"sourceCharacterId","value":"<value>"}` |

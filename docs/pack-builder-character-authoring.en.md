@@ -3235,6 +3235,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `predicateTypes.players.any` | Supported players option identified by any. | `{"value":"any"}` |
 | `predicateTypes.players.not` | Supported players option identified by not. | `{"value":"not"}` |
 | `predicateTypes.characters.inPlay` | Supported characters option identified by inPlay. | `{"value":"inPlay"}` |
+| `predicateTypes.characters.onScript` | Supported characters option identified by onScript. | `{"value":"onScript"}` |
 | `predicateTypes.characters.inTableCharacterZone` | Supported characters option identified by inTableCharacterZone. | `{"value":"inTableCharacterZone"}` |
 | `predicateTypes.characters.identity` | Supported characters option identified by identity. | `{"value":"identity"}` |
 | `predicateTypes.characters.identityMatchesBinding` | Supported characters option identified by identityMatchesBinding. | `{"value":"identityMatchesBinding"}` |
@@ -3345,6 +3346,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `eventFields.resolution` | Supported event fields option identified by resolution. | `{"type":"eventField","field":"resolution","value":"<value>"}` |
 | `eventFields.known` | Supported event fields option identified by known. | `{"type":"eventField","field":"known","value":"<value>"}` |
 | `eventFields.occurrence` | Supported event fields option identified by occurrence. | `{"type":"eventField","field":"occurrence","value":"<value>"}` |
+| `eventFields.playerDeathOrder` | Supported event fields option identified by playerDeathOrder. | `{"type":"eventField","field":"playerDeathOrder","value":"<value>"}` |
 | `eventFields.signal` | Supported event fields option identified by signal. | `{"type":"eventField","field":"signal","value":"<value>"}` |
 | `eventFields.characterId` | Supported event fields option identified by characterId. | `{"type":"eventField","field":"characterId","value":"<value>"}` |
 | `eventFields.sourceCharacterId` | Supported event fields option identified by sourceCharacterId. | `{"type":"eventField","field":"sourceCharacterId","value":"<value>"}` |
