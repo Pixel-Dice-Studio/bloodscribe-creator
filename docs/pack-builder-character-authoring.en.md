@@ -4005,6 +4005,8 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.modifyInformation.fields.redactValues` | Field accepted by modifyInformation; its value must satisfy the typed contract. | `{"redactValues":"<redactValues>"}` |
 | `effects.modifyInformation.fields.redactCharacterTokens` | Field accepted by modifyInformation; its value must satisfy the typed contract. | `{"redactCharacterTokens":"<redactCharacterTokens>"}` |
 | `effects.modifyInformation.fields.sourceCharacterIds` | Field accepted by modifyInformation; its value must satisfy the typed contract. | `{"sourceCharacterIds":"<sourceCharacterIds>"}` |
+| `effects.modifyInformation.fields.informationKinds` | Field accepted by modifyInformation; its value must satisfy the typed contract. | `{"informationKinds":"<informationKinds>"}` |
+| `effects.modifyInformation.fields.ownAbilityOnly` | Field accepted by modifyInformation; its value must satisfy the typed contract. | `{"ownAbilityOnly":"<ownAbilityOnly>"}` |
 | `effects.modifyStartingKnowledge` | Supported effects option identified by modifyStartingKnowledge. | `{"type":"modifyStartingKnowledge","steps":["evilTeamRecognition"],"active":false}` |
 | `effects.modifyStartingKnowledge.fields.type` | Field accepted by modifyStartingKnowledge; its value must satisfy the typed contract. | `{"type":"<type>"}` |
 | `effects.modifyStartingKnowledge.fields.polarity` | Field accepted by modifyStartingKnowledge; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |

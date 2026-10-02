@@ -4005,6 +4005,8 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.modifyInformation.fields.redactValues` | Campo admitido por modifyInformation; su valor debe cumplir el contrato tipado. | `{"redactValues":"<redactValues>"}` |
 | `effects.modifyInformation.fields.redactCharacterTokens` | Campo admitido por modifyInformation; su valor debe cumplir el contrato tipado. | `{"redactCharacterTokens":"<redactCharacterTokens>"}` |
 | `effects.modifyInformation.fields.sourceCharacterIds` | Campo admitido por modifyInformation; su valor debe cumplir el contrato tipado. | `{"sourceCharacterIds":"<sourceCharacterIds>"}` |
+| `effects.modifyInformation.fields.informationKinds` | Campo admitido por modifyInformation; su valor debe cumplir el contrato tipado. | `{"informationKinds":"<informationKinds>"}` |
+| `effects.modifyInformation.fields.ownAbilityOnly` | Campo admitido por modifyInformation; su valor debe cumplir el contrato tipado. | `{"ownAbilityOnly":"<ownAbilityOnly>"}` |
 | `effects.modifyStartingKnowledge` | Activa o desactiva pasos tipados de conocimiento inicial. | `{"type":"modifyStartingKnowledge","steps":["evilTeamRecognition"],"active":false}` |
 | `effects.modifyStartingKnowledge.fields.type` | Campo admitido por modifyStartingKnowledge; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `effects.modifyStartingKnowledge.fields.polarity` | Campo admitido por modifyStartingKnowledge; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |

@@ -4,6 +4,33 @@ Esta guía explica cómo escribir a mano un pack `bloodscribe-3.1`: desde la ra�
 
 Puedes consultar o descargar el [pack completo de demostración](ejemplo-pack-manual.es.bloodscribe.json). Ese archivo usa únicamente IDs y contenido inventados y se valida automáticamente con el mismo importador que usa BloodScribe.
 
+## Dependencias de un cuento
+
+Un personaje puede declarar `rules.taleCoherence`; una regla usa `taleCoherence` en su raíz. Las razones se escriben en el idioma del pack. Por ejemplo:
+
+```json
+{
+  "provides": ["demo:señal"],
+  "requires": [
+    {
+      "reason": "Necesita un compañero que produzca la señal que investiga",
+      "scope": "inPlay",
+      "anyOf": [{ "capability": "demo:fuente-señal" }]
+    }
+  ]
+}
+```
+
+Cada requisito se debe cumplir. `anyOf` admite alternativas con exactamente un campo: `characterId`, `ruleId` o `capability`. Las capacidades son claves declaradas en `provides`, nunca texto interpretado por el motor. `tale` exige disponibilidad en el cuento; `inPlay` exige también el compañero en el reparto real; `outOfPlay` exige una identidad disponible en el cuento pero fuera del reparto. Las reglas requeridas se incorporan con activación `automatic` sin condiciones adicionales. `rules.requiredGameRuleIds` y `modifySetup.requireCharacter` siguen siendo válidos y se integran sin repetir cambios de composición. `requiredCharacterIds` de una regla describe su aplicabilidad, no añade compañeros.
+
+`uiHints.taleCoherenceWarning: true` en el personaje muestra sus razones y lo excluye de generación, sugerencias y sustituciones automáticas, incluso si es favorito. Siempre permite añadirlo manualmente. Sin el flag, permanece disponible para recomendaciones; puede llevar una regla auxiliar sin mostrar ese aviso. La procedencia del libro nunca decide una dependencia.
+
+Carrito y Creator incorporan requisitos inequívocos y ofrecen alternativas cuando hay varias fuentes. Un borrador incompleto se puede editar; no se puede guardar como válido, exportar desde Creator ni iniciar una partida hasta resolverlo. Quitar un requisito vuelve a invalidarlo. Los ciclos se resuelven sin duplicados; las políticas incompatibles de composición, votación o final requieren una elección. El snapshot incluye las reglas necesarias para funcionar sin el catálogo remoto.
+
+Creator conserva estas declaraciones al importar, editar, renombrar IDs y exportar; se editan mediante el JSON adicional de personajes y reglas. Las herramientas de autoría admiten `taleCoherence`, `requiredGameRuleIds` y `uiHints` en propuestas de personaje y validan las dependencias del pack completo. Para información genérica, `modifyInformation.informationKinds` limita el tipo de respuesta y `ownAbilityOnly` limita la modificación a entregas privadas de la propia habilidad; no hace falta enumerar personajes.
+
+Las fichas con duración `whileCondition` conservan su condición y bindings al guardar eventos. Su duración se comprueba también cuando otro evento retira el estado del que dependen; `ownership: independent` conserva la independencia de quien colocó la ficha.
+
 ## Índice
 
 1. [Modelo mental](#1-modelo-mental)
