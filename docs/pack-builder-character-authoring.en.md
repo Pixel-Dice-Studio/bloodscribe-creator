@@ -803,7 +803,7 @@ The mechanicUse history captures actorAbilityMode and the actor participant at r
           "type": "all",
           "conditions": [
             {
-              "type": "eventType",
+              "type": "eventCategory",
               "values": [
                 "mechanicUse"
               ]
@@ -887,7 +887,7 @@ targetResultStatus filters prevented resolutions and returns the captured select
           "type": "all",
           "conditions": [
             {
-              "type": "eventType",
+              "type": "eventCategory",
               "values": [
                 "mechanicUse"
               ]
@@ -971,7 +971,7 @@ abilityProvenance retains the provenance of the ability instance that was used.
           "type": "all",
           "conditions": [
             {
-              "type": "eventType",
+              "type": "eventCategory",
               "values": [
                 "mechanicUse"
               ]
@@ -1241,7 +1241,7 @@ effectTarget retains effective targets after protection and redirection; count c
           "type": "all",
           "conditions": [
             {
-              "type": "eventType",
+              "type": "eventCategory",
               "values": [
                 "mechanicUse"
               ]
@@ -1325,7 +1325,7 @@ The event retains the actor's and selected target's registered identities at res
           "type": "all",
           "conditions": [
             {
-              "type": "eventType",
+              "type": "eventCategory",
               "values": [
                 "mechanicUse"
               ]

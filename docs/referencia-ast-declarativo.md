@@ -240,14 +240,14 @@ Solo se aplican a `players`.
 
 | `type` | Campos y significado | Ejemplo |
 |---|---|---|
-| `eventType` | `values`: tipos semánticos. | `{"type":"eventType","values":["death"]}` |
-| `eventCategory` | `values`: categorías declaradas. | `{"type":"eventCategory","values":["night"]}` |
+| `eventType` | `values`: tipos exactos de evento registrado (`kill-player`, `execute-player`, `nominate-player`, `choose-target`, `record-mechanic-use`…). Un valor que el motor no produce se rechaza al validar una propuesta o un borrador. Solo al cargar contenido ya guardado (pack instalado o partida), un nombre de categoría escrito aquí se migra a `eventCategory`; cualquier otro valor desconocido se rechaza también ahí. | `{"type":"eventType","values":["kill-player"]}` |
+| `eventCategory` | `values`: categorías semánticas (`death`, `execution`, `nomination`, `expulsion`, `action`, `mechanicUse`…). Es la forma de preguntar por muertes, ejecuciones o nominaciones. | `{"type":"eventCategory","values":["death"]}` |
 | `eventPeriod` | `value`: `currentDay`, `currentNight`, `previousDay`, `previousNight`, `game`. | `{"type":"eventPeriod","value":"currentDay"}` |
 | `eventField` | `field` y literal `value`. | `{"type":"eventField","field":"died","value":true}` |
 | `eventRestriction` | `values` y `match?`: `all`, `any` o `exact`; compara el conjunto de restricciones declarado por el efecto. | `{"type":"eventRestriction","values":["ability","vote"],"match":"all"}` |
 | `eventParticipant` | `binding` del evento, más `participant?` y `value?` para contrastarlo con un binding actual. | `{"type":"eventParticipant","binding":"nominee","participant":"actor"}` |
 | `eventParticipantIdentity` | `participant`, `identityMode`, `facet`, `values`. | `{"type":"eventParticipantIdentity","participant":"eventSubject","identityMode":"registered","facet":"allegiance","values":["good"]}` |
-| `all` / `any` / `not` | Composición booleana de predicados de evento. | `{"type":"not","condition":{"type":"eventType","values":["death"]}}` |
+| `all` / `any` / `not` | Composición booleana de predicados de evento. | `{"type":"not","condition":{"type":"eventCategory","values":["death"]}}` |
 
 Campos de `eventField`: `actionId`, `outcome`, `died`, `attribution`, `resolution`, `known`, `occurrence`, `signal`, `characterId`, `targetCount`, `targetAlignment`, `targetAlive`, `state`, `active`. En muertes, `attribution` identifica el bando de la fuente y `resolution` distingue flujos especiales como `mainEvilAttack`.
 
@@ -442,7 +442,7 @@ Los campos comunes de la mayoría de efectos son:
 | `interceptEvent` | Cancela o redirige un evento semántico. | `event`, `match?`, `reaction`, `priority?`, `consumption?`, `appliesWhenProtectionBypassed?`. | Véase 6.5. |
 | `disableAbility` | Desactiva una habilidad según el contrato. | `blocks`, `consumeOnPass`, `informationMayBeFalse`. | `{"type":"disableAbility","targets":{"type":"binding","binding":"selected"},"blocks":"ability"}` |
 | `restrict` | Limita acciones disponibles. | `actions`, `requiresSourceAlive`, `restrictions`, `relation`, `informationMayBeFalse`. | `{"type":"restrict","targets":{"type":"binding","binding":"selected"},"actions":["vote"]}` |
-| `registerAs` | Cambia cómo se registra una identidad. | `affects`, `alignment`, `roles`, `characterIds`, `lifeState`, `mode`, `registersAs`, `teamIds`, `triggerReminder`, `worksWhenDead`. | `{"type":"registerAs","targets":{"type":"binding","binding":"actor"},"registersAs":["equipo-carmesi"],"worksWhenDead":true}` |
+| `registerAs` | Cambia cómo se registra una identidad. Con `preserveAlignment: true`, una ficha que registra como un personaje conserva el alineamiento de quien la lleva. | `affects`, `alignment`, `roles`, `characterIds`, `lifeState`, `mode`, `preserveAlignment`, `registersAs`, `teamIds`, `triggerReminder`, `worksWhenDead`. | `{"type":"registerAs","targets":{"type":"binding","binding":"actor"},"registersAs":["equipo-carmesi"],"worksWhenDead":true}` |
 | `modifyTargets` | Amplía o reduce los objetivos de habilidades que cumplan un perfil. | `delta` obligatorio; `sourceProfile?`, `targetMechanicTags?`. | `{"type":"modifyTargets","delta":-1,"sourceProfile":{"allegiances":["evil"]}}` |
 | `modifyVote` | Cambia el peso de los votantes resueltos. | `weight`, `pairedTargets?`, `pairedWeight?`; los pesos aceptan número o `ValueExpr`. | `{"type":"modifyVote","targets":{"type":"binding","binding":"actor"},"weight":2}` |
 | `modifySetup` | Aplica operaciones tipadas al setup. | `operations` obligatorio. | Véase 6.6. |
@@ -629,6 +629,12 @@ Operaciones disponibles:
 - `{"type":"sumBuckets","buckets":["minion","demon"]}`
 - `{"type":"sourceCopies"}`
 - `{"type":"remainder"}`
+
+Cuando varias fuentes modifican la composición, el resultado no depende del orden de las plazas en la bolsa:
+
+- Los efectos solo relativos (`adjustBucket`, `chooseAdjustments`, `replaceBucket` con número, `requireCharacter` con `onMissing: "add"` y `setBucketCount` con `remainder`) se suman y el total se aplica una vez. Un «−1» y un «+1» se compensan aunque la categoría esté a cero; si el total pide quitar más de lo que hay, se quita lo que hay.
+- Un efecto que fija un valor (`setBucketCount` con otra especificación, `replaceBucket` con `all`) o que depende del recuento del momento (`requireBucket`) no conmuta con los demás. El motor no decide cuál va antes: acepta la bolsa que cumpla cualquiera de las composiciones posibles y avisa al Narrador durante la preparación.
+- Con una sola fuente, sus operaciones se aplican en el orden declarado sobre la composición base; si el resultado no conserva el número de jugadores, el efecto no se aplica.
 
 ## 7. Políticas de interacción
 

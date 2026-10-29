@@ -803,7 +803,7 @@ El historial mechanicUse captura actorAbilityMode y el participante actor en el 
           "type": "all",
           "conditions": [
             {
-              "type": "eventType",
+              "type": "eventCategory",
               "values": [
                 "mechanicUse"
               ]
@@ -887,7 +887,7 @@ targetResultStatus permite filtrar resoluciones prevented y recuperar el objetiv
           "type": "all",
           "conditions": [
             {
-              "type": "eventType",
+              "type": "eventCategory",
               "values": [
                 "mechanicUse"
               ]
@@ -971,7 +971,7 @@ abilityProvenance conserva la procedencia de la instancia de habilidad usada.
           "type": "all",
           "conditions": [
             {
-              "type": "eventType",
+              "type": "eventCategory",
               "values": [
                 "mechanicUse"
               ]
@@ -1241,7 +1241,7 @@ effectTarget conserva los objetivos efectivos después de protecciones y redirec
           "type": "all",
           "conditions": [
             {
-              "type": "eventType",
+              "type": "eventCategory",
               "values": [
                 "mechanicUse"
               ]
@@ -1325,7 +1325,7 @@ El evento conserva las identidades registradas del actor y del objetivo seleccio
           "type": "all",
           "conditions": [
             {
-              "type": "eventType",
+              "type": "eventCategory",
               "values": [
                 "mechanicUse"
               ]
@@ -3243,8 +3243,8 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `predicateTypes.characters.all` | Exige que se cumplan todas las condiciones. | `{"value":"all"}` |
 | `predicateTypes.characters.any` | Exige que se cumpla al menos una condición. | `{"value":"any"}` |
 | `predicateTypes.characters.not` | Invierte el resultado de otra condición. | `{"value":"not"}` |
-| `predicateTypes.events.eventType` | Compara el tipo semántico del evento. | `{"value":"eventType"}` |
-| `predicateTypes.events.eventCategory` | Compara la categoría semántica del evento. | `{"value":"eventCategory"}` |
+| `predicateTypes.events.eventType` | Compara el tipo exacto del evento registrado, como kill-player; no admite categorías. | `{"value":"eventType"}` |
+| `predicateTypes.events.eventCategory` | Compara la categoría semántica del evento, como death, execution o nomination. | `{"value":"eventCategory"}` |
 | `predicateTypes.events.eventPeriod` | Limita el evento a un periodo de la partida. | `{"value":"eventPeriod"}` |
 | `predicateTypes.events.eventField` | Compara un campo tipado del evento. | `{"value":"eventField"}` |
 | `predicateTypes.events.eventRestriction` | Compara las restricciones declaradas por el efecto. | `{"value":"eventRestriction"}` |
