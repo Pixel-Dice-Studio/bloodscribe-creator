@@ -525,7 +525,7 @@ Las políticas conectan una mecánica con los asistentes sin crear comportamient
 
 | `policies[].type` | Qué hace | Opciones |
 |---|---|---|
-| `recordTargetSelectionWhenDisabled` | Conserva la selección aunque el actor esté deshabilitado. | Ninguna. |
+| `recordTargetSelectionWhenDisabled` | Conserva la selección aunque el actor esté deshabilitado, como registro sin efecto que no se activa aunque recupere la habilidad. | Ninguna. |
 | `presentStartingInformationAsShownIdentity` | Presenta transitoriamente la información inicial de la identidad mostrada. | Ninguna. |
 | `relayShownSelection` | Registra y transmite la selección hecha mediante la identidad mostrada. | Ninguna. |
 | `assignSelectedCharacter` | Asigna el personaje seleccionado. | Ninguna. |

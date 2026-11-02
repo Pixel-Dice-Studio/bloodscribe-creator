@@ -1,6 +1,6 @@
 # Referencia del AST declarativo de mecánicas
 
-Esta es la referencia operativa del lenguaje declarativo de BloodScribe tras la auditoría de abstracción. Describe el contrato `mechanics-1.0` que aceptan los packs, no una API para codificar comportamientos por ID de personaje. Los packs canónicos usan `schemaVersion: "bloodscribe-3.1"`; el campo `version` identifica la versión publicable del contenido.
+Esta es la referencia operativa del lenguaje declarativo de BloodScribe tras la auditoría de abstracción. Describe el contrato `mechanics-1.0` que aceptan los packs, no una API para codificar comportamientos por ID de personaje. Los packs canónicos usan `schemaVersion: "bloodscribe-3.3"`; el campo `version` identifica la versión publicable del contenido.
 
 Esta referencia describe el lenguaje declarativo que usa BloodScribe. Sus fuentes de verdad ejecutables dentro del código son:
 
@@ -190,7 +190,7 @@ Solo se aplican a `players`.
 }
 ```
 
-`traverseTable` recorre hasta el primer jugador que cumple el predicado de parada.
+`traverseTable` recorre la mesa en cada dirección hasta el primer jugador que cumple el predicado de parada y devuelve como mucho uno por dirección. `limitPerDirection` es el máximo de asientos que recorre (por defecto 1: solo el asiento contiguo). Para quedarse con varios jugadores que cumplen, usa `nearestMatching`, cuyo límite cuenta coincidencias.
 
 ```json
 {
@@ -240,7 +240,7 @@ Solo se aplican a `players`.
 
 | `type` | Campos y significado | Ejemplo |
 |---|---|---|
-| `eventType` | `values`: tipos exactos de evento registrado (`kill-player`, `execute-player`, `nominate-player`, `choose-target`, `record-mechanic-use`…). Un valor que el motor no produce se rechaza al validar una propuesta o un borrador. Solo al cargar contenido ya guardado (pack instalado o partida), un nombre de categoría escrito aquí se migra a `eventCategory`; cualquier otro valor desconocido se rechaza también ahí. | `{"type":"eventType","values":["kill-player"]}` |
+| `eventType` | `values`: tipos exactos de evento registrado (`kill-player`, `execute-player`, `nominate-player`, `choose-target`, `record-mechanic-use`…). Un valor que el motor no produce se rechaza al importar. | `{"type":"eventType","values":["kill-player"]}` |
 | `eventCategory` | `values`: categorías semánticas (`death`, `execution`, `nomination`, `expulsion`, `action`, `mechanicUse`…). Es la forma de preguntar por muertes, ejecuciones o nominaciones. | `{"type":"eventCategory","values":["death"]}` |
 | `eventPeriod` | `value`: `currentDay`, `currentNight`, `previousDay`, `previousNight`, `game`. | `{"type":"eventPeriod","value":"currentDay"}` |
 | `eventField` | `field` y literal `value`. | `{"type":"eventField","field":"died","value":true}` |
@@ -444,7 +444,7 @@ Los campos comunes de la mayoría de efectos son:
 | `restrict` | Limita acciones disponibles. | `actions`, `requiresSourceAlive`, `restrictions`, `relation`, `informationMayBeFalse`. | `{"type":"restrict","targets":{"type":"binding","binding":"selected"},"actions":["vote"]}` |
 | `registerAs` | Cambia cómo se registra una identidad. Con `preserveAlignment: true`, una ficha que registra como un personaje conserva el alineamiento de quien la lleva. | `affects`, `alignment`, `roles`, `characterIds`, `lifeState`, `mode`, `preserveAlignment`, `registersAs`, `teamIds`, `triggerReminder`, `worksWhenDead`. | `{"type":"registerAs","targets":{"type":"binding","binding":"actor"},"registersAs":["equipo-carmesi"],"worksWhenDead":true}` |
 | `modifyTargets` | Amplía o reduce los objetivos de habilidades que cumplan un perfil. | `delta` obligatorio; `sourceProfile?`, `targetMechanicTags?`. | `{"type":"modifyTargets","delta":-1,"sourceProfile":{"allegiances":["evil"]}}` |
-| `modifyVote` | Cambia el peso de los votantes resueltos. | `weight`, `pairedTargets?`, `pairedWeight?`; los pesos aceptan número o `ValueExpr`. | `{"type":"modifyVote","targets":{"type":"binding","binding":"actor"},"weight":2}` |
+| `modifyVote` | Cambia el peso de los votantes resueltos. Varios pesos sobre el mismo votante se multiplican sobre el voto base 1 (−1 y 3 dan −3; un 0 anula siempre), sin depender del orden de los asientos. | `weight`, `pairedTargets?`, `pairedWeight?`; los pesos aceptan número o `ValueExpr`. | `{"type":"modifyVote","targets":{"type":"binding","binding":"actor"},"weight":2}` |
 | `modifySetup` | Aplica operaciones tipadas al setup. | `operations` obligatorio. | Véase 6.6. |
 | `modifyInformation` | Cambia reglas de información antes de entregarla. | `audience`, `mustBeFalse`. | `{"type":"modifyInformation","mustBeFalse":true,"audience":{"type":"actor"}}` |
 | `modifyNomination` | Cambia la resolución de nominación. | `abilitySpentEvenIfNoExecution`, `countsAsExecution`, `createsReminder`, `voteDelta`, `requiresActorAbstention`. | `{"type":"modifyNomination","voteDelta":1}` |
@@ -625,7 +625,7 @@ Operaciones disponibles:
 - `{"type":"literal","value":2}`
 - `{"type":"choice","default":"base","values":[0,1,2]}`
 - `{"type":"playerCount"}`
-- `{"type":"majorityOfPlayers","leaveAtLeast":1}`
+- `{"type":"majorityOfPlayers","leaveAtLeast":1}`: la mayoría estricta, siempre que queden al menos `leaveAtLeast` jugadores fuera (con 7 jugadores, entre 4 y 6; por defecto 4). Opcionalmente `default` (`literal`, `byPlayerCount` o `sumBuckets`) recomienda otra cantidad dentro de ese rango, por ejemplo `{"type":"sumBuckets","buckets":["townsfolk","outsider"]}` para invertir la proporción habitual de bien y mal. Desde `bloodscribe-3.3`.
 - `{"type":"sumBuckets","buckets":["minion","demon"]}`
 - `{"type":"sourceCopies"}`
 - `{"type":"remainder"}`
@@ -633,7 +633,7 @@ Operaciones disponibles:
 Cuando varias fuentes modifican la composición, el resultado no depende del orden de las plazas en la bolsa:
 
 - Los efectos solo relativos (`adjustBucket`, `chooseAdjustments`, `replaceBucket` con número, `requireCharacter` con `onMissing: "add"` y `setBucketCount` con `remainder`) se suman y el total se aplica una vez. Un «−1» y un «+1» se compensan aunque la categoría esté a cero; si el total pide quitar más de lo que hay, se quita lo que hay.
-- Un efecto que fija un valor (`setBucketCount` con otra especificación, `replaceBucket` con `all`) o que depende del recuento del momento (`requireBucket`) no conmuta con los demás. El motor no decide cuál va antes: acepta la bolsa que cumpla cualquiera de las composiciones posibles y avisa al Narrador durante la preparación.
+- Un efecto que fija un valor (`setBucketCount` con otra especificación, `replaceBucket` con `all`) o que depende del recuento del momento (`requireBucket`) se aplica después de los relativos. Varios de estos efectos se aplican en el orden en que el cuento declara sus personajes, así que el último fija el resultado. Es el orden de las operaciones: primero multiplicaciones (el esquema aún no declara ninguna), luego sumas y restas y al final los valores fijos.
 - Con una sola fuente, sus operaciones se aplican en el orden declarado sobre la composición base; si el resultado no conserva el número de jugadores, el efecto no se aplica.
 
 ## 7. Políticas de interacción
@@ -642,7 +642,7 @@ Las políticas son átomos cerrados que conectan una mecánica con los asistente
 
 | `type` | Explicación | Campos adicionales |
 |---|---|---|
-| `recordTargetSelectionWhenDisabled` | Conserva la selección aunque el actor esté deshabilitado. | — |
+| `recordTargetSelectionWhenDisabled` | Conserva la selección aunque el actor esté deshabilitado, como registro sin efecto que no se activa aunque recupere la habilidad. | — |
 | `presentStartingInformationAsShownIdentity` | Presenta transitoriamente la información inicial de la identidad mostrada. | — |
 | `relayShownSelection` | Registra y transmite la selección hecha mediante la identidad mostrada. | — |
 | `assignSelectedCharacter` | Asigna el personaje seleccionado. | — |

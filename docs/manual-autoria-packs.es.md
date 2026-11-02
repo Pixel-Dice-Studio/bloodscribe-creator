@@ -1,6 +1,6 @@
 # Manual de autoría manual de packs de BloodScribe
 
-Esta guía explica cómo escribir a mano un pack `bloodscribe-3.1`: desde la raíz del JSON hasta tipos de personaje, personajes, reglas, composiciones, votación, cuentos y programas mecánicos. Está pensada para entender cómo se combinan las primitivas, no solo para copiar campos aislados.
+Esta guía explica cómo escribir a mano un pack `bloodscribe-3.3`: desde la raíz del JSON hasta tipos de personaje, personajes, reglas, composiciones, votación, cuentos y programas mecánicos. Está pensada para entender cómo se combinan las primitivas, no solo para copiar campos aislados.
 
 Puedes consultar o descargar el [pack completo de demostración](ejemplo-pack-manual.es.bloodscribe.json). Ese archivo usa únicamente IDs y contenido inventados y se valida automáticamente con el mismo importador que usa BloodScribe.
 
@@ -120,7 +120,7 @@ La forma canónica es:
 
 ```json
 {
-  "schemaVersion": "bloodscribe-3.1",
+  "schemaVersion": "bloodscribe-3.3",
   "id": "mi-juego:pack-principal",
   "key": "pack-principal",
   "version": "1.0.0",
@@ -148,7 +148,7 @@ El campo `version` es independiente: identifica la publicación del contenido de
 
 | Campo | Regla |
 |---|---|
-| `schemaVersion` | Siempre `bloodscribe-3.1`. |
+| `schemaVersion` | Siempre `bloodscribe-3.3`. |
 | `id` | Identidad estable del pack. No se traduce. |
 | `key` | Minúsculas, números y guiones simples. |
 | `version` | Increméntala al cambiar comportamiento o contenido publicado. |
