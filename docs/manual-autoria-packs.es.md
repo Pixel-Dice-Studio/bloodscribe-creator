@@ -468,6 +468,16 @@ Un personaje completo separa identidad, perfil, documentación y ejecución:
 - `teamId` debe existir en `teams` o en otro pack instalado del que dependa deliberadamente el contenido.
 - `requiredGameRuleIds` enlaza reglas que siempre deben acompañar al personaje.
 
+### Personajes compartidos entre packs
+
+Varios packs pueden incluir el mismo personaje, por ejemplo un Cuento que trae su reparto completo y una colección de personajes. BloodScribe los une por `id`, así que todas las copias deben ser el mismo personaje:
+
+- Mantén idénticos `teamId`, `gameplay`, `setup`, `wake`, `mechanics`, `reminderTokens`, `copies` y `requiredGameRuleIds` en todas las copias. Para cambiar el comportamiento, publica la nueva versión en todos los packs que lo incluyan.
+- Pueden variar los textos: nombre, habilidad, guías, etiquetas, instrucciones, `presentation` y sus traducciones.
+- Una copia que solo referencia el personaje, sin mecánicas ni fichas, completa la definición de otro pack y no compite con ella.
+- Si un pack cambia el comportamiento de un personaje ya instalado, la app no lo instala y explica qué personaje y qué packs chocan. Si el choque aparece con packs ya instalados, conserva primero el pack oficial, luego el del catálogo de fans y por último el importado a mano, y aparta el otro.
+- Si necesitas otro comportamiento, crea un personaje nuevo con su propio `id`.
+
 ### Texto
 
 - `info.ability` es la frase breve visible en la ficha.
@@ -1151,6 +1161,7 @@ No hacen falta scripts remotos ni código ejecutable. BloodScribe descarga y val
 | Inventar `effects[].type` | Usa la matriz admitida o declara modelado manual. |
 | Poner `systemType` en un ID corto | Usa `rule:<namespace>:<systemType>:<slug>`. |
 | Traducir IDs entre archivos ES/EN | Conserva IDs y traduce solo textos. |
+| Cambiar las mecánicas de un personaje que ya trae otro pack | Usa la misma definición en todos los packs o crea un personaje con otro `id`. |
 | Declarar un tipo solo dentro del Cuento | Publícalo también en `teams` raíz. |
 | Omitir la copia de tipos del Cuento | Incluye las definiciones necesarias para su snapshot. |
 | Crear una composición dentro del Cuento | Declárala como Regla y enlázala automáticamente. |
