@@ -390,7 +390,7 @@ Cada evento conserva `causedByEventId` cuando nace de otro y una copia de las id
 |---|---|---|
 | `none` | Sin entrada. | `{"kind":"none"}` |
 | `players` | `min`, `max`, `allowRepeated`, `candidates`, `constraints`, `cardinality`. | `{"kind":"players","min":1,"max":2}` |
-| `character` | `candidates`, `optional`. | `{"kind":"character","optional":true}` |
+| `character` | `candidates`, `optional`. Los objetivos son los jugadores con ese personaje real; si no está en juego y un efecto declara `targets: {"type":"inputValue","valueType":"playerId"}`, pasan a ser los jugadores que marque el Narrador. | `{"kind":"character","optional":true}` |
 | `playerAndCharacter` | `player`, `characterCandidates`, `declarerCandidates`; con `recordAction.recordAs: "publicDeclaration"` registra declarante, objetivo y personaje declarado. | `{"kind":"playerAndCharacter","player":{"kind":"players","min":1,"max":1}}` |
 | `participantResponses` | `participants`, `options`; cada opción declara valor, texto y efectos, con `allSameEffects` opcional. `afterResponses` (`when`, `effects`) se evalúa después de aplicar las respuestas, con el estado resultante. | `{"kind":"participantResponses","participants":{"kind":"players","min":1,"max":"all"},"options":[]}` |
 | `characterAssignments` | `players` (entrada `players`), `characters` (expresión evaluada para cada jugador con `effectTarget` enlazado a él), `distinct`. Solo se ofrecen jugadores con algún personaje posible; se combina con `changeCharacter` y `newCharacterFrom: "inputAssignment"`. | `{"kind":"characterAssignments","players":{"kind":"players","min":0,"max":"all"},"characters":{"type":"literal","value":[]},"distinct":true}` |
