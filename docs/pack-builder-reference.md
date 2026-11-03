@@ -380,7 +380,7 @@ Ventanas de `when.window`:
 
 `cadence` puede ser `once` o `each`; `startsAt` fija el primer día o noche. `delay` usa `night`, `day` o `phase` y un `count` positivo.
 
-Eventos de `when.trigger.event`: `characterEntry`, `abilityGrant`, `death`, `execution`, `expulsion`, `nomination`, `publicAction`, `mechanicUse`, `mechanicTargeted`, `tableAction`, `stateChange`, `restrictionChange`, `markerChange`, `storytellerSignal` y `storytellerExecution`. Este último procede de una nominación y ejecución tipadas del Narrador, no de una señal de texto.
+Eventos de `when.trigger.event`: `characterEntry`, `abilityGrant`, `death`, `execution`, `expulsion`, `nomination`, `publicAction`, `mechanicUse`, `mechanicTargeted`, `tableAction`, `stateChange`, `restrictionChange`, `markerChange`, `storytellerSignal`, `storytellerExecution` y `votingResolution`. `storytellerExecution` procede de una nominación y ejecución tipadas del Narrador, no de una señal de texto. `votingResolution` se produce al cerrar una ronda de votación con papeleta; su campo `resolutionCause` vale `winner`, `tie` o `noQualifier`, y `outcome` es el tipo de resultado de la ronda.
 
 Cada evento conserva `causedByEventId` cuando nace de otro y una copia de las identidades de sus participantes en ese instante. Las consultas históricas usan esa copia, por lo que un cambio posterior de personaje o alineamiento no reescribe lo sucedido.
 
@@ -489,7 +489,7 @@ Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affected
 | `modifyNomination` | Cambia el resultado de una nominación. | `countsAsExecution`, `voteDelta`, `requiresActorAbstention`, consumo y fichas. | `{"type":"modifyNomination","voteDelta":1}` |
 | `recordAction` | Registra una acción y su resultado para consultas posteriores. | `actionId`, `outcome`, éxito/fallo, restricciones y metadatos del objetivo. | `{"type":"recordAction","actionId":"claim-example"}` |
 | `storytellerDecision` | Solicita una decisión humana cerrada. | `decision`, `options`; los textos viven en `presentation.decisionPrompts`. | `{"type":"storytellerDecision","decision":"fate","options":["dies","survives"]}` |
-| `manualCheckpoint` | Pausa la resolución hasta que el Narrador elige un resultado cerrado y persistido. | `reason`, `prompt`, `outcomes`, `blocking`, `optional`; cada resultado declara sus efectos. | `{"type":"manualCheckpoint","reason":"storytellerJudgment","prompt":"¿Se cumplió?","outcomes":[{"id":"yes","label":"Sí","effects":[]}],"blocking":true}` |
+| `manualCheckpoint` | Pausa la resolución hasta que el Narrador elige un resultado cerrado y persistido. | `reason`, `prompt`, `outcomes`, `blocking`, `optional`, `holdsIdentityReveal`; cada resultado declara sus efectos. Con `holdsIdentityReveal` la revelación pública de sus objetivos espera a que se resuelva y muestra quiénes son entonces. | `{"type":"manualCheckpoint","reason":"storytellerJudgment","prompt":"¿Se cumplió?","outcomes":[{"id":"yes","label":"Sí","effects":[]}],"blocking":true}` |
 | `manualInstruction` | Muestra un paso que el motor no puede ejecutar. | `instruction`, `reason`, `publicKnown`, `ruleStepActivation` y ayudas. | `{"type":"manualInstruction","instruction":"Resuelve el acuerdo de la mesa.","reason":"Decisión social"}` |
 
 ### Información
