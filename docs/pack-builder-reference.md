@@ -392,7 +392,8 @@ Cada evento conserva `causedByEventId` cuando nace de otro y una copia de las id
 | `players` | `min`, `max`, `allowRepeated`, `candidates`, `constraints`, `cardinality`. | `{"kind":"players","min":1,"max":2}` |
 | `character` | `candidates`, `optional`. | `{"kind":"character","optional":true}` |
 | `playerAndCharacter` | `player`, `characterCandidates`, `declarerCandidates`; con `recordAction.recordAs: "publicDeclaration"` registra declarante, objetivo y personaje declarado. | `{"kind":"playerAndCharacter","player":{"kind":"players","min":1,"max":1}}` |
-| `participantResponses` | `participants`, `options`; cada opción declara valor, texto y efectos, con `allSameEffects` opcional. | `{"kind":"participantResponses","participants":{"kind":"players","min":1,"max":"all"},"options":[]}` |
+| `participantResponses` | `participants`, `options`; cada opción declara valor, texto y efectos, con `allSameEffects` opcional. `afterResponses` (`when`, `effects`) se evalúa después de aplicar las respuestas, con el estado resultante. | `{"kind":"participantResponses","participants":{"kind":"players","min":1,"max":"all"},"options":[]}` |
+| `characterAssignments` | `players` (entrada `players`), `characters` (expresión evaluada para cada jugador con `effectTarget` enlazado a él), `distinct`. Solo se ofrecen jugadores con algún personaje posible; se combina con `changeCharacter` y `newCharacterFrom: "inputAssignment"`. | `{"kind":"characterAssignments","players":{"kind":"players","min":0,"max":"all"},"characters":{"type":"literal","value":[]},"distinct":true}` |
 | `text` | `format`: `statement`, `advice`, `wish`, `yesNo`. | `{"kind":"text","format":"wish"}` |
 | `playerCharacterGuesses` | `max`. | `{"kind":"playerCharacterGuesses","max":3}` |
 | `seatSwaps` | `minPairs`, `maxPairs`. | `{"kind":"seatSwaps","minPairs":1,"maxPairs":2}` |
@@ -461,9 +462,9 @@ Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affected
 | `moveMarker` | Mueve atómicamente una ficha existente. | `kind`, `id`, `from`; `targets` es el destino. | `{"type":"moveMarker","kind":"reminder","id":"crown","from":{"type":"binding","binding":"actor"},"targets":{"type":"binding","binding":"selected"}}` |
 | `adjustCounter` | Ajusta un contador y puede proyectar estado o encadenar varios umbrales. | `counter`, `delta`, `scope`, `bounds`, `projection`, `stateProjection`, `thresholds` (cada umbral lleva `value`, `trigger` `crossing` o `reaching`, `resetTo?` y sus `effects`). | `{"type":"adjustCounter","counter":"charges","delta":1,"targets":{"type":"binding","binding":"actor"}}` |
 | `changeAlignment` | Cambia el alineamiento. | `alignment`, `notifyPlayer`, perfiles y límites de objetivo. | `{"type":"changeAlignment","alignment":"evil","targets":{"type":"binding","binding":"selected"}}` |
-| `changeCharacter` | Sustituye identidad real o mostrada. | Personaje/tipo nuevo, preservación de alineamiento, límites y consecuencias. | `{"type":"changeCharacter","newCharacter":"character:ejemplo:nuevo","targets":{"type":"binding","binding":"selected"}}` |
-| `grantAbility` | Concede o retira una habilidad declarada. | `abilityCharacterId`, `active`, `owner`, `controller`, `ownership`. | `{"type":"grantAbility","abilityCharacterId":"character:ejemplo:fuente","active":true,"ownership":"sourceAbility","targets":{"type":"binding","binding":"selected"}}` |
-| `triggerAbility` | Activa una mecánica declarada del objetivo. | `mechanicTag`. | `{"type":"triggerAbility","mechanicTag":"ability-tag","targets":{"type":"binding","binding":"selected"}}` |
+| `changeCharacter` | Sustituye identidad real o mostrada. | Personaje/tipo nuevo, `newCharacterFrom: "inputAssignment"` (toma el personaje asignado a cada objetivo), preservación de alineamiento, límites y consecuencias. | `{"type":"changeCharacter","newCharacter":"character:ejemplo:nuevo","targets":{"type":"binding","binding":"selected"}}` |
+| `grantAbility` | Concede o retira una habilidad declarada. | `abilityCharacterId`, `active`, `owner`, `controller`, `ownership`, `perspective` (jugador desde cuyo punto de vista se interpretan las referencias a sí mismo de la habilidad prestada). | `{"type":"grantAbility","abilityCharacterId":"character:ejemplo:fuente","active":true,"ownership":"sourceAbility","targets":{"type":"binding","binding":"selected"}}` |
+| `triggerAbility` | Activa una mecánica declarada del objetivo. | `mechanicTag` (sin él, la mecánica nocturna activa del objetivo), `malfunction.triggered` y `malfunction.regular` (condiciones que hacen fallar el uso extra o el propio). | `{"type":"triggerAbility","mechanicTag":"ability-tag","targets":{"type":"binding","binding":"selected"}}` |
 | `swapSeats` | Intercambia asientos seleccionados. | Sin opciones propias. | `{"type":"swapSeats","targets":{"type":"binding","binding":"selected"}}` |
 | `swapCharacters` | Intercambia identidades entre jugadores. | `actor`, `resultingState`, `resultingStateDuration`, `swapsCharactersAndAlignments`. | `{"type":"swapCharacters","targets":{"type":"binding","binding":"selected"}}` |
 | `exchangeCharacterWithTableZone` | Intercambia el personaje de un jugador con uno de una zona central. | `zoneId`, `incomingCharacter`, `alignmentMode`, `targets`. | `{"type":"exchangeCharacterWithTableZone","zoneId":"zone:example","incomingCharacter":{"type":"inputValue","valueType":"characterId"},"targets":{"type":"binding","binding":"selected"}}` |
@@ -537,6 +538,7 @@ Las políticas conectan una mecánica con los asistentes sin crear comportamient
 | `allowDeadActorWithPendingAction` | Mantiene una acción pendiente tras la muerte. | `actionId`. |
 | `requireRecordedTargetAlignment` | Exige el alineamiento capturado por una acción previa. | `actionId`, `alignment`. |
 | `limitSelectionByRecordedActionCount` | Limita la selección por acciones registradas. | `actionId`, `period`: `currentDay` o `game`. |
+| `actsWhileDead` | Conserva el paso nocturno de la mecánica aunque su actor haya muerto. | Ninguna. |
 
 ## 6. Presentación y modelado manual
 
