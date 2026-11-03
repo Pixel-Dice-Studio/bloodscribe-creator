@@ -350,7 +350,7 @@ Personajes y reglas generales usan la misma estructura:
 | `tags` | Capacidades semánticas que otras reglas pueden consultar. |
 | `when` | Momento, cadencia, evento disparador y demora. |
 | `input` | Entrada que presenta Creator. |
-| `conditions` | Expresiones que deben cumplirse. |
+| `conditions` | Expresiones que deben cumplirse para aplicar los efectos. En una elección nocturna se evalúan con `actor`, `selected` e `inputValue`: si fallan, el personaje despierta y elige, pero no ocurre nada. Para que ni siquiera despierte, usa `when.activeWhen`. |
 | `effects` | Operaciones ejecutadas en orden. |
 | `usage` | Límite y momento de consumo. |
 | `policies` | Excepciones tipadas de interacción con los asistentes. |
