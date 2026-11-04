@@ -449,7 +449,7 @@ El cuento puede publicar ese total mediante un único elemento `{"id":"tally:eje
 
 ## 4. Primitivas de efecto
 
-Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affectedBy`, `duration`, `optional`, `reminder`, `reminderTokens` y `spentReminder`. La tabla enumera las opciones propias; Creator conserva campos avanzados admitidos por el esquema.
+Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affectedBy`, `duration`, `optional`, `reminder`, `reminderTokens` y `spentReminder`. La tabla enumera las opciones propias; Creator conserva campos avanzados admitidos por el esquema. Un `emitInformation` con `delay` de noches guarda la elección y, al empezar la noche indicada, evalúa su `when` y su valor con el estado de ese momento y entrega la información en el siguiente despertar del destinatario.
 
 | `effects[].type` | Qué hace | Opciones propias principales | Ejemplo mínimo |
 |---|---|---|---|
