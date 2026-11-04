@@ -342,7 +342,7 @@ En packs se usa `kind`; en runtime se normaliza a `type`.
 | `kind` | Campos | Ejemplo |
 |---|---|---|
 | `none` | — | `{"kind":"none"}` |
-| `players` | `min`, `max` (`number` o `all`), `allowRepeated?`, `candidates?`, `constraints?` | `{"kind":"players","min":1,"max":2}` |
+| `players` | `min`, `max` (`number` o `all`), `allowRepeated?`, `candidates?`, `constraints?`, `chooser?` (`storyteller`) | `{"kind":"players","min":1,"max":2}` |
 | `character` | `candidates?`, `optional?` | `{"kind":"character","optional":true}` |
 | `playerAndCharacter` | `player`, `characterCandidates?` | `{"kind":"playerAndCharacter","player":{"kind":"players","min":1,"max":1}}` |
 | `text` | `format`: `statement`, `advice`, `wish`, `yesNo` | `{"kind":"text","format":"wish"}` |
