@@ -382,6 +382,8 @@ Ventanas de `when.window`:
 
 Eventos de `when.trigger.event`: `characterEntry`, `abilityGrant`, `death`, `execution`, `expulsion`, `nomination`, `publicAction`, `mechanicUse`, `mechanicTargeted`, `tableAction`, `stateChange`, `restrictionChange`, `markerChange`, `storytellerSignal`, `storytellerExecution` y `votingResolution`. `storytellerExecution` procede de una nominación y ejecución tipadas del Narrador, no de una señal de texto. `votingResolution` se produce al cerrar una ronda de votación con papeleta; su campo `resolutionCause` vale `winner`, `tie` o `noQualifier`, y `outcome` es el tipo de resultado de la ronda.
 
+Una reacción sin elección que deba aplicarse sola al ocurrir el evento (contadores, fichas, estados, pérdida de habilidad o muertes) declara `window: "anyTime"` junto a `trigger`; sin esa ventana el motor no la aplica automáticamente.
+
 Cada evento conserva `causedByEventId` cuando nace de otro y una copia de las identidades de sus participantes en ese instante. Las consultas históricas usan esa copia, por lo que un cambio posterior de personaje o alineamiento no reescribe lo sucedido.
 
 ### 3.2 Entradas
