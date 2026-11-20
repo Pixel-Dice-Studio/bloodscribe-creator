@@ -6,10 +6,10 @@ This reference is generated from the same contract used by the MCP. Examples use
 
 - Each wake declares wake.firstTiming or otherTiming: {section, position}, with an integer position 0–30 and a section from nightOrder.sections. Do not author a global rank. before and immediatelyAfter are declarative references conditional on co-presence. Tales may only reorder within the same section through nightOrder.sections.first/other[section]. Guaranteed information does not grant truthfulness; mechanics must justify it. Legacy numeric wakes retain their behavior until explicitly classified.
 - IDs are opaque references; they never select behavior.
-- nightHistory links deathNight to selections, attempts and causes in an absolute night. nightTargets deduplicates selected players; abilityUsed counts confirmed actions rather than wakes. ability.maxNightTargets queries potential selection capacity while ignoring target impairment; identityMode selects real or registered identity. ability.activeProtection queries functional defenses.
+- nightHistory links deathNight to selections, attempts and causes in an absolute night. nightTargets deduplicates selected players; abilityUsed counts confirmed actions rather than wakes. choseEachOther tells whether one of the given players chose another of them with an ability that night; choosing oneself does not count. ability.maxNightTargets queries potential selection capacity while ignoring target impairment; identityMode selects real or registered identity. ability.activeProtection queries functional defenses.
 - interceptEvent with reaction.skipProtection skips one defense of the declared allegiance and continues evaluating other defenses. moveMarker.choose asks the storyteller for an eligible physical instance, preserving its source, duration and identity. Counters are not physical objects.
 - Public voting/beforeVote and voting/beforeExecution actions retain their candidate context and are revalidated on save. Several vote weights on the same voter multiply over the base vote of 1 (-1 and 3 give -3); modifyVote.multiplier applies after vote weight: zero remains zero. Prevented executions retain an execution event with died=false.
-- voting.exhaustedDeadVoters returns selected player IDs that are dead and have spent all dead votes under the current voting rule. voting.executionPending checks that the candidate leads a qualifying nomination with no execution yet that day. Combine them with allEffectiveYes to avoid resolving a victory before a pending execution that could still prevent it.
+- voting.exhaustedDeadVoters returns selected player IDs that are dead and have spent all dead votes under the current voting rule. voting.executionPending checks that the candidate leads a qualifying nomination with no execution yet that day. Combine them with allEffectiveYes to avoid resolving a victory before a pending execution that could still prevent it. voting.adjustmentsChangedExecution tells whether today's vote adjustments made by the given players change who is on the block compared with the same day without them.
 - restrictSetupCombination.minimum and maximum constrain a cast group, including automatic recommendations. when.skipIfNoCandidates skips impossible required selections. dawn/dusk with stage=boundary resolves effects before expiring durations at that boundary.
 - Classify participation, alignment, role, and victory first; never infer them from teamId, names, or prose.
 - Declare participation exclusively with entryMode: cast, temporary, or both.
@@ -3739,6 +3739,18 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.triggerAbility.fields.spentReminder` | Field accepted by triggerAbility; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.triggerAbility.fields.mechanicTag` | Field accepted by triggerAbility; its value must satisfy the typed contract. | `{"mechanicTag":"<mechanicTag>"}` |
 | `effects.triggerAbility.fields.malfunction` | Field accepted by triggerAbility; its value must satisfy the typed contract. | `{"malfunction":"<malfunction>"}` |
+| `effects.restoreLastBreath` | Supported effects option identified by restoreLastBreath. | `{"type":"restoreLastBreath"}` |
+| `effects.restoreLastBreath.fields.type` | Field accepted by restoreLastBreath; its value must satisfy the typed contract. | `{"type":"<type>"}` |
+| `effects.restoreLastBreath.fields.polarity` | Field accepted by restoreLastBreath; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
+| `effects.restoreLastBreath.fields.when` | Field accepted by restoreLastBreath; its value must satisfy the typed contract. | `{"when":"<when>"}` |
+| `effects.restoreLastBreath.fields.delay` | Field accepted by restoreLastBreath; its value must satisfy the typed contract. | `{"delay":"<delay>"}` |
+| `effects.restoreLastBreath.fields.targets` | Field accepted by restoreLastBreath; its value must satisfy the typed contract. | `{"targets":"<targets>"}` |
+| `effects.restoreLastBreath.fields.affectedBy` | Field accepted by restoreLastBreath; its value must satisfy the typed contract. | `{"affectedBy":"<affectedBy>"}` |
+| `effects.restoreLastBreath.fields.duration` | Field accepted by restoreLastBreath; its value must satisfy the typed contract. | `{"duration":"<duration>"}` |
+| `effects.restoreLastBreath.fields.optional` | Field accepted by restoreLastBreath; its value must satisfy the typed contract. | `{"optional":"<optional>"}` |
+| `effects.restoreLastBreath.fields.reminder` | Field accepted by restoreLastBreath; its value must satisfy the typed contract. | `{"reminder":"<reminder>"}` |
+| `effects.restoreLastBreath.fields.reminderTokens` | Field accepted by restoreLastBreath; its value must satisfy the typed contract. | `{"reminderTokens":"<reminderTokens>"}` |
+| `effects.restoreLastBreath.fields.spentReminder` | Field accepted by restoreLastBreath; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.grantVotingCredit` | Supported effects option identified by grantVotingCredit. | `{"type":"grantVotingCredit"}` |
 | `effects.grantVotingCredit.fields.type` | Field accepted by grantVotingCredit; its value must satisfy the typed contract. | `{"type":"<type>"}` |
 | `effects.grantVotingCredit.fields.polarity` | Field accepted by grantVotingCredit; its value must satisfy the typed contract. | `{"polarity":"<polarity>"}` |
@@ -3805,6 +3817,7 @@ modifyInformation can change delivery, but the ledger does not yet expose a quer
 | `effects.emitInformation.fields.reminderTokens` | Field accepted by emitInformation; its value must satisfy the typed contract. | `{"reminderTokens":"<reminderTokens>"}` |
 | `effects.emitInformation.fields.spentReminder` | Field accepted by emitInformation; its value must satisfy the typed contract. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.emitInformation.fields.value` | Field accepted by emitInformation; its value must satisfy the typed contract. | `{"value":"<value>"}` |
+| `effects.emitInformation.fields.suggestedValue` | Field accepted by emitInformation; its value must satisfy the typed contract. | `{"suggestedValue":"<suggestedValue>"}` |
 | `effects.emitInformation.fields.presentation` | Field accepted by emitInformation; its value must satisfy the typed contract. | `{"presentation":"<presentation>"}` |
 | `effects.emitInformation.fields.delivery` | Field accepted by emitInformation; its value must satisfy the typed contract. | `{"delivery":"<delivery>"}` |
 | `effects.emitInformation.fields.transform` | Field accepted by emitInformation; its value must satisfy the typed contract. | `{"transform":"<transform>"}` |

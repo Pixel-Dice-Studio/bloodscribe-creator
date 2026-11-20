@@ -609,7 +609,7 @@ Los efectos se ejecutan en el orden del array. Grupos principales:
 | Resultado | Primitivas principales |
 |---|---|
 | Vida y ejecución | `death`, `resurrect`, `execute` |
-| Estado y fichas | `setPlayerState`, `applyMarker`, `moveMarker`, `adjustCounter` |
+| Estado y fichas | `setPlayerState`, `applyMarker`, `moveMarker`, `adjustCounter`, `restoreLastBreath` |
 | Identidad y posición | `changeAlignment`, `changeCharacter`, `grantAbility`, `swapSeats`, `swapCharacters`, `swapTargets` |
 | Información | `prepareInformation`, `emitInformation`, `modifyInformation` |
 | Intercepción | `interceptEvent`, `disableAbility`, `restrict`, `modifyTargets`, `modifyVote`, `modifySetup`, `modifyNomination` |

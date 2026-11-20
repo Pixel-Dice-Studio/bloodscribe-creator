@@ -6,10 +6,10 @@ Esta referencia se genera desde el mismo contrato que consume el MCP. Los ejempl
 
 - Cada despertar declara wake.firstTiming u otherTiming: {section, position} con posición entera 0–30 y sección del catálogo nightOrder.sections. No escribas un orden global. before e immediatelyAfter son referencias declarativas condicionales a la presencia conjunta. El cuento solo puede reordenar dentro de la misma sección mediante nightOrder.sections.first/other[section]. Información garantizada no concede veracidad; debe justificarla la mecánica. Los datos numéricos antiguos conservan su comportamiento hasta clasificarse explícitamente.
 - Los IDs son referencias opacas; nunca seleccionan comportamiento.
-- nightHistory enlaza deathNight con elecciones, intentos y causas de una noche absoluta. nightTargets deduplica jugadores elegidos y abilityUsed cuenta acciones confirmadas, no despertares. ability.maxNightTargets consulta capacidad potencial sin bloqueos del objetivo; identityMode decide identidad real o registrada. ability.activeProtection consulta defensas funcionales.
+- nightHistory enlaza deathNight con elecciones, intentos y causas de una noche absoluta. nightTargets deduplica jugadores elegidos y abilityUsed cuenta acciones confirmadas, no despertares. choseEachOther dice si alguno de los jugadores indicados eligió a otro de ellos con una habilidad esa noche; elegirse a uno mismo no cuenta. ability.maxNightTargets consulta capacidad potencial sin bloqueos del objetivo; identityMode decide identidad real o registrada. ability.activeProtection consulta defensas funcionales.
 - interceptEvent con reaction.skipProtection omite una sola defensa del alineamiento declarado y continúa con las demás. moveMarker.choose pide al Narrador una instancia elegible; conserva fuente, duración e identidad al transferirla. No uses contadores como objetos físicos.
 - Las acciones públicas voting/beforeVote y voting/beforeExecution se vinculan a su candidato y se revalidan al guardar. modifyVote.multiplier se aplica después del peso: cero sigue siendo cero. Conserva la ejecución con died=false cuando se impide la muerte.
-- voting.exhaustedDeadVoters devuelve los IDs seleccionados que están muertos y han gastado todos sus votos de muerto según la regla vigente. voting.executionPending comprueba que el candidato lidera una nominación válida todavía sin ejecución ese día. Combínalas con allEffectiveYes para no resolver una victoria antes de una ejecución pendiente que todavía podría impedirla.
+- voting.exhaustedDeadVoters devuelve los IDs seleccionados que están muertos y han gastado todos sus votos de muerto según la regla vigente. voting.executionPending comprueba que el candidato lidera una nominación válida todavía sin ejecución ese día. Combínalas con allEffectiveYes para no resolver una victoria antes de una ejecución pendiente que todavía podría impedirla. voting.adjustmentsChangedExecution dice si los ajustes de votos de hoy hechos por los jugadores indicados cambian quién queda en la picota frente al mismo día sin ellos.
 - restrictSetupCombination.minimum y maximum acotan un grupo de IDs del reparto; se aplican también a recomendaciones. when.skipIfNoCandidates omite selecciones obligatorias imposibles. dawn/dusk con stage=boundary resuelve efectos antes de retirar duraciones de esa frontera.
 - Clasifica primero participación, alineamiento, rol y victoria; no uses teamId, nombre o texto para inferirlos.
 - Declara la participación exclusivamente con entryMode: cast, temporary o ambos.
@@ -3739,6 +3739,18 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.triggerAbility.fields.spentReminder` | Campo admitido por triggerAbility; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.triggerAbility.fields.mechanicTag` | Campo admitido por triggerAbility; su valor debe cumplir el contrato tipado. | `{"mechanicTag":"<mechanicTag>"}` |
 | `effects.triggerAbility.fields.malfunction` | Campo admitido por triggerAbility; su valor debe cumplir el contrato tipado. | `{"malfunction":"<malfunction>"}` |
+| `effects.restoreLastBreath` | Cada objetivo muerto que ya gastó su último aliento lo recupera. | `{"type":"restoreLastBreath"}` |
+| `effects.restoreLastBreath.fields.type` | Campo admitido por restoreLastBreath; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
+| `effects.restoreLastBreath.fields.polarity` | Campo admitido por restoreLastBreath; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
+| `effects.restoreLastBreath.fields.when` | Campo admitido por restoreLastBreath; su valor debe cumplir el contrato tipado. | `{"when":"<when>"}` |
+| `effects.restoreLastBreath.fields.delay` | Campo admitido por restoreLastBreath; su valor debe cumplir el contrato tipado. | `{"delay":"<delay>"}` |
+| `effects.restoreLastBreath.fields.targets` | Campo admitido por restoreLastBreath; su valor debe cumplir el contrato tipado. | `{"targets":"<targets>"}` |
+| `effects.restoreLastBreath.fields.affectedBy` | Campo admitido por restoreLastBreath; su valor debe cumplir el contrato tipado. | `{"affectedBy":"<affectedBy>"}` |
+| `effects.restoreLastBreath.fields.duration` | Campo admitido por restoreLastBreath; su valor debe cumplir el contrato tipado. | `{"duration":"<duration>"}` |
+| `effects.restoreLastBreath.fields.optional` | Campo admitido por restoreLastBreath; su valor debe cumplir el contrato tipado. | `{"optional":"<optional>"}` |
+| `effects.restoreLastBreath.fields.reminder` | Campo admitido por restoreLastBreath; su valor debe cumplir el contrato tipado. | `{"reminder":"<reminder>"}` |
+| `effects.restoreLastBreath.fields.reminderTokens` | Campo admitido por restoreLastBreath; su valor debe cumplir el contrato tipado. | `{"reminderTokens":"<reminderTokens>"}` |
+| `effects.restoreLastBreath.fields.spentReminder` | Campo admitido por restoreLastBreath; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.grantVotingCredit` | Cada objetivo muerto entrega su último aliento al actor como crédito para votar. | `{"type":"grantVotingCredit"}` |
 | `effects.grantVotingCredit.fields.type` | Campo admitido por grantVotingCredit; su valor debe cumplir el contrato tipado. | `{"type":"<type>"}` |
 | `effects.grantVotingCredit.fields.polarity` | Campo admitido por grantVotingCredit; su valor debe cumplir el contrato tipado. | `{"polarity":"<polarity>"}` |
@@ -3805,6 +3817,7 @@ modifyInformation puede alterar la entrega, pero el ledger no expone todavía un
 | `effects.emitInformation.fields.reminderTokens` | Campo admitido por emitInformation; su valor debe cumplir el contrato tipado. | `{"reminderTokens":"<reminderTokens>"}` |
 | `effects.emitInformation.fields.spentReminder` | Campo admitido por emitInformation; su valor debe cumplir el contrato tipado. | `{"spentReminder":"<spentReminder>"}` |
 | `effects.emitInformation.fields.value` | Campo admitido por emitInformation; su valor debe cumplir el contrato tipado. | `{"value":"<value>"}` |
+| `effects.emitInformation.fields.suggestedValue` | Campo admitido por emitInformation; su valor debe cumplir el contrato tipado. | `{"suggestedValue":"<suggestedValue>"}` |
 | `effects.emitInformation.fields.presentation` | Campo admitido por emitInformation; su valor debe cumplir el contrato tipado. | `{"presentation":"<presentation>"}` |
 | `effects.emitInformation.fields.delivery` | Campo admitido por emitInformation; su valor debe cumplir el contrato tipado. | `{"delivery":"<delivery>"}` |
 | `effects.emitInformation.fields.transform` | Campo admitido por emitInformation; su valor debe cumplir el contrato tipado. | `{"transform":"<transform>"}` |
