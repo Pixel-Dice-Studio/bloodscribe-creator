@@ -501,7 +501,7 @@ Los efectos comparten, cuando corresponde, `when`, `delay`, `targets`, `affected
 
 `emitInformation.presentation.kind` admite `boolean`, `number`, `text`, `player`, `players`, `character`, `characters`, `identity`, `direction`, `distance`, `grimoire` y `structured`.
 
-La audiencia puede ser `actor`, `selected`, `eventSubject`, `public`, `storyteller` o `players` con una expresión. `delivery.timing` admite `immediate`, `dawn`, `privateDay` y `nextRecipientWake`; `mode` puede ser `shared` o `perRecipient`.
+La audiencia puede ser `actor`, `selected`, `eventSubject`, `public`, `storyteller` o `players` con una expresión. Si la habilidad la tiene el Narrador (una concesión a la partida, sin jugador que actúe), la audiencia `actor` le entrega la información a él. `delivery.timing` admite `immediate`, `dawn`, `privateDay` y `nextRecipientWake`; `mode` puede ser `shared` o `perRecipient`.
 
 ### Preparación
 
